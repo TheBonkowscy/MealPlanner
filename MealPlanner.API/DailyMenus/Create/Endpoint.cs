@@ -5,7 +5,7 @@ namespace MealPlanner.API.DailyMenus.Create;
 
 public static class Endpoint
 {
-    public const string Address = Constants.EndpointPrefix + "/create";
+    public const string Address = Constants.EndpointPrefix;
     
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
