@@ -36,17 +36,16 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
     {
         // Arrange
         var dailyMenu = DailyMenu.Create(Today);
-        var id = Guid.NewGuid();
-        ctx.Database[id] = dailyMenu;
+        ctx.Database[dailyMenu.Id] = dailyMenu;
         
         // Act
-        var result = await Client.GetAsync(Read.Endpoint.Address.Replace("{id:guid}", id.ToString()));
+        var result = await Client.GetAsync(Read.ByIdEndpoint.Address.Replace("{id:guid}", dailyMenu.Id.ToString()));
         
         // Assert
         result.EnsureSuccessStatusCode();
         var response = await result.Content.ReadFromJsonAsync<ReadResponse>();
         response.Should().NotBeNull();
-        response.Id.Should().Be(id);
+        response.Id.Should().Be(dailyMenu.Id);
         response.Date.Should().Be(Today);
     }
     
@@ -54,7 +53,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
     public async Task Get_ReturnsNotFound_WhenDailyMenuDoesNotExist()
     {
         // Act
-        var result = await Client.GetAsync(Read.Endpoint.Address.Replace("{id:guid}", Guid.NewGuid().ToString()));
+        var result = await Client.GetAsync(Read.ByIdEndpoint.Address.Replace("{id:guid}", Guid.NewGuid().ToString()));
         
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);

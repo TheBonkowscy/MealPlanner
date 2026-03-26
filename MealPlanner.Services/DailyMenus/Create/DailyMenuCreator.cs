@@ -26,10 +26,9 @@ public class DailyMenuCreator(InMemoryDatabase ctx) : ICreateDailyMenu
                 mappedMeals.ForEach(meal => result.AddMeal(meal));
             }
 
-            var id = Guid.NewGuid();
-            ctx.Database[id] = result;
+            ctx.Database[result.Id] = result;
 
-            return Task.FromResult(new Response(id));
+            return Task.FromResult(new Response(result.Id));
         }
         catch (Exception exception)
         {

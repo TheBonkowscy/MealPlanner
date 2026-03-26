@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MealPlanner.API.DailyMenus.Read;
 
-public static class Endpoint
+public static class ByIdEndpoint
 {
     public const string Address = Constants.EndpointPrefix + "/{id:guid}";
     

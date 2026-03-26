@@ -11,8 +11,16 @@ public static class Extensions
             .WithDisplayName("Create Daily Menu")
             .WithTags(Constants.OpenApiGroupName);
         
-        app.MapGet(Read.Endpoint.Address, Read.Endpoint.Read)
+        app.MapGet(Read.ByIdEndpoint.Address, Read.ByIdEndpoint.Read)
             .WithDisplayName("Read Daily Menu")
+            .WithTags(Constants.OpenApiGroupName);
+
+        app.MapGet(Read.ForTodayEndpoint.Address, Read.ForTodayEndpoint.Read)
+            .WithDisplayName("Read Daily Menu for Today")
+            .WithTags(Constants.OpenApiGroupName);
+        
+        app.MapGet(Read.ForSpecificDateEndpoint.Address, Read.ForSpecificDateEndpoint.Read)
+            .WithDisplayName("Read Daily Menu for Specific Date")
             .WithTags(Constants.OpenApiGroupName);
 
         return Task.CompletedTask;

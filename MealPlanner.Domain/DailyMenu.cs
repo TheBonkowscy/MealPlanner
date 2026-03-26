@@ -8,9 +8,9 @@ public class DailyMenu
     public static readonly DateOnly MinDateInThePast = new(2019, 9, 28);
 
     private MealsCollection _meals = new();
-    
+
+    public Guid Id { get; } = Guid.NewGuid();
     public DateOnly Date { get; private set; }
-    
     public ReadOnlyMealsCollection Meals
     {
         get => _meals;
