@@ -1,79 +1,67 @@
-using ReadOnlyMealsCollection = System.Collections.Generic.IReadOnlyDictionary<int, MealPlanner.Domain.Meal>;
-using MealsCollection = System.Collections.Concurrent.ConcurrentDictionary<int, MealPlanner.Domain.Meal>;
-
 namespace MealPlanner.Domain;
 
 public class Menu
 {
     public static readonly DateOnly MinDateInThePast = new(2019, 9, 28);
 
-    private MealsCollection _meals = new();
+    private List<MenuItem> _items = [];
 
     public Guid Id { get; } = Guid.NewGuid();
     public DateOnly Date { get; private set; }
-    public ReadOnlyMealsCollection Meals
+    public IReadOnlyList<MenuItem> Items
     {
-        get => _meals;
-        private set => value.ToList().ForEach(TryAddMeal);
+        get => _items;
+        private set => _items = [..value];
     }
 
-    private Menu(DateOnly date, MealsCollection meals)
+    private Menu(DateOnly date, List<MenuItem> items)
     {
         Date = date;
-        Meals = meals;
+        Items = items;
     }
-
-    public void AddMeal(Meal meal) => AddMeal(Meals.Keys.Count(), meal);
+    
+    public void AddMeal(Meal meal) => TryAddMeal(_items.Count, meal);
 
     public void AddMeal(int order, Meal meal) => TryAddMeal(order, meal);
-
-    private void TryAddMeal(KeyValuePair<int, Meal> mealAndOrder)
-    {
-        mealAndOrder.Deconstruct(out var order, out var meal);
-        TryAddMeal(order, meal);
-    }
 
     private void TryAddMeal(int order, Meal meal)
     {
         ValidateOrderAndThrow(order);
         ValidateMealAndThrow(meal);
-        if (!_meals.TryAdd(order, meal))
-        {
-            throw new InvalidOperationException($"Could not add meal to menu due to an error.");
-        }
+        var item = MenuItem.Create(this, meal, order);
+        _items.Add(item);
     }
 
     private void ValidateOrderAndThrow(int order)
     {
-        if (order < 0)
-        {
-            throw new ArgumentOutOfRangeException(null, "Order must be a positive number.");
-        }
-
-        if (order > _meals.Keys.Count)
+        if (order > _items.Count)
         {
             throw new ArgumentOutOfRangeException(null, "Order must not exceed the number of already added meals.");
         }
 
-        var mealAtIndex = _meals!.GetValueOrDefault(order, null);
+        var mealAtIndex = GetMeal(order);
         if (mealAtIndex is not null)
         {
             throw new InvalidOperationException($"There is already a meal added as #{order + 1} in the day");
         }
     }
+    
+    public Meal? GetMeal(int order) => _items.FirstOrDefault(x => x.Order == order)?.Meal;
 
     private void ValidateMealAndThrow(Meal meal)
     {
-        if (_meals.Values.Any(meal.Equals))
+        if (HasMeal(meal))
         {
             throw new InvalidOperationException($"Meal '{meal}' is already present in the menu for {Date}.");
         }
     }
+
+    private bool HasMeal(Meal meal) => _items.Any(x => x.Meal.Equals(meal));
     
     public static Menu Create(DateOnly date)
     {
         ValidateDateAndThrow(date);
-        return new Menu(date, new MealsCollection());
+        return new Menu(date, []);
     }
 
     private static void ValidateDateAndThrow(DateOnly date)

@@ -43,8 +43,8 @@ public class MenuTests
         menu.AddMeal(SharedFirstMeal);
         
         // Assert
-        menu.Meals.Should().HaveCount(1);
-        menu.Meals.Values.First().Should().Be(SharedFirstMeal);
+        menu.Items.Should().HaveCount(1);
+        menu.GetMeal(0).Should().Be(SharedFirstMeal);
     }
 
     [Fact]
@@ -58,11 +58,9 @@ public class MenuTests
         menu.AddMeal(SharedSecondMeal);
         
         // Assert
-        menu.Meals.Should().HaveCount(2);
-        var actualFirstMeal = menu.Meals[0];
-        actualFirstMeal.Should().Be(SharedFirstMeal);
-        var actualSecondMeal = menu.Meals[1];
-        actualSecondMeal.Should().Be(SharedSecondMeal);
+        menu.Items.Should().HaveCount(2);
+        menu.GetMeal(0).Should().Be(SharedFirstMeal);
+        menu.GetMeal(1).Should().Be(SharedSecondMeal);
     }
 
     [Fact]
@@ -91,8 +89,8 @@ public class MenuTests
         menu.AddMeal(0, SharedFirstMeal);
         
         // Assert
-        menu.Meals.Should().HaveCount(1);
-        menu.Meals.Values.Should().Contain(x => x.Name == SharedFirstMeal.Name);
+        menu.Items.Should().HaveCount(1);
+        menu.GetMeal(0)!.Name.Should().Be(SharedFirstMeal.Name);
     }
 
     [Fact]
