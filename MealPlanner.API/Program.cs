@@ -1,12 +1,16 @@
 using MealPlanner.API.Menus;
+using MealPlanner.Persistence;
 using MealPlanner.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddDbContext<MealPlannerDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 
 builder.Services.AddHttpContextAccessor();
 
