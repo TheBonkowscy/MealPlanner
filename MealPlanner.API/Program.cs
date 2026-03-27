@@ -32,7 +32,6 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<InMemoryDatabase>();
 await builder.Services.RegisterMenuServices();
 
 var app = builder.Build();
