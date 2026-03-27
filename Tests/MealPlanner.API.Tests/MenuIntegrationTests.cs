@@ -36,7 +36,7 @@ public class MenuIntegrationTests : IntegrationTestBase
     {
         // Arrange
         var menu = Menu.Create(Tomorrow);
-        ctx.Database[menu.Id] = menu;
+        await AddMenuToDatabase(menu);
         
         // Act
         var result = await Client.GetAsync(BuildGetRoute(menu.Id));
@@ -74,7 +74,7 @@ public class MenuIntegrationTests : IntegrationTestBase
     {
         // Arrange
         var menu = Menu.Create(SpecificDate);
-        ctx.Database[menu.Id] = menu;
+        await AddMenuToDatabase(menu);
         
         // Act
         var result = await Client.GetAsync(BuildGetRoute(menu.Date));
@@ -102,7 +102,7 @@ public class MenuIntegrationTests : IntegrationTestBase
     {
         // Arrange
         var menu = Menu.Create(Today);
-        ctx.Database[menu.Id] = menu;
+        await AddMenuToDatabase(menu);
         
         // Act
         var result = await Client.GetAsync(BuildGetForTodayRoute());
@@ -120,4 +120,10 @@ public class MenuIntegrationTests : IntegrationTestBase
     private static string BuildGetRoute(DateOnly date) => $"{Constants.MenuRoute}/{date.ToString("O")}";
     
     private static string BuildGetForTodayRoute() => $"{Constants.MenuRoute}/today";
+
+    private async Task AddMenuToDatabase(Menu menu)
+    {
+        await DatabaseContext.Menus.AddAsync(menu);
+        await DatabaseContext.SaveChangesAsync();
+    }
 }
