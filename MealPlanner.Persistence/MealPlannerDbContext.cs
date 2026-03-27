@@ -3,11 +3,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Persistence;
 
-public class MealPlannerDbContext(DbContextOptions<MealPlannerDbContext> options) : DbContext(options)
+public class MealPlannerDbContext : DbContext
 {
-    public DbSet<Menu> Menus { get; set; }
-    public DbSet<Meal> Meals { get; set; }
-    public DbSet<MenuItem> MenuItems { get; set; }
+    public virtual DbSet<Menu> Menus { get; set; }
+    public virtual DbSet<Meal> Meals { get; set; }
+    public virtual DbSet<MenuItem> MenuItems { get; set; }
+
+    public MealPlannerDbContext(DbContextOptions<MealPlannerDbContext> options) : base(options)
+    {
+    }
+    
+    protected MealPlannerDbContext()
+    {
+    }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

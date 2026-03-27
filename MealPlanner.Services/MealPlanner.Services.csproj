@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\MealPlanner.Domain\MealPlanner.Domain.csproj" />
+      <ProjectReference Include="..\MealPlanner.Persistence\MealPlanner.Persistence.csproj" />
       <ProjectReference Include="..\MealPlanner.Shared\MealPlanner.Shared.csproj" />
     </ItemGroup>
 
