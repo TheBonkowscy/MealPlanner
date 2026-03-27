@@ -2,14 +2,25 @@
 
 public class MenuItem
 {
+    public int MenuId { get; private set; }
     public Menu Menu { get; private set; }
+    
+    public int MealId { get; private set; }
     public Meal Meal { get; private set; }
+    
     public int Order { get; private set; }
 
+    private MenuItem()
+    {
+        // For EF Core
+    }
+    
     private MenuItem(Menu menu, Meal meal, int order)
     {
         Menu = menu;
+        MenuId = menu.Id;
         Meal = meal;
+        MealId = meal.Id;
         Order = order;
     }
 

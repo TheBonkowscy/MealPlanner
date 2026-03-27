@@ -7,9 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.5" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\MealPlanner.Domain\MealPlanner.Domain.csproj" />
-      <ProjectReference Include="..\MealPlanner.Persistence\MealPlanner.Persistence.csproj" />
-      <ProjectReference Include="..\MealPlanner.Shared\MealPlanner.Shared.csproj" />
     </ItemGroup>
 
 </Project>

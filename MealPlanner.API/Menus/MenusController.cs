@@ -20,8 +20,8 @@ public class MenusController(
     
     [ProducesResponseType(typeof(GetMenuResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpGet("{id:guid}")]
-    public async Task<IResult> GetById([FromRoute(Name = "id")] Guid id, CancellationToken cancellationToken)
+    [HttpGet("{id:int}")]
+    public async Task<IResult> GetById([FromRoute(Name = "id")] int id, CancellationToken cancellationToken)
     {
         var menu = await menuReader.Get(id);
         return menu is null ? Results.NotFound() : Results.Ok(menu);

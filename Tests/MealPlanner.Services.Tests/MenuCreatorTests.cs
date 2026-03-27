@@ -1,6 +1,10 @@
 ﻿using AwesomeAssertions;
+using MealPlanner.Domain;
+using MealPlanner.Persistence;
 using MealPlanner.Services.Menus.Create;
 using MealPlanner.Shared.Menus.Requests;
+using Moq;
+using Moq.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Tests;
 
@@ -8,13 +12,24 @@ public class MenuCreatorTests
 {
     private const string MealName = "Fish and chips";
 
-    private readonly InMemoryDatabase _ctx;
+    private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly MenuCreator _sut;
 
+    private List<Menu> _menus = [];
+    
     public MenuCreatorTests()
     {
-        _ctx = new InMemoryDatabase();
-        _sut = new MenuCreator(_ctx);
+        _ctx = new Mock<MealPlannerDbContext>();
+        _ctx.Setup(x => x.Menus).ReturnsDbSet(_menus);
+        _ctx.Setup(x => x.Menus.AddAsync(It.IsAny<Menu>(), It.IsAny<CancellationToken>())).Callback<Menu, CancellationToken>((menu, _) =>
+        {
+            RandomId.Set(menu);
+            _menus.Add(menu);
+        });
+        
+        _ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
+        
+        _sut = new MenuCreator(_ctx.Object);
     }
     
     [Theory]
@@ -25,10 +40,7 @@ public class MenuCreatorTests
         var result = await _sut.Create(createMenuRequest);
         
         // Assert
-        result.Should().NotBeSameAs(Guid.Empty);
-        
-        // Cleanup
-        _ctx.Database.Clear();
+        result.Id.Should().NotBe(0);
     }
 
     [Fact]
@@ -47,9 +59,6 @@ public class MenuCreatorTests
         await createWithConflict.Awaiting(x => x.Invoke(conflictingRequest))
             .Should().ThrowAsync<InvalidOperationException>()
             .WithMessage($"There is already a Menu defined for {conflictingRequest.Date}.");
-        
-        // Cleanup
-        _ctx.Database.Clear();
     }
 
     public static TheoryData<CreateMenuRequest> ValidCreateRequests

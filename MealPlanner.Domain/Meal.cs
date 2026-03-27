@@ -2,6 +2,13 @@ namespace MealPlanner.Domain;
 
 public class Meal
 {
+    public int Id { get; private set; }
+
+    private Meal()
+    {
+        // For EF Core
+    }
+    
     private Meal(string name)
     {
         Name = name;

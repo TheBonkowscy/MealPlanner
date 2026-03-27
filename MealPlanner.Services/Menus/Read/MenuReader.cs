@@ -1,42 +1,40 @@
 using MealPlanner.Domain;
+using MealPlanner.Persistence;
 using MealPlanner.Shared.Menus.Responses;
+using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Menus.Read;
 
 public interface IReadMenu
 {
-    Task<GetMenuResponse?> Get(Guid id);
+    Task<GetMenuResponse?> Get(int id);
     Task<GetMenuResponse?> Get(DateOnly date);
 }
 
-public class MenuReader(InMemoryDatabase ctx) : IReadMenu
+public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
 {
-    public Task<GetMenuResponse?> Get(Guid id)
+    public async Task<GetMenuResponse?> Get(int id)
     {
-        if (!ctx.Database.TryGetValue(id, out var menu))
-        {
-            return Task.FromResult<GetMenuResponse?>(null);
-        }
-
-        return MapMenu(menu);
+        var menu = await ctx.Menus
+            .Include(x => x.Items)
+            .ThenInclude(x => x.Meal)
+            .FirstOrDefaultAsync(x => x.Id == id);
+        return menu is null ? null : MapMenu(menu);
     }
 
-    private static Task<GetMenuResponse?> MapMenu(Menu menu)
+    private static GetMenuResponse MapMenu(Menu menu)
     {
         var mappedMeals = menu.Items.Select(x => x.Meal.Name);
-        var mappedResponse = new GetMenuResponse(menu.Id, menu.Date, mappedMeals);
-        return Task.FromResult<GetMenuResponse?>(mappedResponse);
+        return new GetMenuResponse(menu.Id, menu.Date, mappedMeals);
     }
 
-    public Task<GetMenuResponse?> Get(DateOnly date)
+    public async Task<GetMenuResponse?> Get(DateOnly date)
     {
-        var menuForDate = ctx.Database.Values.FirstOrDefault(x => x.Date == date);
+        var menuForDate = await ctx.Menus
+            .Include(x => x.Items)
+            .ThenInclude(x => x.Meal)
+            .FirstOrDefaultAsync(x => x.Date == date);
         
-        if (menuForDate is null)
-        {
-            return Task.FromResult<GetMenuResponse?>(null);
-        }
-
-        return MapMenu(menuForDate);
+        return menuForDate is null ? null : MapMenu(menuForDate);
     }
 }

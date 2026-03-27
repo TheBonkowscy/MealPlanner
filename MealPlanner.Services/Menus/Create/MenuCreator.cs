@@ -1,6 +1,8 @@
 using MealPlanner.Domain;
+using MealPlanner.Persistence;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
+using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Menus.Create;
 
@@ -9,14 +11,14 @@ public interface ICreateMenu
     Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest);
 }
 
-public class MenuCreator(InMemoryDatabase ctx) : ICreateMenu
+public class MenuCreator(MealPlannerDbContext ctx) : ICreateMenu
 {
-    public Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest)
+    public async Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest)
     {
         try
         {
-            var existingMenuForDay = ctx.Database.Values.FirstOrDefault(x => x.Date == createMenuRequest.Date);
-            if (existingMenuForDay is not null)
+            var menuAlreadyExists = await ctx.Menus.AnyAsync(x => x.Date == createMenuRequest.Date);
+            if (menuAlreadyExists)
             {
                 throw new InvalidOperationException($"There is already a Menu defined for {createMenuRequest.Date}.");
             }
@@ -28,13 +30,14 @@ public class MenuCreator(InMemoryDatabase ctx) : ICreateMenu
                 mappedMeals.ForEach(meal => result.AddMeal(meal));
             }
 
-            ctx.Database[result.Id] = result;
+            await ctx.Menus.AddAsync(result);
+            await ctx.SaveChangesAsync();
 
-            return Task.FromResult(new CreateMenuResponse(result.Id));
+            return new CreateMenuResponse(result.Id);
         }
         catch (Exception exception)
         {
-            return Task.FromException<CreateMenuResponse>(exception);
+            return await Task.FromException<CreateMenuResponse>(exception);
         }
     }
 }

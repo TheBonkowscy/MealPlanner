@@ -6,12 +6,17 @@ public class Menu
 
     private List<MenuItem> _items = [];
 
-    public Guid Id { get; } = Guid.NewGuid();
+    public int Id { get; private set; }
     public DateOnly Date { get; private set; }
     public IReadOnlyList<MenuItem> Items
     {
         get => _items;
         private set => _items = [..value];
+    }
+
+    private Menu()
+    {
+        // For EF Core
     }
 
     private Menu(DateOnly date, List<MenuItem> items)

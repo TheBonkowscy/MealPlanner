@@ -1,3 +1,3 @@
 namespace MealPlanner.Shared.Menus.Responses;
 
-public record CreateMenuResponse(Guid Id);
+public record CreateMenuResponse(int Id);
