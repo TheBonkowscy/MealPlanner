@@ -1,8 +1,6 @@
 using MealPlanner.API;
 using MealPlanner.API.Menus;
 using MealPlanner.Persistence;
-using MealPlanner.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
@@ -32,6 +30,9 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 await builder.Services.RegisterMenuServices();
 
 var app = builder.Build();
@@ -48,6 +49,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
 app.MapControllers();
 
