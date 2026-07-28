@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.Client", "MealP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.UI", "MealPlanner.UI\MealPlanner.UI.csproj", "{CE6CEC07-CCE9-415A-B4CD-2075ABB67E23}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.AppHost", "MealPlanner.AppHost\MealPlanner.AppHost.csproj", "{BF0BF85F-3A6E-4BB6-9DFF-F097B8D8949D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,10 @@ Global
 		{CE6CEC07-CCE9-415A-B4CD-2075ABB67E23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE6CEC07-CCE9-415A-B4CD-2075ABB67E23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE6CEC07-CCE9-415A-B4CD-2075ABB67E23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF0BF85F-3A6E-4BB6-9DFF-F097B8D8949D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF0BF85F-3A6E-4BB6-9DFF-F097B8D8949D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF0BF85F-3A6E-4BB6-9DFF-F097B8D8949D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF0BF85F-3A6E-4BB6-9DFF-F097B8D8949D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{61D11168-2761-447D-8C37-E206C5FCB40D} = {2F2DDCD4-5114-4FFF-96A5-485A2F573ACF}
