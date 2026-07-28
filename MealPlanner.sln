@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.Shared", "MealP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.Persistence", "MealPlanner.Persistence\MealPlanner.Persistence.csproj", "{99F1AE2B-E8EA-4ABE-85D9-39EF49C88BA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.Client", "MealPlanner.Client\MealPlanner.Client.csproj", "{D1D2D6B5-F89F-4ACB-AE84-24CBD9411AE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{99F1AE2B-E8EA-4ABE-85D9-39EF49C88BA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99F1AE2B-E8EA-4ABE-85D9-39EF49C88BA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99F1AE2B-E8EA-4ABE-85D9-39EF49C88BA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1D2D6B5-F89F-4ACB-AE84-24CBD9411AE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1D2D6B5-F89F-4ACB-AE84-24CBD9411AE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1D2D6B5-F89F-4ACB-AE84-24CBD9411AE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1D2D6B5-F89F-4ACB-AE84-24CBD9411AE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{61D11168-2761-447D-8C37-E206C5FCB40D} = {2F2DDCD4-5114-4FFF-96A5-485A2F573ACF}
