@@ -1,0 +1,68 @@
+﻿@page "/menus"
+@using MealPlanner.Client
+@using MealPlanner.Shared.Menus.Responses
+@implements IDisposable
+@inject IMenuClient menuClient;
+
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+@if (_menus == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Meal name</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var menu in _menus)
+        {
+            <h3>Menu for @menu.Date</h3>
+            <p>Id: @menu.Id</p>
+            @foreach (var meal in menu.Meals)
+            {
+                <tr>
+                    <td>@meal</td>
+                </tr>                
+            }
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private GetMenuResponse?[] _menus;
+    
+    private CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate a loading indicator
+        await Task.Delay(500);
+        var todaysMenu = await menuClient.GetToday(_cts.Token);
+        _menus = [todaysMenu];
+    }
+
+    private class WeatherForecast
+    {
+        public DateOnly Date { get; set; }
+        public int TemperatureC { get; set; }
+        public string? Summary { get; set; }
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

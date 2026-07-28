@@ -1,3 +1,5 @@
+using MealPlanner.Client;
+using MealPlanner.Client.Configuration;
 using MealPlanner.UI.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services
+    .AddOptions<MealPlannerConfigurationOptions>()
+    .Bind(builder.Configuration.GetSection(MealPlannerConfigurationOptions.SectionName));
+builder.Services.AddMealPlannerClient();
 
 var app = builder.Build();
 

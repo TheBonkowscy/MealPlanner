@@ -11,4 +11,8 @@
       <None Remove=".gitignore" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\MealPlanner.Client\MealPlanner.Client.csproj" />
+    </ItemGroup>
+
 </Project>
