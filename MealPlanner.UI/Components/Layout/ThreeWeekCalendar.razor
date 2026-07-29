@@ -1,133 +1,147 @@
-﻿@using System.Globalization
-@using MudBlazor
+﻿@inject NavigationManager Navigation
 
-<MudPaper Class="pa-4 calendar-wrapper">
-    <MudText Typo="Typo.h6" Class="mb-1">Wybierz datę</MudText>
-    <MudText Typo="Typo.body2" Class="mb-4">
-        Ubiegły tydzień, bieżący tydzień i przyszły tydzień.
-    </MudText>
-
-    <div class="calendar-grid calendar-header">
-        <div class="row-label"></div>
-        @foreach (var dayName in DayNames)
-        {
-            <div class="@GetHeaderClass(dayName)">
-                @dayName
-            </div>
-        }
-    </div>
-
-    @foreach (var week in Weeks)
+<MudNavMenu>
+    @foreach (var week in _weeks)
     {
-        <div class="calendar-grid week-row">
-            <div class="row-label">@week.Label</div>
-
-            @foreach (var day in week.Days)
+        <MudNavGroup Title="@($"Week {week.WeekNumber}")"
+                     Expanded="@IsExpanded(week)"
+                     ExpandedChanged="@(() => SelectWeek(week))"
+                     Class="@GetWeekTitleClass(week)">
+            
+            @if (IsExpanded(week))
             {
-                <MudButton Variant="@(IsSelected(day) ? Variant.Filled : Variant.Outlined)"
-                           Color="@(IsSelected(day) ? Color.Primary : Color.Default)"
-                           Class="@GetButtonClass(day)"
-                           OnClick="@(() => PickDay(day))">
-                    @day.Day
-                </MudButton>
+                <MudNavMenu Class="ml-4">
+
+                    @foreach (var day in week.Days)
+                    {
+                        <MudNavLink Href="@($"/meals/day/{day:yyyy-MM-dd}")"
+                                    Class="@GetDayClass(day)">
+
+                            @day.ToString("dddd, d MMMM yyyy", _culture)
+
+                        </MudNavLink>
+                    }
+
+                </MudNavMenu>
             }
-        </div>
+
+        </MudNavGroup>
     }
 
-    <MudDivider Class="my-4" />
+</MudNavMenu>
 
-    <MudText Typo="Typo.body1">
-        Wybrana data: <b>@(SelectedDate?.ToString("yyyy-MM-dd") ?? "brak")</b>
-    </MudText>
-    
-    @if (!IsTodaySelected)
-    {
-        <MudButton Variant="Variant.Text"
-                   Color="Color.Primary"
-                   StartIcon="@Icons.Material.Filled.Today"
-                   OnClick="SetToToday"
-                   Class="mt-2">
-            Set to today
-        </MudButton>
-    }
-</MudPaper>
 
 @code {
-    [Parameter] public DateTime? SelectedDate { get; set; }
-    [Parameter] public EventCallback<DateTime?> SelectedDateChanged { get; set; }
 
-    [Parameter] public DateTime? ReferenceDate { get; set; }
+    [Parameter]
+    public int? SelectedWeek { get; set; }
 
-    private readonly CultureInfo Culture = new("pl-PL");
 
-    private readonly string[] DayNames = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Niedz"];
+    [Parameter]
+    public EventCallback<int> SelectedWeekChanged { get; set; }
 
-    private List<WeekRow> Weeks = new();
 
-    protected override void OnParametersSet()
+    private readonly CultureInfo _culture = new("pl-PL");
+
+
+    private List<CalendarWeek> _weeks = [];
+
+
+    protected override void OnInitialized()
     {
-        var baseDate = (ReferenceDate ?? DateTime.Today).Date;
-        var currentWeekStart = StartOfWeek(baseDate);
+        var weeksForThisYear = BuildWeeksForYear(DateTime.Today.Year);
+        
+        var numberOfWeeks = weeksForThisYear.Count();
+        var nextWeekNumber = numberOfWeeks + 1;
 
-        Weeks =
+        _weeks = weeksForThisYear;
+
+        if (nextWeekNumber > ISOWeek.GetWeekOfYear(DateTime.Today)) return;
+        
+        // Fix for next year - adds three next weeks of January Y+1
+        var nextYear = DateTime.Today.Year + 1;
+        _weeks =
         [
-            new WeekRow("Ubiegły tydzień", BuildWeek(currentWeekStart.AddDays(-7))),
-            new WeekRow("Bieżący tydzień", BuildWeek(currentWeekStart)),
-            new WeekRow("Przyszły tydzień", BuildWeek(currentWeekStart.AddDays(7)))
+            .._weeks,
+            BuildWeek(1, nextYear),
+            BuildWeek(2, nextYear),
+            BuildWeek(3, nextYear),
         ];
     }
-    
-    private bool IsTodaySelected =>
-        SelectedDate?.Date == DateTime.Today;
 
-    private async Task SetToToday()
+    private List<CalendarWeek> BuildWeeksForYear(int todayYear)
     {
-        SelectedDate = DateTime.Today;
-        await SelectedDateChanged.InvokeAsync(SelectedDate);
+        var weeksInYear = ISOWeek.GetWeeksInYear(todayYear);
+        
+        return
+        [
+            .. Enumerable.Range(1, weeksInYear)
+                .Select(weekNumber => BuildWeek(weekNumber, DateTime.Today.Year))
+        ];
     }
 
-    private static DateTime StartOfWeek(DateTime date)
+
+    private CalendarWeek BuildWeek(int weekNumber, int year)
     {
-        var diff = (7 + ((int)date.DayOfWeek - (int)DayOfWeek.Monday)) % 7;
-        return date.Date.AddDays(-diff);
+        var monday =
+            ISOWeek.ToDateTime(
+                year,
+                weekNumber,
+                DayOfWeek.Monday);
+
+
+        return new CalendarWeek
+        {
+            WeekNumber = weekNumber,
+
+            Days =
+            [
+                .. Enumerable.Range(0, 7)
+                    .Select(i => monday.AddDays(i))
+            ]
+        };
     }
 
-    private static List<DateTime> BuildWeek(DateTime monday)
-    {
-        var days = new List<DateTime>(7);
-        for (var i = 0; i < 7; i++)
-            days.Add(monday.Date.AddDays(i));
 
-        return days;
+    private bool IsExpanded(CalendarWeek week)
+    {
+        return SelectedWeek == week.WeekNumber;
     }
 
-    private bool IsSelected(DateTime date)
-        => SelectedDate.HasValue && SelectedDate.Value.Date == date.Date;
 
-    private async Task PickDay(DateTime day)
+    private async Task SelectWeek(CalendarWeek week)
     {
-        SelectedDate = day.Date;
-        await SelectedDateChanged.InvokeAsync(SelectedDate);
+        SelectedWeek = week.WeekNumber;
+
+        await SelectedWeekChanged
+            .InvokeAsync(week.WeekNumber);
     }
 
-    private string GetButtonClass(DateTime day)
+    private string GetWeekTitleClass(CalendarWeek week)
     {
-        var classes = new List<string> { "day-button" };
+        var currentWeek =
+            ISOWeek.GetWeekOfYear(DateTime.Today);
 
-        if (day.Date == DateTime.Today)
-            classes.Add("today");
-
-        if (IsSelected(day))
-            classes.Add("selected");
-
-        if (day.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-            classes.Add("weekend");
-
-        return string.Join(" ", classes);
+        return week.Current
+            ? "current-week-title"
+            : string.Empty;
     }
 
-    private string GetHeaderClass(string dayName)
-        => dayName is "Sob" or "Niedz" ? "weekend" : "";
 
-    private sealed record WeekRow(string Label, List<DateTime> Days);
+    private string GetDayClass(DateTime day)
+    {
+        return day.Date == DateTime.Today
+            ? "today-day"
+            : string.Empty;
+    }
+
+
+    private sealed class CalendarWeek
+    {
+        public int WeekNumber { get; set; }
+
+        public List<DateTime> Days { get; set; } = [];
+        
+        public bool Current => Days.Contains(DateTime.Today);
+    }
 }

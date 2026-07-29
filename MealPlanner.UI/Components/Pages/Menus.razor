@@ -2,9 +2,11 @@
 @using MealPlanner.Client
 @using MealPlanner.Shared.Menus.Responses
 @implements IDisposable
-@inject IMenuClient menuClient;
+@inject IMenuClient MenuClient;
 
-<ThreeWeekCalendar SelectedDate="_selectedDate" SelectedDateChanged="OnDateChanged" />
+<ThreeWeekCalendar
+    SelectedWeek="@SelectedWeek"
+    SelectedWeekChanged="@OnWeekChanged" />
 
 <MudText Class="mt-4">Wybrano: @_selectedDate?.ToString("yyyy-MM-dd")</MudText>
 
@@ -35,6 +37,14 @@ else
 }
 
 @code {
+    private int? SelectedWeek;
+
+    private Task OnWeekChanged(int week)
+    {
+        SelectedWeek = week;
+        return Task.CompletedTask;
+    }
+    
     private DateTime? _selectedDate = DateTime.Today;
     
     private GetMenuResponse? _menu;
@@ -45,17 +55,7 @@ else
     {
         _selectedDate ??= DateTime.Today;
 
-        _menu = await menuClient.Get(_selectedDate.Value, _cts.Token);
-    }
-    
-    private async Task OnDateChanged(DateTime? date)
-    {
-        _selectedDate = date;
-
-        if (_selectedDate.HasValue)
-        {
-            _menu = await menuClient.Get(_selectedDate.Value, _cts.Token);
-        }
+        _menu = await MenuClient.Get(_selectedDate.Value, _cts.Token);
     }
 
     public void Dispose()

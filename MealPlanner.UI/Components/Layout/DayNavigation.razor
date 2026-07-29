@@ -1,0 +1,23 @@
+﻿@using MealPlanner.UI.Models
+<MudNavMenu Class="ml-4">
+
+    @foreach(var day in Week.Days)
+    {
+        <MudNavLink Href="@($"/meals/day/{day:yyyy-MM-dd}")">
+
+            @day.ToString(
+                "dddd, d MMMM yyyy",
+                new CultureInfo("pl-PL"))
+
+        </MudNavLink>
+    }
+
+</MudNavMenu>
+
+
+@code {
+
+    [Parameter]
+    public CalendarWeek Week { get; set; } = default!;
+
+}

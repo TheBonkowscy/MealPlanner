@@ -1,6 +1,8 @@
 ﻿<MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-    <MudNavLink Href="/menus" Match="NavLinkMatch.Prefix">Menus</MudNavLink>
+    <MudNavGroup Title="Menus"Expanded="true">
+        <ThreeWeekCalendar />
+    </MudNavGroup>
     <MudNavGroup Title="Settings" Expanded="true">
         <MudNavLink Href="/users"  Match="NavLinkMatch.Prefix">Users</MudNavLink>
         <MudNavLink Href="/security"  Match="NavLinkMatch.Prefix">Security</MudNavLink>
