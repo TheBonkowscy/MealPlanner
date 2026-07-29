@@ -15,4 +15,8 @@
       <ProjectReference Include="..\MealPlanner.Client\MealPlanner.Client.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MudBlazor" Version="9.7.0" />
+    </ItemGroup>
+
 </Project>

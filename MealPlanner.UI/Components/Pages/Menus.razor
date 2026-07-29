@@ -4,15 +4,15 @@
 @implements IDisposable
 @inject IMenuClient menuClient;
 
+<ThreeWeekCalendar SelectedDate="_selectedDate" SelectedDateChanged="OnDateChanged" />
 
-<PageTitle>Counter</PageTitle>
+<MudText Class="mt-4">Wybrano: @_selectedDate?.ToString("yyyy-MM-dd")</MudText>
 
-<h1>Counter</h1>
-
-@if (_menus == null)
+@if (_menu == null)
 {
     <p>
-        <em>Loading...</em>
+        <em>There is no menu for @_selectedDate?.ToLongDateString()</em>
+        <p>Maybe you shouldn't go hungry all the time, huh?</p>
     </p>
 }
 else
@@ -24,40 +24,38 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var menu in _menus)
+        @foreach (var meal in _menu.Meals)
         {
-            <h3>Menu for @menu.Date</h3>
-            <p>Id: @menu.Id</p>
-            @foreach (var meal in menu.Meals)
-            {
-                <tr>
-                    <td>@meal</td>
-                </tr>                
-            }
+            <tr>
+                <td>@meal</td>
+            </tr>
         }
         </tbody>
     </table>
 }
 
 @code {
-    private GetMenuResponse?[] _menus;
+    private DateTime? _selectedDate = DateTime.Today;
     
-    private CancellationTokenSource _cts = new();
+    private GetMenuResponse? _menu;
+    
+    private readonly CancellationTokenSource _cts = new();
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate a loading indicator
-        await Task.Delay(500);
-        var todaysMenu = await menuClient.GetToday(_cts.Token);
-        _menus = [todaysMenu];
-    }
+        _selectedDate ??= DateTime.Today;
 
-    private class WeatherForecast
+        _menu = await menuClient.Get(_selectedDate.Value, _cts.Token);
+    }
+    
+    private async Task OnDateChanged(DateTime? date)
     {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        _selectedDate = date;
+
+        if (_selectedDate.HasValue)
+        {
+            _menu = await menuClient.Get(_selectedDate.Value, _cts.Token);
+        }
     }
 
     public void Dispose()

@@ -1,0 +1,133 @@
+﻿@using System.Globalization
+@using MudBlazor
+
+<MudPaper Class="pa-4 calendar-wrapper">
+    <MudText Typo="Typo.h6" Class="mb-1">Wybierz datę</MudText>
+    <MudText Typo="Typo.body2" Class="mb-4">
+        Ubiegły tydzień, bieżący tydzień i przyszły tydzień.
+    </MudText>
+
+    <div class="calendar-grid calendar-header">
+        <div class="row-label"></div>
+        @foreach (var dayName in DayNames)
+        {
+            <div class="@GetHeaderClass(dayName)">
+                @dayName
+            </div>
+        }
+    </div>
+
+    @foreach (var week in Weeks)
+    {
+        <div class="calendar-grid week-row">
+            <div class="row-label">@week.Label</div>
+
+            @foreach (var day in week.Days)
+            {
+                <MudButton Variant="@(IsSelected(day) ? Variant.Filled : Variant.Outlined)"
+                           Color="@(IsSelected(day) ? Color.Primary : Color.Default)"
+                           Class="@GetButtonClass(day)"
+                           OnClick="@(() => PickDay(day))">
+                    @day.Day
+                </MudButton>
+            }
+        </div>
+    }
+
+    <MudDivider Class="my-4" />
+
+    <MudText Typo="Typo.body1">
+        Wybrana data: <b>@(SelectedDate?.ToString("yyyy-MM-dd") ?? "brak")</b>
+    </MudText>
+    
+    @if (!IsTodaySelected)
+    {
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Today"
+                   OnClick="SetToToday"
+                   Class="mt-2">
+            Set to today
+        </MudButton>
+    }
+</MudPaper>
+
+@code {
+    [Parameter] public DateTime? SelectedDate { get; set; }
+    [Parameter] public EventCallback<DateTime?> SelectedDateChanged { get; set; }
+
+    [Parameter] public DateTime? ReferenceDate { get; set; }
+
+    private readonly CultureInfo Culture = new("pl-PL");
+
+    private readonly string[] DayNames = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Niedz"];
+
+    private List<WeekRow> Weeks = new();
+
+    protected override void OnParametersSet()
+    {
+        var baseDate = (ReferenceDate ?? DateTime.Today).Date;
+        var currentWeekStart = StartOfWeek(baseDate);
+
+        Weeks =
+        [
+            new WeekRow("Ubiegły tydzień", BuildWeek(currentWeekStart.AddDays(-7))),
+            new WeekRow("Bieżący tydzień", BuildWeek(currentWeekStart)),
+            new WeekRow("Przyszły tydzień", BuildWeek(currentWeekStart.AddDays(7)))
+        ];
+    }
+    
+    private bool IsTodaySelected =>
+        SelectedDate?.Date == DateTime.Today;
+
+    private async Task SetToToday()
+    {
+        SelectedDate = DateTime.Today;
+        await SelectedDateChanged.InvokeAsync(SelectedDate);
+    }
+
+    private static DateTime StartOfWeek(DateTime date)
+    {
+        var diff = (7 + ((int)date.DayOfWeek - (int)DayOfWeek.Monday)) % 7;
+        return date.Date.AddDays(-diff);
+    }
+
+    private static List<DateTime> BuildWeek(DateTime monday)
+    {
+        var days = new List<DateTime>(7);
+        for (var i = 0; i < 7; i++)
+            days.Add(monday.Date.AddDays(i));
+
+        return days;
+    }
+
+    private bool IsSelected(DateTime date)
+        => SelectedDate.HasValue && SelectedDate.Value.Date == date.Date;
+
+    private async Task PickDay(DateTime day)
+    {
+        SelectedDate = day.Date;
+        await SelectedDateChanged.InvokeAsync(SelectedDate);
+    }
+
+    private string GetButtonClass(DateTime day)
+    {
+        var classes = new List<string> { "day-button" };
+
+        if (day.Date == DateTime.Today)
+            classes.Add("today");
+
+        if (IsSelected(day))
+            classes.Add("selected");
+
+        if (day.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+            classes.Add("weekend");
+
+        return string.Join(" ", classes);
+    }
+
+    private string GetHeaderClass(string dayName)
+        => dayName is "Sob" or "Niedz" ? "weekend" : "";
+
+    private sealed record WeekRow(string Label, List<DateTime> Days);
+}
