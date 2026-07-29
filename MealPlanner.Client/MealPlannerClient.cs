@@ -20,13 +20,25 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuClient
     public async Task<GetMenuResponse?> Get(int id, CancellationToken cancellationToken)
     {
         var endpoint = Path.Combine(Constants.MenuRoute, id.ToString());
-        return await httpClient.GetFromJsonAsync<GetMenuResponse>(endpoint, cancellationToken);
+        var response = await httpClient.GetAsync(endpoint, cancellationToken);
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<GetMenuResponse>(cancellationToken); 
+        }
+
+        return null;
     }
 
     public async Task<GetMenuResponse?> Get(DateTime date, CancellationToken cancellationToken)
     {
         var endpoint = Path.Combine(Constants.MenuRoute, date.ToString("yyyy-MM-dd"));
-        return await httpClient.GetFromJsonAsync<GetMenuResponse>(endpoint, cancellationToken);
+        var response = await httpClient.GetAsync(endpoint, cancellationToken);
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<GetMenuResponse>(cancellationToken); 
+        }
+
+        return null;
     }
 
     public async Task<GetMenuResponse?> GetToday(CancellationToken cancellationToken)
