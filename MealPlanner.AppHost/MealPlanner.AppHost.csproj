@@ -11,6 +11,7 @@
     <ItemGroup>
       <ProjectReference Include="..\MealPlanner.API\MealPlanner.API.csproj" />
       <ProjectReference Include="..\MealPlanner.UI\MealPlanner.UI.csproj" />
+      <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="*" />
     </ItemGroup>
 
 </Project>
