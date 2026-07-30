@@ -4,12 +4,6 @@
 @implements IDisposable
 @inject IMenuClient MenuClient;
 
-<ThreeWeekCalendar
-    SelectedWeek="@SelectedWeek"
-    SelectedWeekChanged="@OnWeekChanged" />
-
-<MudText Class="mt-4">Wybrano: @_selectedDate?.ToString("yyyy-MM-dd")</MudText>
-
 @if (_menu == null)
 {
     <p>
@@ -37,14 +31,7 @@ else
 }
 
 @code {
-    private int? SelectedWeek;
 
-    private Task OnWeekChanged(int week)
-    {
-        SelectedWeek = week;
-        return Task.CompletedTask;
-    }
-    
     private DateTime? _selectedDate = DateTime.Today;
     
     private GetMenuResponse? _menu;
@@ -57,6 +44,8 @@ else
 
         _menu = await MenuClient.Get(_selectedDate.Value, _cts.Token);
     }
+    
+    // TODO: Next - "let's add a plus button and a form to be submitted. Propose where and how to put the icon for the navigation."
 
     public void Dispose()
     {

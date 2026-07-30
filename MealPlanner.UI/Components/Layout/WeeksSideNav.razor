@@ -1,6 +1,4 @@
-﻿@inject NavigationManager Navigation
-
-<MudNavMenu>
+﻿<MudNavMenu>
     @foreach (var week in _weeks)
     {
         <MudNavGroup Title="@($"Week {week.WeekNumber}")"
@@ -32,7 +30,14 @@
 
 
 @code {
+    [Parameter]
+    public Func<DateTime, Task<bool>>? HasMenu { get; set; }
 
+    [Parameter]
+    public EventCallback<DateTime> CreateMenu { get; set; }
+    
+    private readonly Dictionary<DateTime, bool> _menuExists = [];
+    
     [Parameter]
     public int? SelectedWeek { get; set; }
 
@@ -52,11 +57,11 @@
         var weeksForThisYear = BuildWeeksForYear(DateTime.Today.Year);
         
         var numberOfWeeks = weeksForThisYear.Count();
-        var nextWeekNumber = numberOfWeeks + 1;
+        var nextWeekNumber = ISOWeek.GetWeekOfYear(DateTime.Today) + 1;
 
         _weeks = weeksForThisYear;
 
-        if (nextWeekNumber > ISOWeek.GetWeekOfYear(DateTime.Today)) return;
+        if (nextWeekNumber > numberOfWeeks) return;
         
         // Fix for next year - adds three next weeks of January Y+1
         var nextYear = DateTime.Today.Year + 1;
