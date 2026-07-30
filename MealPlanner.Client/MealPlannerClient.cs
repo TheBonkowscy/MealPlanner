@@ -50,18 +50,18 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuClient
         return await Get(DateTime.Today, cancellationToken);
     }
 
-    public async Task<GetExistingMenusResponse> GetRange(DateTime? from, DateTime? to, CancellationToken cancellationToken)
+    public async Task<GetExistingMenusResponse> GetRange(DateOnly? from, DateOnly? to, CancellationToken cancellationToken)
     {
         var endpoint = Constants.MenuRoute;
         
         if (from is not null)
         {
-            endpoint = endpoint.AppendQueryParam("from", from.Value.ToUniversalTime());
+            endpoint = endpoint.AppendQueryParam("from", from.Value);
         }
 
         if (to is not null)
         {
-            endpoint = endpoint.AppendQueryParam("to", to.Value.ToUniversalTime());
+            endpoint = endpoint.AppendQueryParam("to", to.Value);
         }
 
         var result = await httpClient.GetAsync(endpoint, cancellationToken);

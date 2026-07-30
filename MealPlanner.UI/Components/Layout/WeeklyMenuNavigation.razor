@@ -1,9 +1,11 @@
+@using System.Globalization
 @using MealPlanner.Client
 @using MealPlanner.Shared.Menus.Responses
 @using MealPlanner.UI.Models
 
 @implements IDisposable
 @inject IMenuClient MenuClient
+@inject NavigationManager Navigation
 
 <MudNavMenu>
     @foreach (var week in _weeks)
@@ -30,7 +32,15 @@
                                     Icon="@Icons.Material.Filled.Add"
                                     Size="Size.Small"
                                     Color="Color.Primary"
-                                    OnClick="@(() => CreateMenu.InvokeAsync(day.Day))" />
+                                    OnClick="@(() => OnMenuCreating(day.Day))" />
+                            }
+                            else
+                            {
+                                <MudIconButton
+                                    Icon="@Icons.Material.Filled.Edit"
+                                    Size="Size.Small"
+                                    Color="Color.Primary"
+                                    OnClick="@(() => OnMenuEditing(day.Day))" />
                             }
 
                         </div>
@@ -43,10 +53,10 @@
 
 @code {
     [Parameter]
-    public Func<DateTime, Task<bool>>? HasMenu { get; set; }
-
-    [Parameter]
     public EventCallback<DateOnly> CreateMenu { get; set; }
+    
+    [Parameter]
+    public EventCallback<DateOnly> EditMenu { get; set; }
 
     [Parameter]
     public int? SelectedWeek { get; set; }
@@ -63,8 +73,8 @@
     protected override async Task OnInitializedAsync()
     {
         // 1. Define range: 6 months back to 6 months forward
-        var startDate = DateTime.Today.AddMonths(-6);
-        var endDate = DateTime.Today.AddMonths(6);
+        var startDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(-6));
+        var endDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(6));
 
         // Fetch menu data from API
         var response = await MenuClient.GetRange(startDate, endDate, _cts.Token);
@@ -91,18 +101,20 @@
     }
 
     private static List<CalendarWeek> BuildWeeksForRange(
-        DateTime start, 
-        DateTime end, 
+        DateOnly start, 
+        DateOnly end, 
         Dictionary<DateOnly, ExistingMenuListItem> existingMenus)
     {
         var weeks = new List<CalendarWeek>();
 
         // Find Monday of the starting date's week
-        var currentMonday = ISOWeek.ToDateTime(
-            ISOWeek.GetYear(start), 
-            ISOWeek.GetWeekOfYear(start), 
-            DayOfWeek.Monday);
+        var currentMonday = DateOnly.FromDateTime(
+            ISOWeek.ToDateTime(
+                ISOWeek.GetYear(start), 
+                ISOWeek.GetWeekOfYear(start), 
+                DayOfWeek.Monday));
 
+        var time = TimeOnly.FromDateTime(DateTime.Today);
         while (currentMonday <= end)
         {
             var weekNumber = ISOWeek.GetWeekOfYear(currentMonday);
@@ -110,7 +122,7 @@
 
             var days = Enumerable.Range(0, 7).Select(i =>
             {
-                var date = DateOnly.FromDateTime(currentMonday.AddDays(i).Date);
+                var date = DateOnly.FromDateTime(currentMonday.AddDays(i).ToDateTime(time));
                 existingMenus.TryGetValue(date, out var menu);
 
                 return new CalendarDay
@@ -152,8 +164,31 @@
 
     private static string GetDayClass(DateOnly day)
     {
-        // TODO: Extract common helpers
         return day == DateOnly.FromDateTime(DateTime.Today) ? "today-day" : string.Empty;
+    }
+    
+    private async Task OnMenuCreating(DateOnly day)
+    {
+        // Execute parameter callback for parent listeners
+        if (CreateMenu.HasDelegate)
+        {
+            await CreateMenu.InvokeAsync(day);
+        }
+
+        // Perform navigation
+        Navigation.NavigateTo($"/meals/create/{day:yyyy-MM-dd}");
+    }
+    
+    private async Task OnMenuEditing(DateOnly day)
+    {
+        // Execute parameter callback for parent listeners
+        if (EditMenu.HasDelegate)
+        {
+            await EditMenu.InvokeAsync(day);
+        }
+
+        // Perform navigation
+        Navigation.NavigateTo($"/meals/edit/{day:yyyy-MM-dd}");
     }
 
     public void Dispose()
