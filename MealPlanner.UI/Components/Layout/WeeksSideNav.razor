@@ -1,4 +1,8 @@
-﻿<MudNavMenu>
+﻿@using MealPlanner.Client
+@implements IDisposable
+@inject IMenuClient MenuClient
+
+<MudNavMenu>
     @foreach (var week in _weeks)
     {
         <MudNavGroup Title="@($"Week {week.WeekNumber}")"
@@ -37,6 +41,8 @@
     public EventCallback<DateTime> CreateMenu { get; set; }
     
     private readonly Dictionary<DateTime, bool> _menuExists = [];
+
+    private static readonly CancellationTokenSource Cts = new();
     
     [Parameter]
     public int? SelectedWeek { get; set; }
@@ -52,9 +58,18 @@
     private List<CalendarWeek> _weeks = [];
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var weeksForThisYear = BuildWeeksForYear(DateTime.Today.Year);
+        var halfYearBack = DateTime.Today.AddMonths(-6);
+        var halfYearUp = DateTime.Today.AddMonths(6);
+        var response = await MenuClient.GetRange(halfYearBack, halfYearUp, Cts.Token);
+
+        var weeksInGivenPeriod = response.ExistingMenus
+            .Select(x => new { WeekNumber = ISOWeek.GetWeekOfYear(x.Day), Year = x.Day.Year, HasMeals = x.HasMeals })
+            .OrderBy(x => x.Year).ThenBy(x => x.WeekNumber)
+            .ToDictionary(x => x, x => new CalendarDay);
+        
+        var weeksForThisYear = await BuildWeeksForYear(DateTime.Today.Year);
         
         var numberOfWeeks = weeksForThisYear.Count();
         var nextWeekNumber = ISOWeek.GetWeekOfYear(DateTime.Today) + 1;
@@ -74,8 +89,9 @@
         ];
     }
 
-    private List<CalendarWeek> BuildWeeksForYear(int todayYear)
+    private async Task<List<CalendarWeek>> BuildWeeksForYear(int todayYear)
     {
+        var existingWeeks = await MenuClient.GetRange(null, null, Cts.Token);
         var weeksInYear = ISOWeek.GetWeeksInYear(todayYear);
         
         return
@@ -149,4 +165,11 @@
         
         public bool Current => Days.Contains(DateTime.Today);
     }
+
+    public void Dispose()
+    {
+        Cts.Cancel();
+        Cts.Dispose();
+    }
+
 }
