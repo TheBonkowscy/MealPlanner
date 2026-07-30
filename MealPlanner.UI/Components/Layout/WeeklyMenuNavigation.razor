@@ -1,0 +1,164 @@
+@using MealPlanner.Client
+@using MealPlanner.Shared.Menus.Responses
+@using MealPlanner.UI.Models
+
+@implements IDisposable
+@inject IMenuClient MenuClient
+
+<MudNavMenu>
+    @foreach (var week in _weeks)
+    {
+        <MudNavGroup Title="@($"Week {week.WeekNumber} of {week.Year}")"
+                     Expanded="@IsExpanded(week)"
+                     ExpandedChanged="@(() => SelectWeek(week))"
+                     Class="@GetWeekTitleClass(week)">
+            
+            @if (IsExpanded(week))
+            {
+                <MudNavMenu Class="ml-4">
+                    @foreach (var day in week.Days)
+                    {
+                        <div class="d-flex align-center justify-space-between @GetDayClass(day.Day)">
+
+                            <MudNavLink Href="@($"/meals/day/{day.Day:yyyy-MM-dd}")">
+                                @day.Day.ToString("dddd, d MMMM yyyy", _culture)
+                            </MudNavLink>
+
+                            @if (!_menuExists.GetValueOrDefault(day.Day))
+                            {
+                                <MudIconButton
+                                    Icon="@Icons.Material.Filled.Add"
+                                    Size="Size.Small"
+                                    Color="Color.Primary"
+                                    OnClick="@(() => CreateMenu.InvokeAsync(day.Day))" />
+                            }
+
+                        </div>
+                    }
+                </MudNavMenu>
+            }
+        </MudNavGroup>
+    }
+</MudNavMenu>
+
+@code {
+    [Parameter]
+    public Func<DateTime, Task<bool>>? HasMenu { get; set; }
+
+    [Parameter]
+    public EventCallback<DateOnly> CreateMenu { get; set; }
+
+    [Parameter]
+    public int? SelectedWeek { get; set; }
+
+    [Parameter]
+    public EventCallback<int> SelectedWeekChanged { get; set; }
+
+    private readonly CancellationTokenSource _cts = new();
+    private readonly CultureInfo _culture = new("pl-PL");
+
+    private List<CalendarWeek> _weeks = [];
+    private Dictionary<DateOnly, bool> _menuExists = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Define range: 6 months back to 6 months forward
+        var startDate = DateTime.Today.AddMonths(-6);
+        var endDate = DateTime.Today.AddMonths(6);
+
+        // Fetch menu data from API
+        var response = await MenuClient.GetRange(startDate, endDate, _cts.Token);
+
+        // Map response items into a fast lookup dictionary
+        var existingMenusDict = response.ExistingMenus
+            .ToDictionary(x => x.Day, x => x);
+
+        // Track menu existence for the UI button visibility check
+        _menuExists = existingMenusDict.ToDictionary(k => k.Key, v => v.Value.HasMeals);
+
+        // 2. Build historically ordered weeks from range
+        _weeks = BuildWeeksForRange(startDate, endDate, existingMenusDict);
+
+        // Default selection to current week if none specified
+        if (!SelectedWeek.HasValue)
+        {
+            var currentWeek = _weeks.FirstOrDefault(w => w.Current);
+            if (currentWeek != null)
+            {
+                SelectedWeek = currentWeek.WeekNumber;
+            }
+        }
+    }
+
+    private static List<CalendarWeek> BuildWeeksForRange(
+        DateTime start, 
+        DateTime end, 
+        Dictionary<DateOnly, ExistingMenuListItem> existingMenus)
+    {
+        var weeks = new List<CalendarWeek>();
+
+        // Find Monday of the starting date's week
+        var currentMonday = ISOWeek.ToDateTime(
+            ISOWeek.GetYear(start), 
+            ISOWeek.GetWeekOfYear(start), 
+            DayOfWeek.Monday);
+
+        while (currentMonday <= end)
+        {
+            var weekNumber = ISOWeek.GetWeekOfYear(currentMonday);
+            var year = ISOWeek.GetYear(currentMonday);
+
+            var days = Enumerable.Range(0, 7).Select(i =>
+            {
+                var date = DateOnly.FromDateTime(currentMonday.AddDays(i).Date);
+                existingMenus.TryGetValue(date, out var menu);
+
+                return new CalendarDay
+                {
+                    Day = date,
+                    Id = menu?.Id,
+                    HasMeals = menu?.HasMeals ?? false
+                };
+            }).ToList();
+
+            weeks.Add(new CalendarWeek
+            {
+                WeekNumber = weekNumber,
+                Year = year,
+                Days = days
+            });
+
+            currentMonday = currentMonday.AddDays(7);
+        }
+
+        return weeks;
+    }
+
+    private bool IsExpanded(CalendarWeek week)
+    {
+        return SelectedWeek == week.WeekNumber;
+    }
+
+    private async Task SelectWeek(CalendarWeek week)
+    {
+        SelectedWeek = week.WeekNumber;
+        await SelectedWeekChanged.InvokeAsync(week.WeekNumber);
+    }
+
+    private static string GetWeekTitleClass(CalendarWeek week)
+    {
+        return week.Current ? "current-week-title" : string.Empty;
+    }
+
+    private static string GetDayClass(DateOnly day)
+    {
+        // TODO: Extract common helpers
+        return day == DateOnly.FromDateTime(DateTime.Today) ? "today-day" : string.Empty;
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

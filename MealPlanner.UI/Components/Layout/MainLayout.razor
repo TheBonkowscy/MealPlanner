@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
 @inject NavigationManager Navigation
 
 <MudThemeProvider />
@@ -26,7 +27,6 @@
                 Icon="@Icons.Material.Filled.Today"
                 OnClick="GoToToday" />
         </MudTooltip>
-        <MudIconButton Icon="@Icons.Material.Filled.AccountCircle" />
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
         <NavMenu/>
