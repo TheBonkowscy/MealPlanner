@@ -37,7 +37,7 @@ public class MenuCreatorTests
     public async Task Create_CreatesSuccessfully_ReturnsId(CreateMenuRequest createMenuRequest)
     {
         // Act
-        var result = await _sut.Create(createMenuRequest);
+        var result = await _sut.Create(createMenuRequest, CancellationToken.None);
         
         // Assert
         result.Id.Should().NotBe(0);
@@ -49,11 +49,11 @@ public class MenuCreatorTests
         // Arrange
         var tomorrow =  DateOnly.FromDateTime(DateTime.Today.AddDays(1));
         var request = new CreateMenuRequest(tomorrow, [MealName]);
-        await _sut.Create(request);
+        await _sut.Create(request, CancellationToken.None);
         var conflictingRequest = new CreateMenuRequest(tomorrow, ["Pierogi"]);
 
         // Act
-        var createWithConflict = async (CreateMenuRequest req) => await _sut.Create(req);
+        var createWithConflict = async (CreateMenuRequest req) => await _sut.Create(req, CancellationToken.None);
         
         // Assert
         await createWithConflict.Awaiting(x => x.Invoke(conflictingRequest))

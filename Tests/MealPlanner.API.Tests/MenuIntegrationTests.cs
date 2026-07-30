@@ -115,6 +115,65 @@ public class MenuIntegrationTests : IntegrationTestBase
         response.Date.Should().Be(Today);
     }
 
+    [Theory]
+    [MemberData(nameof(DateRangeTestData))]
+    public async Task Get_ForDateRange(string query, int expectedCount)
+    {
+        // Arrange
+        await AddMenuToDatabase(Menu.Create(Today));
+        await AddMenuToDatabase(Menu.Create(Tomorrow));
+        
+        // Act
+        var result = await Client.GetAsync($"{Constants.MenuRoute}{query}");
+        
+        // Assert
+        result.EnsureSuccessStatusCode();
+        var response = await result.Content.ReadFromJsonAsync<GetExistingMenusResponse>();
+        response.Should().NotBeNull();
+        response.ExistingMenus.Should().HaveCount(expectedCount);
+    }
+    
+    public static TheoryData<string, int> DateRangeTestData
+    {
+        get
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var tomorrow = today.AddDays(1);
+            return new TheoryData<string, int>
+            {
+                { $"?from={today:O}&to={tomorrow:O}", 2 },
+                { $"?from={tomorrow.AddDays(1):O}&to={tomorrow.AddDays(2):O}", 0 },
+                { $"?from={tomorrow:O}&to={today:O}", 0 },
+                { $"?from={tomorrow:O}", 1 },
+                { $"?to={today:O}", 1 },
+                { $"?from={today:O}&to={today:O}", 1 }
+            };
+        }
+    }
+
+    [Fact]
+    public async Task Get_ForDateRange_ReturnsOnlyMenusWithinRange_WhenBothFromAndToProvided()
+    {
+        // Arrange
+        await AddMenuToDatabase(Menu.Create(Today.AddDays(-1)));
+        var menu1 = Menu.Create(Today);
+        var menu2 = Menu.Create(Tomorrow);
+        await AddMenuToDatabase(menu1);
+        await AddMenuToDatabase(menu2);
+        await AddMenuToDatabase(Menu.Create(Tomorrow.AddDays(1)));
+
+        // Act
+        var result = await Client.GetAsync($"{Constants.MenuRoute}?from={Today:O}&to={Tomorrow:O}");
+
+        // Assert
+        result.EnsureSuccessStatusCode();
+        var response = await result.Content.ReadFromJsonAsync<GetExistingMenusResponse>();
+        response.Should().NotBeNull();
+        response.ExistingMenus.Should().HaveCount(2);
+        response.ExistingMenus.Should().Contain(m => m.Id == menu1.Id);
+        response.ExistingMenus.Should().Contain(m => m.Id == menu2.Id);
+    }
+
     private static string BuildGetRoute(int id) => $"{Constants.MenuRoute}/{id.ToString()}";
 
     private static string BuildGetRoute(DateOnly date) => $"{Constants.MenuRoute}/{date.ToString("O")}";

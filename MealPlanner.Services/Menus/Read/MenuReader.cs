@@ -7,18 +7,19 @@ namespace MealPlanner.Services.Menus.Read;
 
 public interface IReadMenu
 {
-    Task<GetMenuResponse?> Get(int id);
-    Task<GetMenuResponse?> Get(DateOnly date);
+    Task<GetMenuResponse?> Get(int id, CancellationToken ct);
+    Task<GetMenuResponse?> Get(DateOnly date, CancellationToken ct);
+    Task<GetExistingMenusResponse> GetRange(DateOnly? from, DateOnly? to, CancellationToken ct);
 }
 
 public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
 {
-    public async Task<GetMenuResponse?> Get(int id)
+    public async Task<GetMenuResponse?> Get(int id, CancellationToken ct)
     {
         var menu = await ctx.Menus
             .Include(x => x.Items)
             .ThenInclude(x => x.Meal)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
         return menu is null ? null : MapMenu(menu);
     }
 
@@ -28,13 +29,34 @@ public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
         return new GetMenuResponse(menu.Id, menu.Date, mappedMeals);
     }
 
-    public async Task<GetMenuResponse?> Get(DateOnly date)
+    public async Task<GetMenuResponse?> Get(DateOnly date, CancellationToken ct)
     {
         var menuForDate = await ctx.Menus
             .Include(x => x.Items)
             .ThenInclude(x => x.Meal)
-            .FirstOrDefaultAsync(x => x.Date == date);
+            .FirstOrDefaultAsync(x => x.Date == date, ct);
         
         return menuForDate is null ? null : MapMenu(menuForDate);
+    }
+
+    public async Task<GetExistingMenusResponse> GetRange(DateOnly? from, DateOnly? to, CancellationToken ct)
+    {
+        var query = ctx.Menus.Include(x => x.Items).AsQueryable();
+
+        if (from is not null)
+        {
+            query = query.Where(x => x.Date >= from);
+        }
+
+        if (to is not null)
+        {
+            query = query.Where(x => x.Date <= to);
+        }
+        
+        var result =  await query.ToListAsync(ct);
+
+        var mappedResult = result.Select(x => new ExistingMenuListItem(x.Id, x.Date, x.Items.Any()));
+        
+        return new GetExistingMenusResponse(mappedResult);
     }
 }

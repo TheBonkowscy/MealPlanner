@@ -12,4 +12,6 @@ public interface IMenuClient
     Task<GetMenuResponse?> Get(DateTime date, CancellationToken cancellationToken);
     
     Task<GetMenuResponse?> GetToday(CancellationToken cancellationToken);
+    
+    Task<GetExistingMenusResponse> GetRange(DateTime? from, DateTime? to, CancellationToken cancellationToken);
 }

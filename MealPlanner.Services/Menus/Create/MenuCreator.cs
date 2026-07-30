@@ -8,16 +8,16 @@ namespace MealPlanner.Services.Menus.Create;
 
 public interface ICreateMenu
 {
-    Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest);
+    Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest, CancellationToken ct);
 }
 
 public class MenuCreator(MealPlannerDbContext ctx) : ICreateMenu
 {
-    public async Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest)
+    public async Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest, CancellationToken ct)
     {
         try
         {
-            var menuAlreadyExists = await ctx.Menus.AnyAsync(x => x.Date == createMenuRequest.Date);
+            var menuAlreadyExists = await ctx.Menus.AnyAsync(x => x.Date == createMenuRequest.Date, ct);
             if (menuAlreadyExists)
             {
                 throw new InvalidOperationException($"There is already a Menu defined for {createMenuRequest.Date}.");
@@ -27,11 +27,11 @@ public class MenuCreator(MealPlannerDbContext ctx) : ICreateMenu
             if (createMenuRequest.Meals is not null)
             {
                 var mappedMeals = createMenuRequest.Meals.Select(Meal.Create).ToList();
-                mappedMeals.ForEach(meal => result.AddMeal(meal));
+                mappedMeals.ForEach(result.AddMeal);
             }
 
-            await ctx.Menus.AddAsync(result);
-            await ctx.SaveChangesAsync();
+            await ctx.Menus.AddAsync(result, ct);
+            await ctx.SaveChangesAsync(ct);
 
             return new CreateMenuResponse(result.Id);
         }
