@@ -10,7 +10,7 @@ public static class ServiceRegistration
     {
         public IServiceCollection AddMealPlannerClient()
         {
-            services.AddHttpClient(nameof(MealPlannerClient), (services, client) =>
+            services.AddHttpClient<IMenuClient, MealPlannerClient>(nameof(MealPlannerClient), (services, client) =>
             {
                 var options = services.GetRequiredService<IOptions<MealPlannerConfigurationOptions>>();
 
@@ -18,7 +18,6 @@ public static class ServiceRegistration
                 
                 // TODO: resiliency
             });
-            services.AddTransient<IMenuClient, MealPlannerClient>();
             return services;
         }        
     }

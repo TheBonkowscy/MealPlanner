@@ -1,0 +1,147 @@
+﻿@inject NavigationManager Navigation
+
+<MudNavMenu>
+    @foreach (var week in _weeks)
+    {
+        <MudNavGroup Title="@($"Week {week.WeekNumber}")"
+                     Expanded="@IsExpanded(week)"
+                     ExpandedChanged="@(() => SelectWeek(week))"
+                     Class="@GetWeekTitleClass(week)">
+            
+            @if (IsExpanded(week))
+            {
+                <MudNavMenu Class="ml-4">
+
+                    @foreach (var day in week.Days)
+                    {
+                        <MudNavLink Href="@($"/meals/day/{day:yyyy-MM-dd}")"
+                                    Class="@GetDayClass(day)">
+
+                            @day.ToString("dddd, d MMMM yyyy", _culture)
+
+                        </MudNavLink>
+                    }
+
+                </MudNavMenu>
+            }
+
+        </MudNavGroup>
+    }
+
+</MudNavMenu>
+
+
+@code {
+
+    [Parameter]
+    public int? SelectedWeek { get; set; }
+
+
+    [Parameter]
+    public EventCallback<int> SelectedWeekChanged { get; set; }
+
+
+    private readonly CultureInfo _culture = new("pl-PL");
+
+
+    private List<CalendarWeek> _weeks = [];
+
+
+    protected override void OnInitialized()
+    {
+        var weeksForThisYear = BuildWeeksForYear(DateTime.Today.Year);
+        
+        var numberOfWeeks = weeksForThisYear.Count();
+        var nextWeekNumber = numberOfWeeks + 1;
+
+        _weeks = weeksForThisYear;
+
+        if (nextWeekNumber > ISOWeek.GetWeekOfYear(DateTime.Today)) return;
+        
+        // Fix for next year - adds three next weeks of January Y+1
+        var nextYear = DateTime.Today.Year + 1;
+        _weeks =
+        [
+            .._weeks,
+            BuildWeek(1, nextYear),
+            BuildWeek(2, nextYear),
+            BuildWeek(3, nextYear),
+        ];
+    }
+
+    private List<CalendarWeek> BuildWeeksForYear(int todayYear)
+    {
+        var weeksInYear = ISOWeek.GetWeeksInYear(todayYear);
+        
+        return
+        [
+            .. Enumerable.Range(1, weeksInYear)
+                .Select(weekNumber => BuildWeek(weekNumber, DateTime.Today.Year))
+        ];
+    }
+
+
+    private CalendarWeek BuildWeek(int weekNumber, int year)
+    {
+        var monday =
+            ISOWeek.ToDateTime(
+                year,
+                weekNumber,
+                DayOfWeek.Monday);
+
+
+        return new CalendarWeek
+        {
+            WeekNumber = weekNumber,
+
+            Days =
+            [
+                .. Enumerable.Range(0, 7)
+                    .Select(i => monday.AddDays(i))
+            ]
+        };
+    }
+
+
+    private bool IsExpanded(CalendarWeek week)
+    {
+        return SelectedWeek == week.WeekNumber;
+    }
+
+
+    private async Task SelectWeek(CalendarWeek week)
+    {
+        SelectedWeek = week.WeekNumber;
+
+        await SelectedWeekChanged
+            .InvokeAsync(week.WeekNumber);
+    }
+
+    private string GetWeekTitleClass(CalendarWeek week)
+    {
+        var currentWeek =
+            ISOWeek.GetWeekOfYear(DateTime.Today);
+
+        return week.Current
+            ? "current-week-title"
+            : string.Empty;
+    }
+
+
+    private string GetDayClass(DateTime day)
+    {
+        return day.Date == DateTime.Today
+            ? "today-day"
+            : string.Empty;
+    }
+
+
+    private sealed class CalendarWeek
+    {
+        public int WeekNumber { get; set; }
+
+        public List<DateTime> Days { get; set; } = [];
+        
+        public bool Current => Days.Contains(DateTime.Today);
+    }
+}

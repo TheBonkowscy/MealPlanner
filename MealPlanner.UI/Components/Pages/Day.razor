@@ -1,0 +1,53 @@
+﻿@page "/meals/day/{Date:datetime}"
+@using MealPlanner.Client
+@inject IMenuClient MenuClient
+
+
+<MudText Typo="Typo.h5">
+
+    @Date.ToString(
+        "dddd, d MMMM yyyy",
+        _culture)
+
+</MudText>
+
+@if (!_meals.Any())
+{
+    <em>Brak posiłków na ten dzień</em>
+    <p>Może warto coś przekąsić?</p>
+}
+else
+{
+    <MudList T="string">
+
+        @foreach (var meal in _meals)
+        {
+            <MudListItem T="string" Value="meal">
+                @meal
+            </MudListItem>
+        }
+
+    </MudList>
+}
+
+@code {
+
+    [Parameter]
+    public DateTime Date { get; set; }
+
+
+    private readonly CultureInfo _culture =
+        new("pl-PL");
+
+
+    private IEnumerable<string> _meals = [];
+    
+    private readonly CancellationTokenSource _cts = new();
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var menuForDay = await MenuClient.Get(Date, _cts.Token);
+        _meals = menuForDay?.Meals ?? [];
+    }
+}

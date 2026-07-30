@@ -1,0 +1,66 @@
+﻿@page "/menus"
+@using MealPlanner.Client
+@using MealPlanner.Shared.Menus.Responses
+@implements IDisposable
+@inject IMenuClient MenuClient;
+
+<ThreeWeekCalendar
+    SelectedWeek="@SelectedWeek"
+    SelectedWeekChanged="@OnWeekChanged" />
+
+<MudText Class="mt-4">Wybrano: @_selectedDate?.ToString("yyyy-MM-dd")</MudText>
+
+@if (_menu == null)
+{
+    <p>
+        <em>There is no menu for @_selectedDate?.ToLongDateString()</em>
+        <p>Maybe you shouldn't go hungry all the time, huh?</p>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Meal name</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var meal in _menu.Meals)
+        {
+            <tr>
+                <td>@meal</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private int? SelectedWeek;
+
+    private Task OnWeekChanged(int week)
+    {
+        SelectedWeek = week;
+        return Task.CompletedTask;
+    }
+    
+    private DateTime? _selectedDate = DateTime.Today;
+    
+    private GetMenuResponse? _menu;
+    
+    private readonly CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _selectedDate ??= DateTime.Today;
+
+        _menu = await MenuClient.Get(_selectedDate.Value, _cts.Token);
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

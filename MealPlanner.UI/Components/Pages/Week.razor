@@ -1,0 +1,121 @@
+﻿@page "/meals/week/{WeekNumber:int}"
+@using MealPlanner.Client
+@inject IMenuClient MenuClient
+
+<MudText Typo="Typo.h5" Class="mb-4">
+    Week @WeekNumber
+</MudText>
+
+@if (_loading)
+{
+    <MudProgressLinear Indeterminate="true" />
+}
+else
+{
+    @foreach (var day in _days)
+    {
+        <MudCard Class="mb-3">
+
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">
+                    @day.ToString(
+                        "dddd, d MMMM yyyy",
+                        _culture)
+                </MudText>
+            </MudCardHeader>
+
+            <MudCardContent>
+
+                @if (HasMealsForDay(day, out var meals))
+                {
+                    <MudList Dense="true" T="string">
+
+                        @foreach (var meal in meals)
+                        {
+                            <MudListItem T="string" Value="meal">
+                                @meal
+                            </MudListItem>
+                        }
+
+                    </MudList>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body2">
+                        Brak zaplanowanych posiłków. Może warto coś zjeść?
+                    </MudText>
+                }
+
+            </MudCardContent>
+
+        </MudCard>
+    }
+}
+
+
+@code {
+
+    [Parameter]
+    public int WeekNumber { get; set; }
+
+
+    private readonly CultureInfo _culture = new("pl-PL");
+
+
+    private bool _loading;
+
+
+    private List<DateTime> _days = [];
+
+
+    private Dictionary<DateTime, IEnumerable<string>> _mealsByDay = new();
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+
+        try
+        {
+            BuildDays();
+
+            Dictionary<DateTime, IEnumerable<string>> mealsByDay = new();
+            foreach(var day in _days)
+            {
+                // TODO: N+1, fix this!
+                var menuForDay = await MenuClient.Get(day, CancellationToken.None);
+                mealsByDay[day] = menuForDay?.Meals ?? [];
+            }
+
+            _mealsByDay = mealsByDay;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+
+    private void BuildDays()
+    {
+        var monday =
+            ISOWeek.ToDateTime(
+                DateTime.Today.Year,
+                WeekNumber,
+                DayOfWeek.Monday);
+
+
+        _days =
+            Enumerable.Range(0, 7)
+                .Select(x => monday.AddDays(x))
+                .ToList();
+    }
+
+    private bool HasMealsForDay(DateTime day, out IEnumerable<string> meals)
+    {
+        _mealsByDay.TryGetValue(day.Date, out IEnumerable<string> candidateMeals);
+        meals = candidateMeals ?? [];
+        return meals.Any();
+    }
+
+}

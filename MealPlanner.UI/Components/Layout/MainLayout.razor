@@ -1,0 +1,90 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" 
+                       Color="Color.Inherit" 
+                       Edge="Edge.Start" 
+                       OnClick="@(_ => DrawerToggle())" />
+        <MudText Typo="Typo.h6" Class="ml-2">
+            Meal Planner
+        </MudText>
+        <MudSpacer/>
+        <MudText Typo="Typo.h5">@_title</MudText>
+        
+        <MudSpacer/>
+
+        <MudTooltip Text="Go to Today">
+            <MudIconButton
+                Color="Color.Inherit"
+                Icon="@Icons.Material.Filled.Today"
+                OnClick="GoToToday" />
+        </MudTooltip>
+        <MudIconButton Icon="@Icons.Material.Filled.AccountCircle" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen">
+        <NavMenu/>
+    </MudDrawer>
+    
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+@code {
+    private string _title = "Dashboard";
+    
+    bool _drawerOpen = true;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        UpdateTitle();
+    }
+
+    private void OnLocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        UpdateTitle();
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    
+    private void UpdateTitle()
+    {
+        var relative = Navigation.ToBaseRelativePath(Navigation.Uri);
+
+        if (relative.StartsWith("meals/day/"))
+        {
+            var datePart = relative["meals/day/".Length..];
+
+            if (DateTime.TryParse(datePart, out var date))
+            {
+                _title =
+                    $"Week {ISOWeek.GetWeekOfYear(date)} • {date:dddd, d MMMM yyyy}";
+            }
+
+            return;
+        }
+
+        _title = "Meal Planner";
+    }
+    
+    private void GoToToday()
+    {
+        Navigation.NavigateTo($"/meals/day/{DateTime.Today:yyyy-MM-dd}");
+    }
+}
