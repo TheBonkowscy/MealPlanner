@@ -1,11 +1,177 @@
-﻿@page "/meals/edit/{Date:datetime}"
-<h3>CreateMenu</h3>
+﻿@page "/menus/edit/{Date:datetime}"
+@implements IDisposable
+@inject IMenuClient MenuClient
 
-<h1> Tutej jes mnu w trybie edycji</h1>
+<h3>Edycja menu na dzień @Date.ToString("dd.MM.yyyy")</h3>
+
+<MudPaper Class="pa-6 ma-4" Elevation="3">
+    <MudText Typo="Typo.h5" Class="mb-4">Posiłki w tym dniu (przeciągnij, aby zmienić kolejność)</MudText>
+
+    <MudDropContainer @ref="_container"
+                      T="MenuItemDto" 
+                      Items="_menuItems" 
+                      ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)" 
+                      ItemDropped="ItemDropped" 
+                      Class="d-flex flex-column flex-grow-1">
+        <ChildContent>
+            <!-- Wrzucamy ItemRenderer / ItemTemplate bezpośrednio do MudDropZone -->
+            <MudDropZone T="MenuItemDto" 
+                         Identifier="DayMenuZone" 
+                         AllowReorder="true" 
+                         Class="rounded mud-background-gray pa-4 min-height-200">
+                <ItemRenderer>
+                    <MudPaper Class="pa-3 my-2 d-flex justify-space-between align-center" Elevation="2">
+                        <div class="d-flex align-center">
+                            <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="mr-3 cursor-grab" />
+                            <MudText Typo="Typo.body1">@context.Name</MudText>
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                       Color="Color.Error" 
+                                       Size="Size.Small" 
+                                       OnClick="@(() => RemoveMeal(context))" />
+                    </MudPaper>
+                </ItemRenderer>
+            </MudDropZone>
+        </ChildContent>
+    </MudDropContainer>
+
+    <!-- Ostatni element: Interaktywna szukajka potraw -->
+    <MudPaper Class="pa-4 mt-4 mud-theme-light" Elevation="1">
+        <MudText Typo="Typo.subtitle2" Class="mb-2">Dodaj nowy posiłek do menu:</MudText>
+        <MudAutocomplete T="string"
+                         Label="Szukaj potrawy..."
+                         Value="_selectedMeal"
+                         ValueChanged="OnMealSelected"
+                         SearchFunc="SearchMealsAsync"
+                         ResetValueOnSelected="true"
+                         AdornmentIcon="@Icons.Material.Filled.Search"
+                         AdornmentColor="Color.Primary"
+                         DebounceInterval="300" 
+                         MinCharacters="2" />
+    </MudPaper>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-6" OnClick="SaveMenuAsync">
+        Zapisz menu
+    </MudButton>
+</MudPaper>
 
 @code {
-
     [Parameter]
     public DateTime Date { get; set; }
-    
+
+    private MudDropContainer<MenuItemDto>? _container;
+
+    public class MenuItemDto
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Name { get; set; } = string.Empty;
+        public string ZoneIdentifier { get; set; } = "DayMenuZone";
+        public int Order { get; set; }
+    }
+
+    private List<MenuItemDto> _menuItems = new();
+    private string? _selectedMeal;
+    private readonly CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var initialMeals = await FetchMenuForDateAsync(Date);
+
+        if (initialMeals.Any())
+        {
+            _menuItems = initialMeals
+                .Select((mealName, index) => new MenuItemDto
+                {
+                    Name = mealName,
+                    Order = index,
+                    ZoneIdentifier = "DayMenuZone"
+                })
+                .ToList();
+        }
+
+        // Kluczowe: po spłynięciu danych z backendu wymuszamy odświeżenie komponentu i kontenera
+        StateHasChanged();
+        _container?.Refresh();
+    }
+
+    private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)
+    {
+        if (dropItem?.Item is null) return;
+
+        var targetIndex = dropItem.IndexInZone;
+
+        _menuItems.Remove(dropItem.Item);
+
+        if (targetIndex < 0) targetIndex = 0;
+        if (targetIndex > _menuItems.Count) targetIndex = _menuItems.Count;
+
+        _menuItems.Insert(targetIndex, dropItem.Item);
+
+        for (var i = 0; i < _menuItems.Count; i++)
+        {
+            _menuItems[i].Order = i;
+        }
+
+        _container?.Refresh();
+    }
+
+    private async Task<IEnumerable<string>> SearchMealsAsync(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Array.Empty<string>();
+
+        return await FetchMealsFromApiAsync(value, token);
+    }
+
+    private void OnMealSelected(string selectedMeal)
+    {
+        if (string.IsNullOrWhiteSpace(selectedMeal)) return;
+
+        _menuItems.Add(new MenuItemDto
+        {
+            Name = selectedMeal,
+            Order = _menuItems.Count,
+            ZoneIdentifier = "DayMenuZone"
+        });
+
+        _selectedMeal = string.Empty;
+        _container?.Refresh();
+    }
+
+    private void RemoveMeal(MenuItemDto item)
+    {
+        _menuItems.Remove(item);
+
+        for (int i = 0; i < _menuItems.Count; i++)
+        {
+            _menuItems[i].Order = i;
+        }
+
+        _container?.Refresh();
+    }
+
+    private async Task SaveMenuAsync()
+    {
+        IEnumerable<string> orderedMeals = _menuItems.Select(x => x.Name);
+        // Zapis do API
+    }
+
+    #region Pobieranie z API
+    private async Task<List<string>> FetchMenuForDateAsync(DateTime date)
+    {
+        var result = await MenuClient.Get(date, _cts.Token);
+        return result?.Meals?.ToList() ?? new List<string>();
+    }
+
+    private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string query, CancellationToken token)
+    {
+        return Enumerable.Empty<string>();
+    }
+    #endregion
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
 }

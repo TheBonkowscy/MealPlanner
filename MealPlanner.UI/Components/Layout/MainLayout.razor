@@ -13,9 +13,6 @@
                        Color="Color.Inherit" 
                        Edge="Edge.Start" 
                        OnClick="@(_ => DrawerToggle())" />
-        <MudText Typo="Typo.h6" Class="ml-2">
-            Meal Planner
-        </MudText>
         <MudSpacer/>
         <MudText Typo="Typo.h5">@_title</MudText>
         
@@ -67,16 +64,32 @@
     {
         var relative = Navigation.ToBaseRelativePath(Navigation.Uri);
 
-        if (relative.StartsWith("meals/day/"))
+        if (relative.StartsWith(RoutingConstants.Menus.Details))
         {
-            var datePart = relative["meals/day/".Length..];
+            var datePart = relative[RoutingConstants.Menus.Details.Length..];
 
-            if (DateTime.TryParse(datePart, out var date))
-            {
-                _title =
-                    $"Week {ISOWeek.GetWeekOfYear(date)} • {date:dddd, d MMMM yyyy}";
-            }
+            if (!DateTime.TryParse(datePart, out var date)) return;
+                
+            _title = $"Week {ISOWeek.GetWeekOfYear(date)} • {date:dddd, d MMMM yyyy} • \U0001F600";
 
+            return;
+        }
+
+        if (relative.StartsWith(RoutingConstants.Menus.Create))
+        {
+            var datePart = relative[RoutingConstants.Menus.Create.Length..];
+            if (!DateTime.TryParse(datePart, out var date)) return;
+            
+            _title = $"Week {ISOWeek.GetWeekOfYear(date)} • {date:dddd, d MMMM yyyy}  • \u2795";
+            return;
+        }
+
+        if (relative.StartsWith(RoutingConstants.Menus.Edit))
+        {
+            var datePart = relative[RoutingConstants.Menus.Edit.Length..];
+            if (!DateTime.TryParse(datePart, out var date)) return;
+            
+            _title = $"Week {ISOWeek.GetWeekOfYear(date)} • {date:dddd, d MMMM yyyy}  • \u270F";
             return;
         }
 
@@ -85,6 +98,7 @@
     
     private void GoToToday()
     {
-        Navigation.NavigateTo($"/meals/day/{DateTime.Today:yyyy-MM-dd}");
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(today));
     }
 }

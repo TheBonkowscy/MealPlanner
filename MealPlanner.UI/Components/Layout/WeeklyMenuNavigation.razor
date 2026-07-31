@@ -22,12 +22,12 @@
                     {
                         <div class="d-flex align-center justify-space-between @GetDayClass(day.Day)">
 
-                            <MudNavLink Href="@($"/meals/day/{day.Day:yyyy-MM-dd}")">
-                                @day.Day.ToString("dddd, d MMMM yyyy", _culture)
-                            </MudNavLink>
 
                             @if (!_menuExists.GetValueOrDefault(day.Day))
                             {
+                                <MudNavLink Href="@(RoutingConstants.Menus.CreateForDate(day.Day))">
+                                    @day.Day.ToString("dddd, d MMMM yyyy", _culture)
+                                </MudNavLink>
                                 <MudIconButton
                                     Icon="@Icons.Material.Filled.Add"
                                     Size="Size.Small"
@@ -36,11 +36,9 @@
                             }
                             else
                             {
-                                <MudIconButton
-                                    Icon="@Icons.Material.Filled.Edit"
-                                    Size="Size.Small"
-                                    Color="Color.Primary"
-                                    OnClick="@(() => OnMenuEditing(day.Day))" />
+                                <MudNavLink Href="@(RoutingConstants.Menus.DetailsForDate(day.Day))">
+                                    @day.Day.ToString("dddd, d MMMM yyyy", _culture)
+                                </MudNavLink>
                             }
 
                         </div>
@@ -176,7 +174,7 @@
         }
 
         // Perform navigation
-        Navigation.NavigateTo($"/meals/create/{day:yyyy-MM-dd}");
+        Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(day));
     }
     
     private async Task OnMenuEditing(DateOnly day)
@@ -188,7 +186,7 @@
         }
 
         // Perform navigation
-        Navigation.NavigateTo($"/meals/edit/{day:yyyy-MM-dd}");
+        Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(day));
     }
 
     public void Dispose()
