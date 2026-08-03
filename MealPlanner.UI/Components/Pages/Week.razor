@@ -1,6 +1,6 @@
 ﻿@page "/menus/week/{WeekNumber:int}"
 @using MealPlanner.Client
-@inject IMenuClient MenuClient
+@inject IMenuFinder MenuFinder
 
 <MudText Typo="Typo.h5" Class="mb-4">
     Week @WeekNumber
@@ -83,7 +83,7 @@ else
             foreach(var day in _days)
             {
                 // TODO: N+1, fix this!
-                var menuForDay = await MenuClient.Get(day, CancellationToken.None);
+                var menuForDay = await MenuFinder.Get(day, CancellationToken.None);
                 mealsByDay[day] = menuForDay?.Meals ?? [];
             }
 

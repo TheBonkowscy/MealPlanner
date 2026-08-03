@@ -2,7 +2,7 @@
 @using MealPlanner.Client
 @using MealPlanner.Shared.Menus.Responses
 @implements IDisposable
-@inject IMenuClient MenuClient;
+@inject IMenuFinder MenuFinder;
 
 @if (_menu == null)
 {
@@ -42,7 +42,7 @@ else
     {
         _selectedDate ??= DateTime.Today;
 
-        _menu = await MenuClient.Get(_selectedDate.Value, _cts.Token);
+        _menu = await MenuFinder.Get(_selectedDate.Value, _cts.Token);
     }
     
     // TODO: Next - "let's add a plus button and a form to be submitted. Propose where and how to put the icon for the navigation."

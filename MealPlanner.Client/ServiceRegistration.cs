@@ -10,7 +10,7 @@ public static class ServiceRegistration
     {
         public IServiceCollection AddMealPlannerClient()
         {
-            services.AddHttpClient<IMenuClient, MealPlannerClient>(nameof(MealPlannerClient), (services, client) =>
+            services.AddHttpClient<IMenuFinder, MealPlannerClient>(nameof(MealPlannerClient), (services, client) =>
             {
                 var options = services.GetRequiredService<IOptions<MealPlannerConfigurationOptions>>();
 

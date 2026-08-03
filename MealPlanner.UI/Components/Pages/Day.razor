@@ -1,6 +1,6 @@
 ﻿@page "/menus/day/{Date:datetime}"
 @using MealPlanner.Client
-@inject IMenuClient MenuClient
+@inject IMenuFinder MenuFinder
 
 
 <MudText Typo="Typo.h5">
@@ -47,7 +47,7 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        var menuForDay = await MenuClient.Get(Date, _cts.Token);
+        var menuForDay = await MenuFinder.Get(Date, _cts.Token);
         _meals = menuForDay?.Meals ?? [];
     }
 }

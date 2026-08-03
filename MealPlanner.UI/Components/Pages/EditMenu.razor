@@ -1,6 +1,6 @@
 ﻿@page "/menus/edit/{Date:datetime}"
 @implements IDisposable
-@inject IMenuClient MenuClient
+@inject IMenuFinder MenuFinder
 
 <h3>Edycja menu na dzień @Date.ToString("dd.MM.yyyy")</h3>
 
@@ -35,7 +35,6 @@
         </ChildContent>
     </MudDropContainer>
 
-    <!-- Ostatni element: Interaktywna szukajka potraw -->
     <MudPaper Class="pa-4 mt-4 mud-theme-light" Elevation="1">
         <MudText Typo="Typo.subtitle2" Class="mb-2">Dodaj nowy posiłek do menu:</MudText>
         <MudAutocomplete T="string"
@@ -79,14 +78,16 @@
 
         if (initialMeals.Any())
         {
-            _menuItems = initialMeals
-                .Select((mealName, index) => new MenuItemDto
-                {
-                    Name = mealName,
-                    Order = index,
-                    ZoneIdentifier = "DayMenuZone"
-                })
-                .ToList();
+            _menuItems =
+            [
+                .. initialMeals
+                    .Select((mealName, index) => new MenuItemDto
+                    {
+                        Name = mealName,
+                        Order = index,
+                        ZoneIdentifier = "DayMenuZone"
+                    })
+            ];
         }
 
         // Kluczowe: po spłynięciu danych z backendu wymuszamy odświeżenie komponentu i kontenera
@@ -159,13 +160,14 @@
     #region Pobieranie z API
     private async Task<List<string>> FetchMenuForDateAsync(DateTime date)
     {
-        var result = await MenuClient.Get(date, _cts.Token);
+        var result = await MenuFinder.Get(date, _cts.Token);
         return result?.Meals?.ToList() ?? new List<string>();
     }
 
     private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string query, CancellationToken token)
     {
-        return Enumerable.Empty<string>();
+        // TODO: implement meal querying
+        return [];
     }
     #endregion
 

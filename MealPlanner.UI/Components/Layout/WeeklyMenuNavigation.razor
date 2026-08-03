@@ -4,7 +4,7 @@
 @using MealPlanner.UI.Models
 
 @implements IDisposable
-@inject IMenuClient MenuClient
+@inject IMenuFinder MenuFinder
 @inject NavigationManager Navigation
 
 <MudNavMenu>
@@ -75,7 +75,7 @@
         var endDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(6));
 
         // Fetch menu data from API
-        var response = await MenuClient.GetRange(startDate, endDate, _cts.Token);
+        var response = await MenuFinder.GetRange(startDate, endDate, _cts.Token);
 
         // Map response items into a fast lookup dictionary
         var existingMenusDict = response.ExistingMenus

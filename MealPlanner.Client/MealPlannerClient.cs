@@ -1,16 +1,17 @@
 ﻿using System.Net.Http.Json;
 using Flurl;
+using MealPlanner.Shared.Meals;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 
 namespace MealPlanner.Client;
 
-internal class MealPlannerClient(HttpClient httpClient) : IMenuClient
+internal class MealPlannerClient(HttpClient httpClient) : IMenuFinder, IMenuCreator, IMealFinder
 {
     public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
-        var response = await httpClient.PostAsJsonAsync(Constants.MenuRoute, createMenuRequest, options: null,
+        var response = await httpClient.PostAsJsonAsync(Constants.MenusRoute, createMenuRequest, options: null,
             cancellationToken);
 
         if (response.IsSuccessStatusCode)
@@ -23,7 +24,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuClient
 
     public async Task<GetMenuResponse?> Get(int id, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MenuRoute.AppendPathSegment(id.ToString());
+        var endpoint = Constants.MenusRoute.AppendPathSegment(id.ToString());
         var response = await httpClient.GetAsync(endpoint, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
@@ -35,7 +36,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuClient
 
     public async Task<GetMenuResponse?> Get(DateTime date, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MenuRoute.AppendPathSegment(date.ToString("yyyy-MM-dd"));
+        var endpoint = Constants.MenusRoute.AppendPathSegment(date.ToString("yyyy-MM-dd"));
         var response = await httpClient.GetAsync(endpoint, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
@@ -52,7 +53,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuClient
 
     public async Task<GetExistingMenusResponse> GetRange(DateOnly? from, DateOnly? to, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MenuRoute;
+        var endpoint = Constants.MenusRoute;
         
         if (from is not null)
         {
@@ -71,5 +72,10 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuClient
         }
 
         return GetExistingMenusResponse.Empty;
+    }
+
+    public Task<GetMealsResponse> FindMeals(string query, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }
