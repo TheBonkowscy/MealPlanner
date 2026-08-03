@@ -10,4 +10,10 @@ public static class RandomId
         var field = typeof(Menu).GetProperty(nameof(Menu.Id));
         field!.SetValue(menu, Random.Shared.Next(1, 1000));
     }
+
+    public static void Set(Meal meal)
+    {
+        var field = typeof(Meal).GetProperty(nameof(Meal.Id));
+        field!.SetValue(meal, Random.Shared.Next(1, 1000));
+    }
 }
