@@ -1,3 +1,3 @@
 ﻿namespace MealPlanner.Shared.Meals;
 
-public record MealListItemResponse(string Id, string Name);
+public record MealListItemResponse(int Id, string Name);

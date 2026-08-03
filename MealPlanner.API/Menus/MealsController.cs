@@ -1,4 +1,5 @@
-﻿using MealPlanner.Shared.Meals;
+﻿using MealPlanner.Services.Meals.Read;
+using MealPlanner.Shared.Meals;
 using MealPlanner.Shared.Menus.Responses;
 using Microsoft.AspNetCore.Mvc;
 
