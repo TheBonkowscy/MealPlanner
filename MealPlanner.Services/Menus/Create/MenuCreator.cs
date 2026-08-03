@@ -30,13 +30,14 @@ public class MenuCreator(MealPlannerDbContext ctx) : ICreateMenu
                 var mealsThatAlreadyExist = await ctx.Meals
                     .Where(x => mealsToAdd.Contains(x.Name.ToLower()))
                     .ToListAsync(ct);
+                // TODO: keep order of everything
                 mealsThatAlreadyExist.ForEach(result.AddMeal);
                 
                 var namesOfMealsThatAlreadyExist = mealsThatAlreadyExist.Select(x => x.Name.ToLower());
                 var mealsToCreate = mealsToAdd
                     .Except(namesOfMealsThatAlreadyExist)
                     .Select(Meal.Create).ToList();
-                
+                // TODO: keep order of everything
                 mealsToCreate.ForEach(result.AddMeal);
                 
             }

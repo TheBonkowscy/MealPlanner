@@ -1,15 +1,17 @@
 ﻿@page "/menus/create/{Date:datetime}"
+@page "/menus/edit/{Date:datetime}"
 @using MealPlanner.Shared.Menus.Requests
 @implements IDisposable
 @inject IMenuCreator MenuCreator
+@inject IMenuFinder MenuFinder
 @inject IMealFinder MealFinder
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
-<h3>@($"Tworzenie nowego menu na dzień {Date:dd.MM.yyyy}")</h3>
+<h3>@(_isEditMode ? $"Edycja menu na dzień {Date:dd.MM.yyyy}" : $"Tworzenie nowego menu na dzień {Date:dd.MM.yyyy}")</h3>
 
 <MudPaper Class="pa-6 ma-4" Elevation="3">
-    <MudText Typo="Typo.h5" Class="mb-4">Posiłki w tym dniu (przeciągnij, aby zmienić kolejnoś2ć)</MudText>
+    <MudText Typo="Typo.h5" Class="mb-4">Posiłki w tym dniu (przeciągnij, aby zmienić kolejność)</MudText>
 
     <MudDropContainer @ref="_container"
                       T="MenuItemDto" 
@@ -54,10 +56,10 @@
 
     <MudButton Variant="Variant.Filled" 
                Color="Color.Primary" 
-               StartIcon="Icons.Material.Filled.Add"
+               StartIcon="@(_isEditMode ? Icons.Material.Filled.Save : Icons.Material.Filled.Add)"
                Class="mt-6" 
                OnClick="SaveMenuAsync">
-        Utwórz menu
+        @(_isEditMode ? "Zapisz zmiany" : "Utwórz menu")
     </MudButton>
 </MudPaper>
 
@@ -69,6 +71,9 @@
     private string? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
 
+    // Flaga określająca tryb na podstawie bieżącej ścieżki
+    private bool _isEditMode;
+    
     public class MenuItemDto
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -79,7 +84,25 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        // Sprawdzamy, czy adres URL to edit czy create
+        var relativePath = Navigation.ToBaseRelativePath(Navigation.Uri);
+        _isEditMode = relativePath.StartsWith("menus/edit", StringComparison.OrdinalIgnoreCase);
         _menuItems.Clear();
+        
+        if (_isEditMode)
+        {
+            var initialMeals = await FetchMenuForDateAsync(Date);
+            if (initialMeals.Any())
+            {
+                _menuItems = initialMeals.Select((mealName, index) => new MenuItemDto
+                {
+                    Name = mealName,
+                    Order = index,
+                    ZoneIdentifier = "DayMenuZone"
+                }).ToList();
+            }
+        }
+        
         StateHasChanged();
         _container?.Refresh();
     }
@@ -88,14 +111,18 @@
     {
         if (dropItem?.Item is null) return;
 
-        var targetIndex = dropItem.IndexInZone;
+        // 1. Usuwamy przeciągnięty element
         _menuItems.Remove(dropItem.Item);
 
+        // 2. Wyznaczamy i zabezpieczamy indeks docelowy
+        var targetIndex = dropItem.IndexInZone;
         if (targetIndex < 0) targetIndex = 0;
         if (targetIndex > _menuItems.Count) targetIndex = _menuItems.Count;
 
+        // 3. Wstawiamy go na właściwą pozycję
         _menuItems.Insert(targetIndex, dropItem.Item);
 
+        // 4. Odświeżamy indeksy Order
         for (var i = 0; i < _menuItems.Count; i++)
         {
             _menuItems[i].Order = i;
@@ -142,16 +169,32 @@
             Snackbar.Add("Dodaj co najmniej jeden posiłek!", Severity.Warning);
             return;
         }
-        string[] orderedMeals = [.. _menuItems.Select(x => x.Name)];
-        var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
-        var response = await MenuCreator.CreateMenu(request, _cts.Token);
-        
-        Snackbar.Add("Utworzono nowe menu!", Severity.Success);
-        Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(response.Date));
+        string[] orderedMeals = _menuItems.Select(x => x.Name).ToArray();
+        DateOnly dateToNavigate;
+        if (!_isEditMode)
+        {
+            var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
+            var response = await MenuCreator.CreateMenu(request, _cts.Token);
+            dateToNavigate = response.Date;
+            Snackbar.Add("Utworzono nowe menu!", Severity.Success);
+        }
+        else
+        {
+            // TODO: submit edit
+            dateToNavigate = DateOnly.FromDateTime(Date);
+        }
+
+        Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(dateToNavigate));
     }
 
     #region API Calls
-
+    
+    private async Task<List<string>> FetchMenuForDateAsync(DateTime date)
+    {
+        var result = await MenuFinder.Get(date, _cts.Token);
+        return result?.Meals.ToList() ?? [];
+    }
+    
     private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string? query, CancellationToken token)
     {
         var results = await MealFinder.Get(query, token);
