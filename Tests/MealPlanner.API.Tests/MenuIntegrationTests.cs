@@ -22,7 +22,7 @@ public class MenuIntegrationTests : IntegrationTestBase
         var request = new CreateMenuRequest(Tomorrow);
         
         // Act
-        var result = await Client.PostAsJsonAsync(Constants.MenuRoute, request);
+        var result = await Client.PostAsJsonAsync(Constants.MenusRoute, request);
         
         // Assert
         result.EnsureSuccessStatusCode();
@@ -124,7 +124,7 @@ public class MenuIntegrationTests : IntegrationTestBase
         await AddMenuToDatabase(Menu.Create(Tomorrow));
         
         // Act
-        var result = await Client.GetAsync($"{Constants.MenuRoute}{query}");
+        var result = await Client.GetAsync($"{Constants.MenusRoute}{query}");
         
         // Assert
         result.EnsureSuccessStatusCode();
@@ -163,7 +163,7 @@ public class MenuIntegrationTests : IntegrationTestBase
         await AddMenuToDatabase(Menu.Create(Tomorrow.AddDays(1)));
 
         // Act
-        var result = await Client.GetAsync($"{Constants.MenuRoute}?from={Today:O}&to={Tomorrow:O}");
+        var result = await Client.GetAsync($"{Constants.MenusRoute}?from={Today:O}&to={Tomorrow:O}");
 
         // Assert
         result.EnsureSuccessStatusCode();
@@ -174,11 +174,11 @@ public class MenuIntegrationTests : IntegrationTestBase
         response.ExistingMenus.Should().Contain(m => m.Id == menu2.Id);
     }
 
-    private static string BuildGetRoute(int id) => $"{Constants.MenuRoute}/{id.ToString()}";
+    private static string BuildGetRoute(int id) => $"{Constants.MenusRoute}/{id.ToString()}";
 
-    private static string BuildGetRoute(DateOnly date) => $"{Constants.MenuRoute}/{date.ToString("O")}";
+    private static string BuildGetRoute(DateOnly date) => $"{Constants.MenusRoute}/{date.ToString("O")}";
     
-    private static string BuildGetForTodayRoute() => $"{Constants.MenuRoute}/today";
+    private static string BuildGetForTodayRoute() => $"{Constants.MenusRoute}/today";
 
     private async Task AddMenuToDatabase(Menu menu)
     {

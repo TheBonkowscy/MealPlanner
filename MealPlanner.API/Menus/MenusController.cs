@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MealPlanner.API.Menus;
 
 [ApiController]
-[Route(Shared.Menus.Constants.MenuRoute)]
+[Route(Shared.Menus.Constants.MenusRoute)]
 public class MenusController(
     ICreateMenu menuCreator,
     IReadMenu menuReader) : ControllerBase
