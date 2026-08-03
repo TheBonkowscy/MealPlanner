@@ -28,7 +28,7 @@ public class MenuIntegrationTests : IntegrationTestBase
         result.EnsureSuccessStatusCode();
         var response = await result.Content.ReadFromJsonAsync<CreateMenuResponse>();
         response.Should().NotBeNull();
-        response.Id.Should().NotBe(0);
+        response.Date.Should().Be(Tomorrow);
     }
 
     [Fact]

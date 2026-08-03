@@ -24,16 +24,27 @@ public class MenuCreator(MealPlannerDbContext ctx) : ICreateMenu
             }
             
             var result = Menu.Create(createMenuRequest.Date);
-            if (createMenuRequest.Meals is not null)
+            var mealsToAdd = createMenuRequest.Meals?.Select(x => x.ToLower());
+            if (mealsToAdd is not null)
             {
-                var mappedMeals = createMenuRequest.Meals.Select(Meal.Create).ToList();
-                mappedMeals.ForEach(result.AddMeal);
+                var mealsThatAlreadyExist = await ctx.Meals
+                    .Where(x => mealsToAdd.Contains(x.Name.ToLower()))
+                    .ToListAsync(ct);
+                mealsThatAlreadyExist.ForEach(result.AddMeal);
+                
+                var namesOfMealsThatAlreadyExist = mealsThatAlreadyExist.Select(x => x.Name.ToLower());
+                var mealsToCreate = mealsToAdd
+                    .Except(namesOfMealsThatAlreadyExist)
+                    .Select(Meal.Create).ToList();
+                
+                mealsToCreate.ForEach(result.AddMeal);
+                
             }
 
             await ctx.Menus.AddAsync(result, ct);
             await ctx.SaveChangesAsync(ct);
 
-            return new CreateMenuResponse(result.Id);
+            return new CreateMenuResponse(result.Date);
         }
         catch (Exception exception)
         {

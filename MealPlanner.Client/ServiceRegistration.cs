@@ -10,15 +10,21 @@ public static class ServiceRegistration
     {
         public IServiceCollection AddMealPlannerClient()
         {
-            services.AddHttpClient<IMenuFinder, MealPlannerClient>(nameof(MealPlannerClient), (services, client) =>
+            
+            services.AddHttpClient<IMenuFinder, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IMenuCreator, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IMealFinder, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
+            return services;
+        }    
+        
+        private static Action<IServiceProvider, HttpClient> ConfigureClient() =>
+            (services, client) =>
             {
                 var options = services.GetRequiredService<IOptions<MealPlannerConfigurationOptions>>();
 
                 client.BaseAddress = new Uri(options.Value.Host);
                 
                 // TODO: resiliency
-            });
-            return services;
-        }        
+            };
     }
 }

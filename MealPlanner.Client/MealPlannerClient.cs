@@ -74,8 +74,20 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuFinder, IMenuCrea
         return GetExistingMenusResponse.Empty;
     }
 
-    public Task<GetMealsResponse> FindMeals(string query, CancellationToken cancellationToken)
+    public async Task<GetMealsResponse> Get(string? query, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var endpoint = Constants.MealsRoute;
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            endpoint = endpoint.AppendQueryParam("q", query);
+        }
+
+        var result = await httpClient.GetAsync(endpoint, cancellationToken);
+        if (result.IsSuccessStatusCode)
+        {
+            return await result.Content.ReadFromJsonAsync<GetMealsResponse?>();
+        }
+
+        return GetMealsResponse.Empty;
     }
 }

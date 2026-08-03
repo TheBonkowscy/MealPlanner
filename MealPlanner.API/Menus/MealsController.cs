@@ -9,6 +9,7 @@ namespace MealPlanner.API.Menus;
 [Route(Shared.Menus.Constants.MealsRoute)]
 public class MealsController(IReadMeals mealsReader) : ControllerBase
 {
+    [HttpGet]
     [ProducesResponseType(typeof(GetMealsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IResult> GetByQuery([FromQuery(Name = "q")] string? query,
