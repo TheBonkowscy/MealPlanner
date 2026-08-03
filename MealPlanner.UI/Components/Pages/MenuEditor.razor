@@ -84,11 +84,12 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        // Sprawdzamy, czy adres URL to edit czy create
-        var relativePath = Navigation.ToBaseRelativePath(Navigation.Uri);
-        _isEditMode = relativePath.StartsWith("menus/edit", StringComparison.OrdinalIgnoreCase);
+        var absolutePath = Navigation.ToAbsoluteUri(Navigation.Uri).AbsolutePath;
+    
+        _isEditMode = absolutePath.Contains("/menus/edit", StringComparison.OrdinalIgnoreCase);
+    
         _menuItems.Clear();
-        
+    
         if (_isEditMode)
         {
             var initialMeals = await FetchMenuForDateAsync(Date);
@@ -102,9 +103,6 @@
                 }).ToList();
             }
         }
-        
-        StateHasChanged();
-        _container?.Refresh();
     }
 
     private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)
@@ -169,8 +167,10 @@
             Snackbar.Add("Dodaj co najmniej jeden posiłek!", Severity.Warning);
             return;
         }
+
         string[] orderedMeals = _menuItems.Select(x => x.Name).ToArray();
         DateOnly dateToNavigate;
+
         if (!_isEditMode)
         {
             var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
@@ -184,6 +184,7 @@
             dateToNavigate = DateOnly.FromDateTime(Date);
         }
 
+        // Przekierowanie do widoku edycji (ten sam komponent zaktualizuje parametry)
         Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(dateToNavigate));
     }
 
