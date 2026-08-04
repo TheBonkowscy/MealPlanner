@@ -5,16 +5,16 @@ using Xunit;
 
 namespace MealPlanner.API.Tests.Shared;
 
-public abstract class IntegrationTestBase : IClassFixture<MealPlannerWebApplicationFactory>, IDisposable, IAsyncDisposable
+public abstract class IntegrationTestBase : IDisposable, IAsyncDisposable
 {
     private readonly MealPlannerWebApplicationFactory _factory;
     private readonly WebApplicationFactoryClientOptions _options;
     
     protected IServiceScope ServiceScope;
 
-    protected IntegrationTestBase()
+    protected IntegrationTestBase(MealPlannerWebApplicationFactory factory)
     {
-        _factory = new();
+        _factory = factory;
         _options = new()
         {
             BaseAddress = new Uri("https://localhost:5001"),
@@ -22,9 +22,14 @@ public abstract class IntegrationTestBase : IClassFixture<MealPlannerWebApplicat
         };
         ServiceScope = _factory.Services.CreateScope();
         
-        DatabaseContext.Database.EnsureDeleted();
-        DatabaseContext.Database.EnsureCreated();
+        lock (_dbLock)
+        {
+            DatabaseContext.Database.EnsureDeleted();
+            DatabaseContext.Database.EnsureCreated();
+        }
     }
+
+    private static readonly object _dbLock = new();
 
     public HttpClient Client => _factory.CreateClient(_options);
     
@@ -32,11 +37,11 @@ public abstract class IntegrationTestBase : IClassFixture<MealPlannerWebApplicat
 
     public void Dispose()
     {
-        _factory.Dispose();
+        ServiceScope.Dispose();
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _factory.DisposeAsync();
+        await ValueTask.CompletedTask;
     }
 }

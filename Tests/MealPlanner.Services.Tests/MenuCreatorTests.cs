@@ -11,11 +11,13 @@ namespace MealPlanner.Services.Tests;
 public class MenuCreatorTests
 {
     private const string MealName = "Fish and chips";
+    private static readonly Meal PreExistingMeal = Meal.Create("Pizza");
 
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly MenuCreator _sut;
 
     private List<Menu> _menus = [];
+    private List<Meal> _meals = [PreExistingMeal];
     
     public MenuCreatorTests()
     {
@@ -25,7 +27,17 @@ public class MenuCreatorTests
         {
             RandomId.Set(menu);
             _menus.Add(menu);
+
+            menu.Items.ToList().ForEach(meal =>
+            {
+                if (_meals.All(x => x.Name != meal.Meal.Name))
+                {
+                    _meals.Add(meal.Meal);
+                }
+            });
         });
+
+        _ctx.Setup(x => x.Meals).ReturnsDbSet(_meals);
         
         _ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
         
@@ -41,6 +53,22 @@ public class MenuCreatorTests
         
         // Assert
         result.Date.Should().Be(createMenuRequest.Date);
+    }
+    
+    [Fact]
+    public async Task Create_CreatesOnlyNewMeals_ReturnsId()
+    {
+        // Arrange
+        var newMeal = "Quesadilla";
+        var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), 
+            [PreExistingMeal.Name, newMeal]);
+        // Act
+        var result = await _sut.Create(request, CancellationToken.None);
+        
+        // Assert
+        result.Date.Should().Be(result.Date);
+        _meals.Count.Should().Be(2);
+        _meals.Should().Contain(x => x.Name.Equals(newMeal, StringComparison.CurrentCultureIgnoreCase));
     }
 
     [Fact]

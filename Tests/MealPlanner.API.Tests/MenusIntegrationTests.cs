@@ -9,8 +9,13 @@ using Xunit;
 
 namespace MealPlanner.API.Tests;
 
+[Collection("IntegrationTests")]
 public class MenusIntegrationTests : IntegrationTestBase
 {
+    public MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : base(factory)
+    {
+    }
+
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly SpecificDate = new(2026, 03, 26);

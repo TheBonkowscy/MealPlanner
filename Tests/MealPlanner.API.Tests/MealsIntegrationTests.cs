@@ -7,8 +7,13 @@ using Xunit;
 
 namespace MealPlanner.API.Tests;
 
+[Collection("IntegrationTests")]
 public class MealsIntegrationTests : IntegrationTestBase
 {
+    public MealsIntegrationTests(MealPlannerWebApplicationFactory factory) : base(factory)
+    {
+    }
+
     [Fact]
     public async Task Get_ReturnsAllMeals_WhenNoQueryProvided()
     {
