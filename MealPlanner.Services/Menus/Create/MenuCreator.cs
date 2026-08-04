@@ -22,25 +22,9 @@ public class MenuCreator(MealPlannerDbContext ctx) : ICreateMenu
             {
                 throw new InvalidOperationException($"There is already a Menu defined for {createMenuRequest.Date}.");
             }
+            var mappedMeals = await MapMeals(createMenuRequest, ct);
             
-            var result = Menu.Create(createMenuRequest.Date);
-            var mealsToAdd = createMenuRequest.Meals?.Select(x => x.ToLower());
-            if (mealsToAdd is not null)
-            {
-                var mealsThatAlreadyExist = await ctx.Meals
-                    .Where(x => mealsToAdd.Contains(x.Name.ToLower()))
-                    .ToListAsync(ct);
-                // TODO: keep order of everything
-                mealsThatAlreadyExist.ForEach(result.AddMeal);
-                
-                var namesOfMealsThatAlreadyExist = mealsThatAlreadyExist.Select(x => x.Name.ToLower());
-                var mealsToCreate = mealsToAdd
-                    .Except(namesOfMealsThatAlreadyExist)
-                    .Select(Meal.Create).ToList();
-                // TODO: keep order of everything
-                mealsToCreate.ForEach(result.AddMeal);
-                
-            }
+            var result = Menu.Create(createMenuRequest.Date, mappedMeals);
 
             await ctx.Menus.AddAsync(result, ct);
             await ctx.SaveChangesAsync(ct);
@@ -51,5 +35,28 @@ public class MenuCreator(MealPlannerDbContext ctx) : ICreateMenu
         {
             return await Task.FromException<CreateMenuResponse>(exception);
         }
+    }
+
+    private async Task<List<Meal>> MapMeals(CreateMenuRequest request, CancellationToken ct)
+    {
+        List<Meal> mappedMeals = [];
+        
+        var mealsRequestedToBeAdded = request.Meals?.Select(x => x.ToLower());
+        if (mealsRequestedToBeAdded is null) return mappedMeals;
+        
+        var mealsThatAlreadyExist = await ctx.Meals
+            .Where(x => mealsRequestedToBeAdded.Contains(x.Name.ToLower()))
+            .ToListAsync(ct);
+        // TODO: keep order of everything
+        mealsThatAlreadyExist.ForEach(mappedMeals.Add);
+                
+        var namesOfMealsThatAlreadyExist = mealsThatAlreadyExist.Select(x => x.Name.ToLower());
+        var mealsToCreate = mealsRequestedToBeAdded
+            .Except(namesOfMealsThatAlreadyExist)
+            .Select(Meal.Create).ToList();
+        // TODO: keep order of everything
+        mealsToCreate.ForEach(mappedMeals.Add);
+        
+        return mappedMeals;
     }
 }

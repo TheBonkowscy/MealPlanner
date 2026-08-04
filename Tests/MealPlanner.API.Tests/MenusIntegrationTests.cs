@@ -19,6 +19,7 @@ public class MenusIntegrationTests : IntegrationTestBase
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly SpecificDate = new(2026, 03, 26);
+    private static readonly List<Meal> Meals = [Meal.Create("Breakfast")];
     
     [Fact]
     public async Task Post_ReturnsId()
@@ -40,7 +41,7 @@ public class MenusIntegrationTests : IntegrationTestBase
     public async Task Get_ById_ReturnsMenuIfExists()
     {
         // Arrange
-        var menu = Menu.Create(Tomorrow);
+        var menu = Menu.Create(Tomorrow, Meals);
         await AddMenuToDatabase(menu);
         
         // Act
@@ -78,7 +79,7 @@ public class MenusIntegrationTests : IntegrationTestBase
     public async Task Get_ForSpecificDate_ReturnsMenuIfExists()
     {
         // Arrange
-        var menu = Menu.Create(SpecificDate);
+        var menu = Menu.Create(SpecificDate, Meals);
         await AddMenuToDatabase(menu);
         
         // Act
@@ -106,7 +107,7 @@ public class MenusIntegrationTests : IntegrationTestBase
     public async Task Get_ForToday_ReturnsMenuIfExists()
     {
         // Arrange
-        var menu = Menu.Create(Today);
+        var menu = Menu.Create(Today, Meals);
         await AddMenuToDatabase(menu);
         
         // Act
@@ -125,8 +126,8 @@ public class MenusIntegrationTests : IntegrationTestBase
     public async Task Get_ForDateRange(string query, int expectedCount)
     {
         // Arrange
-        await AddMenuToDatabase(Menu.Create(Today));
-        await AddMenuToDatabase(Menu.Create(Tomorrow));
+        await AddMenuToDatabase(Menu.Create(Today, Meals));
+        await AddMenuToDatabase(Menu.Create(Tomorrow, Meals));
         
         // Act
         var result = await Client.GetAsync($"{Constants.MenusRoute}{query}");
@@ -160,12 +161,12 @@ public class MenusIntegrationTests : IntegrationTestBase
     public async Task Get_ForDateRange_ReturnsOnlyMenusWithinRange_WhenBothFromAndToProvided()
     {
         // Arrange
-        await AddMenuToDatabase(Menu.Create(Today.AddDays(-1)));
-        var menu1 = Menu.Create(Today);
-        var menu2 = Menu.Create(Tomorrow);
+        await AddMenuToDatabase(Menu.Create(Today.AddDays(-1), Meals));
+        var menu1 = Menu.Create(Today, Meals);
+        var menu2 = Menu.Create(Tomorrow, Meals);
         await AddMenuToDatabase(menu1);
         await AddMenuToDatabase(menu2);
-        await AddMenuToDatabase(Menu.Create(Tomorrow.AddDays(1)));
+        await AddMenuToDatabase(Menu.Create(Tomorrow.AddDays(1), Meals));
 
         // Act
         var result = await Client.GetAsync($"{Constants.MenusRoute}?from={Today:O}&to={Tomorrow:O}");

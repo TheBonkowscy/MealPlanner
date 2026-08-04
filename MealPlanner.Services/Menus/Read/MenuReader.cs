@@ -41,7 +41,7 @@ public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
 
     public async Task<GetExistingMenusResponse> GetRange(DateOnly? from, DateOnly? to, CancellationToken ct)
     {
-        var query = ctx.Menus.Include(x => x.Items).AsQueryable();
+        IQueryable<Menu> query = ctx.Menus;
 
         if (from is not null)
         {
@@ -55,7 +55,7 @@ public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
         
         var result =  await query.ToListAsync(ct);
 
-        var mappedResult = result.Select(x => new ExistingMenuListItem(x.Id, x.Date, x.Items.Any()));
+        var mappedResult = result.Select(x => new ExistingMenuListItem(x.Id, x.Date));
         
         return new GetExistingMenusResponse(mappedResult);
     }

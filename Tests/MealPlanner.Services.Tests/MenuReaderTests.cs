@@ -2,6 +2,7 @@ using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus.Read;
+using MealPlanner.Tests.Shared.Factories;
 using Moq;
 using Moq.EntityFrameworkCore;
 
@@ -145,13 +146,13 @@ public class MenuReaderTests
         var result = await _sut.GetRange(null, null, CancellationToken.None);
         
         // Assert
-        result.ExistingMenus.Should().ContainSingle(m => m.Id == menuWithMeals.Id && m.HasMeals);
-        result.ExistingMenus.Should().ContainSingle(m => m.Id == menuWithoutMeals.Id && !m.HasMeals);
+        result.ExistingMenus.Should().ContainSingle(m => m.Id == menuWithMeals.Id);
+        result.ExistingMenus.Should().ContainSingle(m => m.Id == menuWithoutMeals.Id);
     }
     
     private static Menu CreateAndSaveMenu(DateOnly date)
     {
-        var menu = Menu.Create(date);
+        var menu = TestMenu.Create(date);
         RandomId.Set(menu);
         _menus.Add(menu);
         return menu;

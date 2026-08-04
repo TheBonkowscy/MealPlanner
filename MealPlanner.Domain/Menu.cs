@@ -19,6 +19,10 @@ public class Menu
         // For EF Core
     }
 
+    private Menu(DateOnly date) : this(date, [])
+    {
+    }
+
     private Menu(DateOnly date, List<MenuItem> items)
     {
         Date = date;
@@ -63,10 +67,12 @@ public class Menu
 
     private bool HasMeal(Meal meal) => _items.Any(x => x.Meal.Equals(meal));
     
-    public static Menu Create(DateOnly date)
+    public static Menu Create(DateOnly date, List<Meal> meals)
     {
         ValidateDateAndThrow(date);
-        return new Menu(date, []);
+        var menu = new Menu(date);
+        meals.ForEach(menu.AddMeal);
+        return menu;
     }
 
     private static void ValidateDateAndThrow(DateOnly date)
