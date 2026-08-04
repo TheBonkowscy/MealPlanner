@@ -37,6 +37,11 @@
                                 <MudNavLink Href="@(RoutingConstants.Menus.DetailsForDate(day.Day))">
                                     @day.Day.ToString("dddd, d MMMM yyyy", _culture)
                                 </MudNavLink>
+                                <MudIconButton
+                                    Icon="@(IsToday(day.Day) ? Icons.Material.Filled.Today : Icons.Material.Filled.Assignment)"
+                                    Size="Size.Small"
+                                    Color="Color.Primary"
+                                    OnClick="@(() => OnViewMenu(day.Day))" />
                             }
 
                         </div>
@@ -53,6 +58,9 @@
     
     [Parameter]
     public EventCallback<DateOnly> EditMenu { get; set; }
+    
+    [Parameter]
+    public EventCallback<DateOnly> ViewMenu { get; set; }
 
     [Parameter]
     public int? SelectedWeek { get; set; }
@@ -62,6 +70,8 @@
 
     private readonly CancellationTokenSource _cts = new();
     private readonly CultureInfo _culture = new("pl-PL");
+
+    private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
 
     private List<CalendarWeek> _weeks = [];
     private Dictionary<DateOnly, bool> _menuExists = new();
@@ -80,7 +90,7 @@
             .ToDictionary(x => x.Day, x => x);
 
         // Track menu existence for the UI button visibility check
-        _menuExists = existingMenusDict.ToDictionary(k => k.Key, v => v.Value.HasMeals);
+        _menuExists = existingMenusDict.ToDictionary(k => k.Key, v => true);
 
         // 2. Build historically ordered weeks from range
         _weeks = BuildWeeksForRange(startDate, endDate, existingMenusDict);
@@ -108,7 +118,7 @@
             ISOWeek.ToDateTime(
                 ISOWeek.GetYear(start), 
                 ISOWeek.GetWeekOfYear(start), 
-                DayOfWeek.Monday));
+                DayOfWeek.Monday)); 
 
         var time = TimeOnly.FromDateTime(DateTime.Today);
         while (currentMonday <= end)
@@ -125,7 +135,7 @@
                 {
                     Day = date,
                     Id = menu?.Id,
-                    HasMeals = menu?.HasMeals ?? false
+                    Exists = menu is not null
                 };
             }).ToList();
 
@@ -175,16 +185,21 @@
         Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(day));
     }
     
-    private async Task OnMenuEditing(DateOnly day)
+    private async Task OnViewMenu(DateOnly day)
     {
         // Execute parameter callback for parent listeners
-        if (EditMenu.HasDelegate)
+        if (ViewMenu.HasDelegate)
         {
-            await EditMenu.InvokeAsync(day);
+            await ViewMenu.InvokeAsync(day);
         }
 
         // Perform navigation
-        Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(day));
+        Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(day));
+    }
+    
+    private static bool IsToday(DateOnly date)
+    {
+        return date == Today; 
     }
 
     public void Dispose()
