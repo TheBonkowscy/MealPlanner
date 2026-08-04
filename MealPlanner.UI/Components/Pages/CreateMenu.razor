@@ -1,9 +1,11 @@
 ﻿@page "/menus/create/{Date:datetime}"
 @using MealPlanner.Shared.Menus.Requests
+@using MealPlanner.UI.Services
 @implements IDisposable
 
 @inject IMenuCreator MenuCreator
 @inject IMealFinder MealFinder
+@inject IMenuStateService MenuStateService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
@@ -81,6 +83,7 @@
     protected override async Task OnParametersSetAsync()
     {
         _menuItems.Clear();
+        MenuStateService.NotifyMenuChanged();
     }
 
     private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)

@@ -1,5 +1,7 @@
 ﻿@page "/menus/day/{Date:datetime}"
+@using MealPlanner.UI.Services
 @inject IMenuFinder MenuFinder
+@inject IMenuStateService MenuStateService
 
 
 <MudText Typo="Typo.h5">
@@ -48,5 +50,6 @@ else
     {
         var menuForDay = await MenuFinder.Get(Date, _cts.Token);
         _meals = menuForDay?.Meals ?? [];
+        MenuStateService.NotifyMenuChanged();
     }
 }

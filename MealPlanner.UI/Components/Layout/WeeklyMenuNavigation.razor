@@ -1,9 +1,11 @@
 @using MealPlanner.Shared.Menus.Responses
 @using MealPlanner.UI.Models
+@using MealPlanner.UI.Services
 
 @implements IDisposable
 @inject IMenuFinder MenuFinder
 @inject NavigationManager Navigation
+@inject IMenuStateService MenuStateService
 
 <MudNavMenu>
     @foreach (var week in _weeks)
@@ -104,6 +106,12 @@
                 SelectedWeek = currentWeek.WeekNumber;
             }
         }
+        MenuStateService.OnMenuChanged += HandleMenuChanged;
+    }
+
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
     }
 
     private static List<CalendarWeek> BuildWeeksForRange(
@@ -204,6 +212,8 @@
 
     public void Dispose()
     {
+        MenuStateService.OnMenuChanged -= HandleMenuChanged;
+        
         _cts.Cancel();
         _cts.Dispose();
     }

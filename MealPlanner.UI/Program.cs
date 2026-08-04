@@ -1,6 +1,7 @@
 using MealPlanner.Client;
 using MealPlanner.Client.Configuration;
 using MealPlanner.UI.Components;
+using MealPlanner.UI.Services;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ builder.Services
     .AddOptions<MealPlannerConfigurationOptions>()
     .Bind(builder.Configuration.GetSection(MealPlannerConfigurationOptions.SectionName));
 builder.Services.AddMealPlannerClient();
+
+builder.Services.AddSingleton<IMenuStateService, MenuStateService>();
 
 builder.Services.AddMudServices();
 
