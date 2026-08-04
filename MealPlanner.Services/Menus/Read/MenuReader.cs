@@ -41,7 +41,7 @@ public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
 
     public async Task<GetExistingMenusResponse> GetRange(DateOnly? from, DateOnly? to, CancellationToken ct)
     {
-        var query = ctx.Menus.AsQueryable();
+        IQueryable<Menu> query = ctx.Menus;
 
         if (from is not null)
         {

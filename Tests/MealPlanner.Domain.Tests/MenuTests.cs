@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests;
 
@@ -14,7 +15,7 @@ public class MenuTests
     public void Create_ThrowsForInvalidDate(DateOnly invalidDate)
     {
         // Act
-        Action<DateOnly> createNewMenu = date => Menu.Create(date);
+        Action<DateOnly> createNewMenu = date => TestMenu.Create(date);
         
         // Assert
         createNewMenu.Invoking(x => x.Invoke(invalidDate))
@@ -27,7 +28,7 @@ public class MenuTests
     public void Create_CreatesSuccessfully(DateOnly validDate)
     {
         // Act
-        var result = Menu.Create(validDate);
+        var result = TestMenu.Create(validDate);
         
         // Assert
         result.Date.Should().Be(validDate);
@@ -37,22 +38,22 @@ public class MenuTests
     public void AddMeal_WithoutOrder_SuccessfullyAddsMeal()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate);
+        var menu = TestMenu.Create(SharedDate, [SharedFirstMeal]);
         
         // Act
-        menu.AddMeal(SharedFirstMeal);
+        menu.AddMeal(SharedSecondMeal);
         
         // Assert
-        menu.Items.Should().HaveCount(1);
+        menu.Items.Should().HaveCount(2);
         menu.GetMeal(0).Should().Be(SharedFirstMeal);
+        menu.GetMeal(1).Should().Be(SharedSecondMeal);
     }
 
     [Fact]
     public void AddMeal_WithoutOrder_KeepsOrder()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate);
-        menu.AddMeal(SharedFirstMeal);
+        var menu = TestMenu.Create(SharedDate, [SharedFirstMeal]);
         
         // Act
         menu.AddMeal(SharedSecondMeal);
@@ -67,11 +68,10 @@ public class MenuTests
     public void AddMeal_WithMealAlreadyAdded_ThrowsException()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate);
-        menu.AddMeal(SharedFirstMeal);
+        var menu = TestMenu.Create(SharedDate, [SharedFirstMeal]);
         
         // Act
-        Action<Meal> addMealToMenu = newMeal => menu.AddMeal(newMeal);
+        Action<Meal> addMealToMenu = menu.AddMeal;
         
         // Assert
         addMealToMenu.Invoking(x => x.Invoke(SharedFirstMeal))
@@ -83,26 +83,26 @@ public class MenuTests
     public void AddMeal_WithOrder_SuccessfullyAddsMeal()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate);
+        var menu = TestMenu.Create(SharedDate, [SharedFirstMeal]);
+        const int order = 1;
         
         // Act
-        menu.AddMeal(0, SharedFirstMeal);
+        menu.AddMeal(order, SharedSecondMeal);
         
         // Assert
-        menu.Items.Should().HaveCount(1);
-        menu.GetMeal(0)!.Name.Should().Be(SharedFirstMeal.Name);
+        menu.Items.Should().HaveCount(2);
+        menu.GetMeal(order)!.Name.Should().Be(SharedSecondMeal.Name);
     }
 
     [Fact]
     public void AddMeal_WithOrder_WhenOrderAlreadyTaken_ThrowsException()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate);
+        var menu = TestMenu.Create(SharedDate, [SharedFirstMeal]);
         const int mealOrder = 0;
-        menu.AddMeal(mealOrder, SharedFirstMeal);
         
         // Act
-        Action<int, Meal> addMealToMenu = (order, meal) =>  menu.AddMeal(order, meal);
+        Action<int, Meal> addMealToMenu = menu.AddMeal;
         
         // Assert
         addMealToMenu.Invoking(x => x.Invoke(mealOrder, SharedSecondMeal))
@@ -114,11 +114,10 @@ public class MenuTests
     public void AddMeal_WithOrder_WithMealAlreadyAdded_ThrowsException()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate);
-        menu.AddMeal(SharedFirstMeal);
+        var menu = TestMenu.Create(SharedDate, [SharedFirstMeal]);
         
         // Act
-        Action<int, Meal> addMealToMenu = (order, meal) =>  menu.AddMeal(order, meal);
+        Action<int, Meal> addMealToMenu = menu.AddMeal;
         
         // Assert
         addMealToMenu.Invoking(x => x.Invoke(1, SharedFirstMeal))
@@ -130,10 +129,10 @@ public class MenuTests
     public void AddMeal_WithOrder_ThrowsExceptionForNegativeOrder()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate);
+        var menu = TestMenu.Create(SharedDate);
         
         // Act
-        Action<int, Meal> addMealToMenu = (order, meal) => menu.AddMeal(order, meal);
+        Action<int, Meal> addMealToMenu = menu.AddMeal;
         
         // Assert
         addMealToMenu.Invoking(x => x.Invoke(-1, SharedFirstMeal))

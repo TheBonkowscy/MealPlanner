@@ -22,6 +22,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\MealPlanner.Services\MealPlanner.Services.csproj" />
+      <ProjectReference Include="..\MealPlanner.Tests.Shared\MealPlanner.Tests.Shared.csproj" />
     </ItemGroup>
 
 </Project>
