@@ -12,7 +12,8 @@ var postgresdb = postgres.AddDatabase("MealPlanner");
 
 // Migrations worker
 var migrations = builder.AddProject<MealPlanner_AspireDatabaseMigrator>("migrations")
-    .WithReference(postgresdb);
+    .WithReference(postgresdb)
+    .WaitFor(postgresdb);
 
 // API
 var api = builder.AddProject<MealPlanner_API>("meal-planner-api")

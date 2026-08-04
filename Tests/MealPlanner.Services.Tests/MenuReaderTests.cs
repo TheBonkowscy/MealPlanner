@@ -17,6 +17,7 @@ public class MenuReaderTests
     private static List<Menu> _menus = [];
     public MenuReaderTests()
     {
+        _menus.Clear();
         _ctx = new Mock<MealPlannerDbContext>();
         _ctx.Setup(x => x.Menus).ReturnsDbSet(_menus);
         _ctx.Setup(x => x.Menus.AddAsync(It.IsAny<Menu>(), It.IsAny<CancellationToken>())).Callback<Menu, CancellationToken>((menu, _) =>
@@ -34,7 +35,7 @@ public class MenuReaderTests
     public async Task GetById_ReturnsNull_WhenMenuDoesNotExist()
     {
         // Act
-        var result = await _sut.Get(1);
+        var result = await _sut.Get(1, CancellationToken.None);
         
         // Assert
         result.Should().BeNull();
@@ -47,7 +48,7 @@ public class MenuReaderTests
         var menu = CreateAndSaveMenu(Today);
         
         // Act
-        var result = await _sut.Get(menu.Id);
+        var result = await _sut.Get(menu.Id, CancellationToken.None);
         
         // Assert
         result.Should().NotBeNull();
@@ -59,7 +60,7 @@ public class MenuReaderTests
     public async Task GetForDate_ReturnsNull_WhenMenuDoesNotExist()
     {
         // Act
-        var result = await _sut.Get(Today);
+        var result = await _sut.Get(Today, CancellationToken.None);
         
         // Assert
         result.Should().BeNull();
@@ -72,12 +73,80 @@ public class MenuReaderTests
         var menu = CreateAndSaveMenu(Today);
         
         // Act
-        var result = await _sut.Get(Today);
+        var result = await _sut.Get(Today, CancellationToken.None);
         
         // Assert
         result.Should().NotBeNull();
         result.Id.Should().Be(menu.Id);
         result.Date.Should().Be(menu.Date);
+    }
+    
+    [Theory]
+    [MemberData(nameof(GetRangeTestData))]
+    public async Task GetRange_Theory(Action arrange, DateOnly? from, DateOnly? to, int expectedCount)
+    {
+        // Arrange
+        arrange();
+        
+        // Act
+        var result = await _sut.GetRange(from, to, CancellationToken.None);
+        
+        // Assert
+        result.ExistingMenus.Should().HaveCount(expectedCount);
+    }
+    
+    public static TheoryData<Action, DateOnly?, DateOnly?, int> GetRangeTestData
+    {
+        get
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var tomorrow = today.AddDays(1);
+            
+            return new TheoryData<Action, DateOnly?, DateOnly?, int>
+            {
+                { () => { CreateAndSaveMenu(today); CreateAndSaveMenu(tomorrow); }, null, null, 2 },
+                { () => { CreateAndSaveMenu(today); }, tomorrow, tomorrow.AddDays(1), 0 },
+                { () => { CreateAndSaveMenu(today); }, tomorrow, today, 0 },
+                { () => { CreateAndSaveMenu(today); CreateAndSaveMenu(tomorrow); }, tomorrow, null, 1 },
+                { () => { CreateAndSaveMenu(today); CreateAndSaveMenu(tomorrow); }, null, today, 1 },
+                { () => { CreateAndSaveMenu(today); CreateAndSaveMenu(tomorrow); }, today, today, 1 }
+            };
+        }
+    }
+    
+    [Fact]
+    public async Task GetRange_ReturnsOnlyMenusWithinRange_WhenBothFromAndToProvided()
+    {
+        // Arrange
+        CreateAndSaveMenu(Today.AddDays(-1));
+        var menuInRange1 = CreateAndSaveMenu(Today);
+        var menuInRange2 = CreateAndSaveMenu(Today.AddDays(1));
+        CreateAndSaveMenu(Today.AddDays(2));
+        
+        // Act
+        var result = await _sut.GetRange(Today, Today.AddDays(1), CancellationToken.None);
+        
+        // Assert
+        result.ExistingMenus.Should().HaveCount(2);
+        result.ExistingMenus.Should().Contain(m => m.Id == menuInRange1.Id);
+        result.ExistingMenus.Should().Contain(m => m.Id == menuInRange2.Id);
+    }
+    
+    [Fact]
+    public async Task GetRange_HasMeals_Set_WhenMenuHasItems()
+    {
+        // Arrange
+        var menuWithMeals = CreateAndSaveMenu(Today);
+        menuWithMeals.AddMeal(Meal.Create("Pizza"));
+        
+        var menuWithoutMeals = CreateAndSaveMenu(Today.AddDays(1));
+        
+        // Act
+        var result = await _sut.GetRange(null, null, CancellationToken.None);
+        
+        // Assert
+        result.ExistingMenus.Should().ContainSingle(m => m.Id == menuWithMeals.Id && m.HasMeals);
+        result.ExistingMenus.Should().ContainSingle(m => m.Id == menuWithoutMeals.Id && !m.HasMeals);
     }
     
     private static Menu CreateAndSaveMenu(DateOnly date)

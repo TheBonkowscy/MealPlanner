@@ -1,3 +1,4 @@
+using MealPlanner.Services.Meals.Read;
 using MealPlanner.Services.Menus.Create;
 using MealPlanner.Services.Menus.Read;
 
@@ -9,6 +10,7 @@ public static class Extensions
     {
         services.AddTransient<ICreateMenu, MenuCreator>();
         services.AddTransient<IReadMenu, MenuReader>();
+        services.AddTransient<IReadMeals, MealsReader>();
         return Task.CompletedTask;
     }
 }

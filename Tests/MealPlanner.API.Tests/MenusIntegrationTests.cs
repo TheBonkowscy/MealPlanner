@@ -9,8 +9,13 @@ using Xunit;
 
 namespace MealPlanner.API.Tests;
 
-public class MenuIntegrationTests : IntegrationTestBase
+[Collection("IntegrationTests")]
+public class MenusIntegrationTests : IntegrationTestBase
 {
+    public MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : base(factory)
+    {
+    }
+
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly SpecificDate = new(2026, 03, 26);
@@ -22,13 +27,13 @@ public class MenuIntegrationTests : IntegrationTestBase
         var request = new CreateMenuRequest(Tomorrow);
         
         // Act
-        var result = await Client.PostAsJsonAsync(Constants.MenuRoute, request);
+        var result = await Client.PostAsJsonAsync(Constants.MenusRoute, request);
         
         // Assert
         result.EnsureSuccessStatusCode();
         var response = await result.Content.ReadFromJsonAsync<CreateMenuResponse>();
         response.Should().NotBeNull();
-        response.Id.Should().NotBe(0);
+        response.Date.Should().Be(Tomorrow);
     }
 
     [Fact]
@@ -115,11 +120,70 @@ public class MenuIntegrationTests : IntegrationTestBase
         response.Date.Should().Be(Today);
     }
 
-    private static string BuildGetRoute(int id) => $"{Constants.MenuRoute}/{id.ToString()}";
-
-    private static string BuildGetRoute(DateOnly date) => $"{Constants.MenuRoute}/{date.ToString("O")}";
+    [Theory]
+    [MemberData(nameof(DateRangeTestData))]
+    public async Task Get_ForDateRange(string query, int expectedCount)
+    {
+        // Arrange
+        await AddMenuToDatabase(Menu.Create(Today));
+        await AddMenuToDatabase(Menu.Create(Tomorrow));
+        
+        // Act
+        var result = await Client.GetAsync($"{Constants.MenusRoute}{query}");
+        
+        // Assert
+        result.EnsureSuccessStatusCode();
+        var response = await result.Content.ReadFromJsonAsync<GetExistingMenusResponse>();
+        response.Should().NotBeNull();
+        response.ExistingMenus.Should().HaveCount(expectedCount);
+    }
     
-    private static string BuildGetForTodayRoute() => $"{Constants.MenuRoute}/today";
+    public static TheoryData<string, int> DateRangeTestData
+    {
+        get
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var tomorrow = today.AddDays(1);
+            return new TheoryData<string, int>
+            {
+                { $"?from={today:O}&to={tomorrow:O}", 2 },
+                { $"?from={tomorrow.AddDays(1):O}&to={tomorrow.AddDays(2):O}", 0 },
+                { $"?from={tomorrow:O}&to={today:O}", 0 },
+                { $"?from={tomorrow:O}", 1 },
+                { $"?to={today:O}", 1 },
+                { $"?from={today:O}&to={today:O}", 1 }
+            };
+        }
+    }
+
+    [Fact]
+    public async Task Get_ForDateRange_ReturnsOnlyMenusWithinRange_WhenBothFromAndToProvided()
+    {
+        // Arrange
+        await AddMenuToDatabase(Menu.Create(Today.AddDays(-1)));
+        var menu1 = Menu.Create(Today);
+        var menu2 = Menu.Create(Tomorrow);
+        await AddMenuToDatabase(menu1);
+        await AddMenuToDatabase(menu2);
+        await AddMenuToDatabase(Menu.Create(Tomorrow.AddDays(1)));
+
+        // Act
+        var result = await Client.GetAsync($"{Constants.MenusRoute}?from={Today:O}&to={Tomorrow:O}");
+
+        // Assert
+        result.EnsureSuccessStatusCode();
+        var response = await result.Content.ReadFromJsonAsync<GetExistingMenusResponse>();
+        response.Should().NotBeNull();
+        response.ExistingMenus.Should().HaveCount(2);
+        response.ExistingMenus.Should().Contain(m => m.Id == menu1.Id);
+        response.ExistingMenus.Should().Contain(m => m.Id == menu2.Id);
+    }
+
+    private static string BuildGetRoute(int id) => $"{Constants.MenusRoute}/{id.ToString()}";
+
+    private static string BuildGetRoute(DateOnly date) => $"{Constants.MenusRoute}/{date.ToString("O")}";
+    
+    private static string BuildGetForTodayRoute() => $"{Constants.MenusRoute}/today";
 
     private async Task AddMenuToDatabase(Menu menu)
     {

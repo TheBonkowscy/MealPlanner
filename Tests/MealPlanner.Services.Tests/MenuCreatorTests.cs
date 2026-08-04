@@ -11,11 +11,13 @@ namespace MealPlanner.Services.Tests;
 public class MenuCreatorTests
 {
     private const string MealName = "Fish and chips";
+    private static readonly Meal PreExistingMeal = Meal.Create("Pizza");
 
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly MenuCreator _sut;
 
     private List<Menu> _menus = [];
+    private List<Meal> _meals = [PreExistingMeal];
     
     public MenuCreatorTests()
     {
@@ -25,7 +27,17 @@ public class MenuCreatorTests
         {
             RandomId.Set(menu);
             _menus.Add(menu);
+
+            menu.Items.ToList().ForEach(meal =>
+            {
+                if (_meals.All(x => x.Name != meal.Meal.Name))
+                {
+                    _meals.Add(meal.Meal);
+                }
+            });
         });
+
+        _ctx.Setup(x => x.Meals).ReturnsDbSet(_meals);
         
         _ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
         
@@ -37,10 +49,26 @@ public class MenuCreatorTests
     public async Task Create_CreatesSuccessfully_ReturnsId(CreateMenuRequest createMenuRequest)
     {
         // Act
-        var result = await _sut.Create(createMenuRequest);
+        var result = await _sut.Create(createMenuRequest, CancellationToken.None);
         
         // Assert
-        result.Id.Should().NotBe(0);
+        result.Date.Should().Be(createMenuRequest.Date);
+    }
+    
+    [Fact]
+    public async Task Create_CreatesOnlyNewMeals_ReturnsId()
+    {
+        // Arrange
+        var newMeal = "Quesadilla";
+        var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), 
+            [PreExistingMeal.Name, newMeal]);
+        // Act
+        var result = await _sut.Create(request, CancellationToken.None);
+        
+        // Assert
+        result.Date.Should().Be(result.Date);
+        _meals.Count.Should().Be(2);
+        _meals.Should().Contain(x => x.Name.Equals(newMeal, StringComparison.CurrentCultureIgnoreCase));
     }
 
     [Fact]
@@ -49,11 +77,11 @@ public class MenuCreatorTests
         // Arrange
         var tomorrow =  DateOnly.FromDateTime(DateTime.Today.AddDays(1));
         var request = new CreateMenuRequest(tomorrow, [MealName]);
-        await _sut.Create(request);
+        await _sut.Create(request, CancellationToken.None);
         var conflictingRequest = new CreateMenuRequest(tomorrow, ["Pierogi"]);
 
         // Act
-        var createWithConflict = async (CreateMenuRequest req) => await _sut.Create(req);
+        var createWithConflict = async (CreateMenuRequest req) => await _sut.Create(req, CancellationToken.None);
         
         // Assert
         await createWithConflict.Awaiting(x => x.Invoke(conflictingRequest))
