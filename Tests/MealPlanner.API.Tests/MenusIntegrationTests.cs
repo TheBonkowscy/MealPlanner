@@ -9,7 +9,7 @@ using Xunit;
 
 namespace MealPlanner.API.Tests;
 
-public class MenuIntegrationTests : IntegrationTestBase
+public class MenusIntegrationTests : IntegrationTestBase
 {
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
     private static readonly DateOnly Tomorrow = Today.AddDays(1);

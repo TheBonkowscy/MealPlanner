@@ -40,7 +40,7 @@ public class MenuCreatorTests
         var result = await _sut.Create(createMenuRequest, CancellationToken.None);
         
         // Assert
-        result.Id.Should().NotBe(0);
+        result.Date.Should().Be(createMenuRequest.Date);
     }
 
     [Fact]
