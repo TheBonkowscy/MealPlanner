@@ -16,8 +16,8 @@
                        Edge="Edge.Start" 
                        OnClick="@(_ => DrawerToggle())" />
         <MudSpacer/>
-        <MudText Typo="Typo.h5">@_title</MudText>
-        
+        <MudText Typo="Typo.h5">@AppBarService.Title</MudText>
+    
         <MudSpacer/>
         
         @foreach (var action in AppBarService.Actions)

@@ -1,5 +1,6 @@
 ﻿@page "/menus/edit/{Date:datetime}"
 @using MealPlanner.Shared.Menus.Requests
+@using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @inherits ComponentBase
 @inject IUpdateMenus MenusUpdater
@@ -86,6 +87,9 @@
     protected override async Task OnParametersSetAsync()
     {
         _menuItems.Clear();
+        
+        var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u270F";
+        AppBarService.SetTitle(formattedTitle);
     
         var initialMeals = await FetchMenuForDateAsync(Date);
         if (initialMeals.Any())

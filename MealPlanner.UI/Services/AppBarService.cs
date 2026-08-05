@@ -1,22 +1,21 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using MealPlanner.UI.Models;
 
 namespace MealPlanner.UI.Services;
 
-public class AppBarAction
-{
-    public string Icon { get; set; } = string.Empty;
-    public string Tooltip { get; set; } = string.Empty;
-    public EventCallback OnClick { get; set; }
-}
-
 public class AppBarService
 {
-    private readonly List<AppBarAction> _actions = new();
+    private readonly List<AppBarAction> _actions = [];
 
-    // Zdarzenie powiadamiające MainLayout o konieczności przenderowania
+    public string Title { get; private set; } = "Meal Planner";
+    public IReadOnlyList<AppBarAction> Actions => _actions.AsReadOnly();
+
     public event Action? OnChange;
 
-    public IReadOnlyList<AppBarAction> Actions => _actions.AsReadOnly();
+    public void SetTitle(string title)
+    {
+        Title = title;
+        NotifyStateChanged();
+    }
 
     public void SetActions(params AppBarAction[] actions)
     {
@@ -28,6 +27,7 @@ public class AppBarService
     public void ClearActions()
     {
         _actions.Clear();
+        Title = "Meal Planner";
         NotifyStateChanged();
     }
 

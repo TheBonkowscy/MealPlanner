@@ -1,4 +1,5 @@
 ﻿@page "/menus/day/{Date:datetime}"
+@using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @inherits LayoutComponentBase
 @inject IFindMenus FindMenus
@@ -50,6 +51,10 @@ else
     protected override async Task OnParametersSetAsync()
     {
         var menuForDay = await FindMenus.Get(Date, _cts.Token);
+        
+        var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \U0001F4CB";
+        AppBarService.SetTitle(formattedTitle);
+        
         if (menuForDay is not null)
         {
             _meals = menuForDay.Meals;
@@ -57,7 +62,7 @@ else
             {
                 Icon = Icons.Material.Filled.Edit,
                 Tooltip = "Edytuj menu",
-                OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo($"/menus/edit/{Date.ToString("yyyy-MM-dd", _culture)}"))
+                OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(DateOnly.FromDateTime(Date))))
             });
         }
         else
@@ -66,7 +71,7 @@ else
             {
                 Icon = Icons.Material.Filled.Add,
                 Tooltip = "Utwórz menu",
-                OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo($"/menus/create/{Date.ToString("yyyy-MM-dd", _culture)}"))
+                OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(DateOnly.FromDateTime(Date))))
             });
         }
         _meals = menuForDay?.Meals ?? [];
