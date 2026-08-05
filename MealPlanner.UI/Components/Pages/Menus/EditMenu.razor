@@ -80,8 +80,6 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        var absolutePath = Navigation.ToAbsoluteUri(Navigation.Uri).AbsolutePath;
-    
         _menuItems.Clear();
     
         var initialMeals = await FetchMenuForDateAsync(Date);

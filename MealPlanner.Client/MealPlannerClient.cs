@@ -24,7 +24,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
 
     public async Task<GetMenuResponse?> Get(int id, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MenusRoute.AppendPathSegment(id.ToString());
+        var endpoint = AppendDateToBaseUri(id.ToString());
         var response = await httpClient.GetAsync(endpoint, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
@@ -36,7 +36,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
 
     public async Task<GetMenuResponse?> Get(DateTime date, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MenusRoute.AppendPathSegment(date.ToString("yyyy-MM-dd"));
+        var endpoint = AppendDateToBaseUri(date.ToString("yyyy-MM-dd"));
         var response = await httpClient.GetAsync(endpoint, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
@@ -93,7 +93,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
 
     public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
     {
-        var response = await httpClient.PutAsJsonAsync(Constants.MenusRoute.AppendPathSegment(request.Date), request, options: null,
+        var response = await httpClient.PutAsJsonAsync(AppendDateToBaseUri(request.Date.ToString("yyyy-MM-dd")), request, options: null,
             cancellationToken);
 
         if (response.IsSuccessStatusCode)
@@ -102,5 +102,10 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
         }
 
         throw new Exception("Unable to update menu");   // TODO: concrete types?
+    }
+
+    private static Url AppendDateToBaseUri(string toString)
+    {
+        return Constants.MenusRoute.AppendPathSegment(toString);
     }
 }
