@@ -95,10 +95,9 @@
 
     private async Task RenderMenu()
     {
-        
         // 1. Define range: 6 months back to 6 months forward
-        var startDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(-6));
-        var endDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(6));
+        var startDate = FindDayOfTheWeekWithDate(DateOnly.FromDateTime(DateTime.Today.AddMonths(-6)), DayOfWeek.Monday);
+        var endDate = FindDayOfTheWeekWithDate(DateOnly.FromDateTime(DateTime.Today.AddMonths(6)), DayOfWeek.Sunday);
 
         // Fetch menu data from API
         var response = await MenuFinder.GetRange(startDate, endDate, _cts.Token);
@@ -122,6 +121,13 @@
             SelectedWeek = currentWeek.WeekNumber;
         }
     }
+
+    private static DateOnly FindDayOfTheWeekWithDate(DateOnly date, DayOfWeek dayOfWeek) =>
+        DateOnly.FromDateTime(
+            ISOWeek.ToDateTime(
+                ISOWeek.GetYear(date), 
+                ISOWeek.GetWeekOfYear(date), 
+                dayOfWeek));
 
     private static List<CalendarWeek> BuildWeeksForRange(
         DateOnly start, 
