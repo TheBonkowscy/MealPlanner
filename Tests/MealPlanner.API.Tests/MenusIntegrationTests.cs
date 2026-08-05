@@ -10,12 +10,8 @@ using Xunit;
 namespace MealPlanner.API.Tests;
 
 [Collection("IntegrationTests")]
-public class MenusIntegrationTests : IntegrationTestBase
+public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
-    public MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : base(factory)
-    {
-    }
-
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly SpecificDate = new(2026, 03, 26);
@@ -25,7 +21,7 @@ public class MenusIntegrationTests : IntegrationTestBase
     public async Task Post_ReturnsId()
     {
         // Arrange
-        var request = new CreateMenuRequest(Tomorrow);
+        var request = new CreateMenuRequest(Tomorrow, [.. Meals.Select(x => x.Name)]);
         
         // Act
         var result = await Client.PostAsJsonAsync(Constants.MenusRoute, request);

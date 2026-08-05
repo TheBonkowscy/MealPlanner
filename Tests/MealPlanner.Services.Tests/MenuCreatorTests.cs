@@ -46,15 +46,17 @@ public class MenuCreatorTests
         _sut = new MenuCreator(_ctx.Object, _mealsMapper);
     }
     
-    [Theory]
-    [MemberData(nameof(ValidCreateRequests))]
-    public async Task Create_CreatesSuccessfully_ReturnsId(CreateMenuRequest createMenuRequest)
+    [Fact]
+    public async Task Create_CreatesSuccessfully_ReturnsId()
     {
+        // Arrange
+        CreateMenuRequest request = new(DateOnly.FromDateTime(DateTime.Today), [MealName]);
+        
         // Act
-        var result = await _sut.Create(createMenuRequest, CancellationToken.None);
+        var result = await _sut.Create(request, CancellationToken.None);
         
         // Assert
-        result.Date.Should().Be(createMenuRequest.Date);
+        result.Date.Should().Be(request.Date);
     }
     
     [Fact]
@@ -89,21 +91,5 @@ public class MenuCreatorTests
         await createWithConflict.Awaiting(x => x.Invoke(conflictingRequest))
             .Should().ThrowAsync<InvalidOperationException>()
             .WithMessage($"There is already a Menu defined for {conflictingRequest.Date}.");
-    }
-
-    public static TheoryData<CreateMenuRequest> ValidCreateRequests
-    {
-        get
-        {
-            var today = DateOnly.FromDateTime(DateTime.Today);
-            var data = new TheoryData<CreateMenuRequest>
-            {
-                new(today, [MealName]),
-                new(today.AddDays(1), []),
-                new(today.AddDays(2))
-            };
-
-            return data;
-        }
     }
 }
