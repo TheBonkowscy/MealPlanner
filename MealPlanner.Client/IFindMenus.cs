@@ -3,7 +3,7 @@ using MealPlanner.Shared.Menus.Responses;
 
 namespace MealPlanner.Client;
 
-public interface IMenuFinder
+public interface IFindMenus
 {
     Task<GetMenuResponse?> Get(int id, CancellationToken cancellationToken);
     

@@ -1,7 +1,8 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
-using MealPlanner.Services.Menus.Create;
+using MealPlanner.Services.Meals;
+using MealPlanner.Services.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using Moq;
 using Moq.EntityFrameworkCore;
@@ -14,6 +15,7 @@ public class MenuCreatorTests
     private static readonly Meal PreExistingMeal = Meal.Create("Pizza");
 
     private readonly Mock<MealPlannerDbContext> _ctx;
+    private readonly IMapMeals _mealsMapper;
     private readonly MenuCreator _sut;
 
     private List<Menu> _menus = [];
@@ -40,8 +42,8 @@ public class MenuCreatorTests
         _ctx.Setup(x => x.Meals).ReturnsDbSet(_meals);
         
         _ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
-        
-        _sut = new MenuCreator(_ctx.Object);
+        _mealsMapper = new MealMapper(_ctx.Object);
+        _sut = new MenuCreator(_ctx.Object, _mealsMapper);
     }
     
     [Theory]

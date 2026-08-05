@@ -1,6 +1,6 @@
 ﻿@page "/menus/day/{Date:datetime}"
 @using MealPlanner.UI.Services
-@inject IMenuFinder MenuFinder
+@inject IFindMenus FindMenus
 @inject IMenuStateService MenuStateService
 
 
@@ -48,7 +48,7 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        var menuForDay = await MenuFinder.Get(Date, _cts.Token);
+        var menuForDay = await FindMenus.Get(Date, _cts.Token);
         _meals = menuForDay?.Meals ?? [];
         MenuStateService.NotifyMenuChanged();
     }

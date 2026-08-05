@@ -7,7 +7,7 @@ using MealPlanner.Shared.Menus.Responses;
 
 namespace MealPlanner.Client;
 
-internal class MealPlannerClient(HttpClient httpClient) : IMenuFinder, IMenuCreator, IMealFinder
+internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindMeals, IUpdateMenus
 {
     public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
@@ -89,5 +89,18 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuFinder, IMenuCrea
         }
 
         return GetMealsResponse.Empty;
+    }
+
+    public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
+    {
+        var response = await httpClient.PutAsJsonAsync(Constants.MenusRoute.AppendPathSegment(request.Date), request, options: null,
+            cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<UpdateMenuResponse>();
+        }
+
+        throw new Exception("Unable to update menu");   // TODO: concrete types?
     }
 }

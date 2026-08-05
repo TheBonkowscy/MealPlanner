@@ -2,7 +2,7 @@
 
 namespace MealPlanner.Client;
 
-public interface IMealFinder
+public interface IFindMeals
 {
     Task<GetMealsResponse> Get(string? query, CancellationToken cancellationToken = default);
 }

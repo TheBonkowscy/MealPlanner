@@ -3,7 +3,7 @@ using MealPlanner.Persistence;
 using MealPlanner.Shared.Menus.Responses;
 using Microsoft.EntityFrameworkCore;
 
-namespace MealPlanner.Services.Menus.Read;
+namespace MealPlanner.Services.Menus;
 
 public interface IReadMenu
 {

@@ -1,18 +1,16 @@
-﻿@page "/menus/create/{Date:datetime}"
+﻿@page "/menus/edit/{Date:datetime}"
 @using MealPlanner.Shared.Menus.Requests
-@using MealPlanner.UI.Services
 @implements IDisposable
-
-@inject ICreateMenus CreateMenus
+@inject IUpdateMenus MenusUpdater
+@inject IFindMenus FindMenus
 @inject IFindMeals FindMeals
-@inject IMenuStateService MenuStateService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
-<h3>@($"Tworzenie nowego menu na dzień {Date:dd.MM.yyyy}")</h3>
+<h3>@($"Edycja menu na dzień {Date:dd.MM.yyyy}")</h3>
 
 <MudPaper Class="pa-6 ma-4" Elevation="3">
-    <MudText Typo="Typo.h5" Class="mb-4">Posiłki zaplanowane na ten dzień</MudText>
+    <MudText Typo="Typo.h5" Class="mb-4">Przeciągnij, aby zmienić kolejność posiłków</MudText>
 
     <MudDropContainer @ref="_container"
                       T="MenuItemDto" 
@@ -55,12 +53,12 @@
                          MinCharacters="2" />
     </MudPaper>
 
-    <MudButton Variant="Variant.Filled"
-               Color="Color.Primary"
-               StartIcon="@Icons.Material.Filled.Add"
-               Class="mt-6"
+    <MudButton Variant="Variant.Filled" 
+               Color="Color.Primary" 
+               StartIcon="@Icons.Material.Filled.Save"
+               Class="mt-6" 
                OnClick="SaveMenuAsync">
-        Utwórz menu
+        Zapisz zmiany
     </MudButton>
 </MudPaper>
 
@@ -68,10 +66,10 @@
     [Parameter] public DateTime Date { get; set; }
 
     private MudDropContainer<MenuItemDto>? _container;
-    private readonly List<MenuItemDto> _menuItems = [];
+    private List<MenuItemDto> _menuItems = [];
     private string? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
-
+    
     public class MenuItemDto
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -82,7 +80,23 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        var absolutePath = Navigation.ToAbsoluteUri(Navigation.Uri).AbsolutePath;
+    
         _menuItems.Clear();
+    
+        var initialMeals = await FetchMenuForDateAsync(Date);
+        if (initialMeals.Any())
+        {
+            _menuItems =
+            [
+                .. initialMeals.Select((mealName, index) => new MenuItemDto
+                {
+                    Name = mealName,
+                    Order = index,
+                    ZoneIdentifier = "DayMenuZone"
+                })
+            ];
+        }
     }
 
     private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)
@@ -148,18 +162,24 @@
             return;
         }
 
-        var orderedMeals = _menuItems.Select(x => x.Name).ToArray();
-
-        var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
-        var response = await CreateMenus.CreateMenu(request, _cts.Token);
-        Snackbar.Add("Utworzono nowe menu!", Severity.Success);
+        var orderedMeals = _menuItems.ToDictionary(x => x.Order, x => x.Name);
         
-        MenuStateService.NotifyMenuChanged();
+
+        var request = new UpdateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
+        var response = await MenusUpdater.Update(request, _cts.Token);
+        Snackbar.Add("Pomyślnie edytowano menu!", Severity.Success);
+        
         Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Date));
     }
 
     #region API Calls
-
+    
+    private async Task<List<string>> FetchMenuForDateAsync(DateTime date)
+    {
+        var result = await FindMenus.Get(date, _cts.Token);
+        return result?.Meals.ToList() ?? [];
+    }
+    
     private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string? query, CancellationToken token)
     {
         var results = await FindMeals.Get(query, token);
