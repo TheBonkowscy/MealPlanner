@@ -1,9 +1,11 @@
 @using MealPlanner.Shared.Menus.Responses
 @using MealPlanner.UI.Models
+@using MealPlanner.UI.Services
 
 @implements IDisposable
 @inject IMenuFinder MenuFinder
 @inject NavigationManager Navigation
+@inject IMenuStateService MenuStateService
 
 <MudNavMenu>
     @foreach (var week in _weeks)
@@ -78,9 +80,24 @@
 
     protected override async Task OnInitializedAsync()
     {
+        MenuStateService.OnMenuChanged += HandleMenuChanged;
+        await RenderMenu();
+    }
+
+    private void HandleMenuChanged()
+    {
+        _ = InvokeAsync(async() =>
+        {
+            await RenderMenu();
+            StateHasChanged();
+        });
+    }
+
+    private async Task RenderMenu()
+    {
         // 1. Define range: 6 months back to 6 months forward
-        var startDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(-6));
-        var endDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(6));
+        var startDate = FindDayOfTheWeekWithDate(DateOnly.FromDateTime(DateTime.Today.AddMonths(-6)), DayOfWeek.Monday);
+        var endDate = FindDayOfTheWeekWithDate(DateOnly.FromDateTime(DateTime.Today.AddMonths(6)), DayOfWeek.Sunday);
 
         // Fetch menu data from API
         var response = await MenuFinder.GetRange(startDate, endDate, _cts.Token);
@@ -96,15 +113,21 @@
         _weeks = BuildWeeksForRange(startDate, endDate, existingMenusDict);
 
         // Default selection to current week if none specified
-        if (!SelectedWeek.HasValue)
+        if (SelectedWeek.HasValue) return;
+        
+        var currentWeek = _weeks.FirstOrDefault(w => w.Current);
+        if (currentWeek != null)
         {
-            var currentWeek = _weeks.FirstOrDefault(w => w.Current);
-            if (currentWeek != null)
-            {
-                SelectedWeek = currentWeek.WeekNumber;
-            }
+            SelectedWeek = currentWeek.WeekNumber;
         }
     }
+
+    private static DateOnly FindDayOfTheWeekWithDate(DateOnly date, DayOfWeek dayOfWeek) =>
+        DateOnly.FromDateTime(
+            ISOWeek.ToDateTime(
+                ISOWeek.GetYear(date), 
+                ISOWeek.GetWeekOfYear(date), 
+                dayOfWeek));
 
     private static List<CalendarWeek> BuildWeeksForRange(
         DateOnly start, 
@@ -204,6 +227,8 @@
 
     public void Dispose()
     {
+        MenuStateService.OnMenuChanged -= HandleMenuChanged;
+        
         _cts.Cancel();
         _cts.Dispose();
     }
