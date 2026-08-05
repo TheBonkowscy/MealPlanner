@@ -6,6 +6,7 @@
 @inject ICreateMenus CreateMenus
 @inject IFindMeals FindMeals
 @inject IMenuStateService MenuStateService
+@inject AppBarService AppBarService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
@@ -83,6 +84,9 @@
     protected override async Task OnParametersSetAsync()
     {
         _menuItems.Clear();
+        
+        var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u002B";
+        AppBarService.SetTitle(formattedTitle);
     }
 
     private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)
