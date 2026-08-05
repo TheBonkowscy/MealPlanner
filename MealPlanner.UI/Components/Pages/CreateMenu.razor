@@ -83,7 +83,6 @@
     protected override async Task OnParametersSetAsync()
     {
         _menuItems.Clear();
-        MenuStateService.NotifyMenuChanged();
     }
 
     private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)
@@ -155,6 +154,7 @@
         var response = await MenuCreator.CreateMenu(request, _cts.Token);
         Snackbar.Add("Utworzono nowe menu!", Severity.Success);
         
+        MenuStateService.NotifyMenuChanged();
         Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Date));
     }
 

@@ -80,6 +80,22 @@
 
     protected override async Task OnInitializedAsync()
     {
+        MenuStateService.OnMenuChanged += HandleMenuChanged;
+        await RenderMenu();
+    }
+
+    private void HandleMenuChanged()
+    {
+        _ = InvokeAsync(async() =>
+        {
+            await RenderMenu();
+            StateHasChanged();
+        });
+    }
+
+    private async Task RenderMenu()
+    {
+        
         // 1. Define range: 6 months back to 6 months forward
         var startDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(-6));
         var endDate = DateOnly.FromDateTime(DateTime.Today.AddMonths(6));
@@ -98,20 +114,13 @@
         _weeks = BuildWeeksForRange(startDate, endDate, existingMenusDict);
 
         // Default selection to current week if none specified
-        if (!SelectedWeek.HasValue)
+        if (SelectedWeek.HasValue) return;
+        
+        var currentWeek = _weeks.FirstOrDefault(w => w.Current);
+        if (currentWeek != null)
         {
-            var currentWeek = _weeks.FirstOrDefault(w => w.Current);
-            if (currentWeek != null)
-            {
-                SelectedWeek = currentWeek.WeekNumber;
-            }
+            SelectedWeek = currentWeek.WeekNumber;
         }
-        MenuStateService.OnMenuChanged += HandleMenuChanged;
-    }
-
-    private void HandleMenuChanged()
-    {
-        InvokeAsync(StateHasChanged);
     }
 
     private static List<CalendarWeek> BuildWeeksForRange(
