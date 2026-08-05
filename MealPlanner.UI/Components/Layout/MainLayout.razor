@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@using MealPlanner.UI.Services
 @implements IDisposable
+@inject AppBarService AppBarService
 @inject NavigationManager Navigation
 
 <MudThemeProvider />
@@ -17,6 +19,16 @@
         <MudText Typo="Typo.h5">@_title</MudText>
         
         <MudSpacer/>
+        
+        @foreach (var action in AppBarService.Actions)
+        {
+            <MudTooltip Text="@action.Tooltip">
+                <MudIconButton
+                    Color="Color.Inherit"
+                    Icon="@action.Icon"
+                    OnClick="@action.OnClick" />
+            </MudTooltip>
+        }
 
         <MudTooltip Text="Go to Today">
             <MudIconButton
@@ -25,6 +37,7 @@
                 OnClick="GoToToday" />
         </MudTooltip>
     </MudAppBar>
+
     <MudDrawer @bind-Open="@_drawerOpen">
         <NavMenu/>
     </MudDrawer>
@@ -33,69 +46,23 @@
         @Body
     </MudMainContent>
 </MudLayout>
+
 @code {
-    private string _title = "Dashboard";
-    
-    bool _drawerOpen = true;
+    private string _title = "Meal Planner";
+    private bool _drawerOpen = true;
 
     protected override void OnInitialized()
     {
-        Navigation.LocationChanged += OnLocationChanged;
-        UpdateTitle();
-    }
-
-    private void OnLocationChanged(object sender, LocationChangedEventArgs args)
-    {
-        UpdateTitle();
-        InvokeAsync(StateHasChanged);
+        AppBarService.OnChange += StateHasChanged;
     }
 
     public void Dispose()
     {
-        Navigation.LocationChanged -= OnLocationChanged;
+        AppBarService.OnChange -= StateHasChanged;
     }
 
-    void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
-    
-    private void UpdateTitle()
-    {
-        var relative = Navigation.ToBaseRelativePath(Navigation.Uri);
+    private void DrawerToggle() => _drawerOpen = !_drawerOpen;
 
-        if (relative.StartsWith(RoutingConstants.Menus.Details))
-        {
-            var datePart = relative[RoutingConstants.Menus.Details.Length..];
-
-            if (!DateTime.TryParse(datePart, out var date)) return;
-                
-            _title = $"Week {ISOWeek.GetWeekOfYear(date)} • {date:dddd, d MMMM yyyy} • \U0001F4CB";
-
-            return;
-        }
-
-        if (relative.StartsWith(RoutingConstants.Menus.Create))
-        {
-            var datePart = relative[RoutingConstants.Menus.Create.Length..];
-            if (!DateTime.TryParse(datePart, out var date)) return;
-            
-            _title = $"Week {ISOWeek.GetWeekOfYear(date)} • {date:dddd, d MMMM yyyy}  • \u2795";
-            return;
-        }
-
-        if (relative.StartsWith(RoutingConstants.Menus.Edit))
-        {
-            var datePart = relative[RoutingConstants.Menus.Edit.Length..];
-            if (!DateTime.TryParse(datePart, out var date)) return;
-            
-            _title = $"Week {ISOWeek.GetWeekOfYear(date)} • {date:dddd, d MMMM yyyy}  • \u270F";
-            return;
-        }
-
-        _title = "Meal Planner";
-    }
-    
     private void GoToToday()
     {
         var today = DateOnly.FromDateTime(DateTime.Today);

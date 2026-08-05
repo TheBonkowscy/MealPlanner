@@ -1,11 +1,13 @@
 ﻿@page "/menus/edit/{Date:datetime}"
 @using MealPlanner.Shared.Menus.Requests
-@implements IDisposable
+@using MealPlanner.UI.Services
+@inherits ComponentBase
 @inject IUpdateMenus MenusUpdater
 @inject IFindMenus FindMenus
 @inject IFindMeals FindMeals
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
+@inject AppBarService AppBarService
 
 <h3>@($"Edycja menu na dzień {Date:dd.MM.yyyy}")</h3>
 
@@ -64,6 +66,9 @@
 
 @code {
     [Parameter] public DateTime Date { get; set; }
+    
+    private readonly CultureInfo _culture =
+        new("pl-PL");
 
     private MudDropContainer<MenuItemDto>? _container;
     private List<MenuItemDto> _menuItems = [];
@@ -95,6 +100,12 @@
                 })
             ];
         }
+        AppBarService.SetActions(new AppBarAction
+        {
+            Icon = Icons.Material.Filled.Undo,
+            Tooltip = "Powrót do szczegółów",
+            OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(DateOnly.FromDateTime(Date))))
+        });
     }
 
     private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)
@@ -190,5 +201,6 @@
     {
         _cts.Cancel();
         _cts.Dispose();
+        AppBarService.ClearActions();
     }
 }
