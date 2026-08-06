@@ -15,13 +15,18 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly SpecificDate = new(2026, 03, 26);
-    private static readonly List<Meal> Meals = [Meal.Create("Breakfast")];
+    private static readonly Meal PreExistingMeal = Meal.Create("Breakfast");
+    private static readonly Dictionary<int, string> Meals = new()
+    {
+        { 0, PreExistingMeal.Name }
+    };
     
     [Fact]
     public async Task Post_ReturnsId()
     {
         // Arrange
-        var request = new CreateMenuRequest(Tomorrow, [.. Meals.Select(x => x.Name)]);
+        await AddMealToDatabase(PreExistingMeal);
+        var request = new CreateMenuRequest(Tomorrow, Meals);
         
         // Act
         var result = await Client.PostAsJsonAsync(Constants.MenusRoute, request);
@@ -37,7 +42,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Get_ById_ReturnsMenuIfExists()
     {
         // Arrange
-        var menu = Menu.Create(Tomorrow, Meals);
+        var menu = Menu.Create(Tomorrow, [.. Meals.Values.Select(Meal.Create)]);
         await AddMenuToDatabase(menu);
         
         // Act
@@ -75,7 +80,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Get_ForSpecificDate_ReturnsMenuIfExists()
     {
         // Arrange
-        var menu = Menu.Create(SpecificDate, Meals);
+        var menu = Menu.Create(SpecificDate, [..Meals.Values.Select(Meal.Create)]);
         await AddMenuToDatabase(menu);
         
         // Act
@@ -103,7 +108,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Get_ForToday_ReturnsMenuIfExists()
     {
         // Arrange
-        var menu = Menu.Create(Today, Meals);
+        var menu = Menu.Create(Today, [..Meals.Values.Select(Meal.Create)]);
         await AddMenuToDatabase(menu);
         
         // Act
@@ -122,8 +127,8 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Get_ForDateRange(string query, int expectedCount)
     {
         // Arrange
-        await AddMenuToDatabase(Menu.Create(Today, Meals));
-        await AddMenuToDatabase(Menu.Create(Tomorrow, Meals));
+        await AddMenuToDatabase(Menu.Create(Today, [..Meals.Values.Select(Meal.Create)]));
+        await AddMenuToDatabase(Menu.Create(Tomorrow, [..Meals.Values.Select(Meal.Create)]));
         
         // Act
         var result = await Client.GetAsync($"{Constants.MenusRoute}{query}");
@@ -157,12 +162,12 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Get_ForDateRange_ReturnsOnlyMenusWithinRange_WhenBothFromAndToProvided()
     {
         // Arrange
-        await AddMenuToDatabase(Menu.Create(Today.AddDays(-1), Meals));
-        var menu1 = Menu.Create(Today, Meals);
-        var menu2 = Menu.Create(Tomorrow, Meals);
+        await AddMenuToDatabase(Menu.Create(Today.AddDays(-1), [..Meals.Values.Select(Meal.Create)]));
+        var menu1 = Menu.Create(Today, [..Meals.Values.Select(Meal.Create)]);
+        var menu2 = Menu.Create(Tomorrow, [..Meals.Values.Select(Meal.Create)]);
         await AddMenuToDatabase(menu1);
         await AddMenuToDatabase(menu2);
-        await AddMenuToDatabase(Menu.Create(Tomorrow.AddDays(1), Meals));
+        await AddMenuToDatabase(Menu.Create(Tomorrow.AddDays(1), [..Meals.Values.Select(Meal.Create)]));
 
         // Act
         var result = await Client.GetAsync($"{Constants.MenusRoute}?from={Today:O}&to={Tomorrow:O}");
@@ -185,6 +190,12 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     private async Task AddMenuToDatabase(Menu menu)
     {
         await DatabaseContext.Menus.AddAsync(menu);
+        await DatabaseContext.SaveChangesAsync();
+    }
+    
+    private async Task AddMealToDatabase(Meal meal)
+    {
+        await DatabaseContext.Meals.AddAsync(meal);
         await DatabaseContext.SaveChangesAsync();
     }
 }
