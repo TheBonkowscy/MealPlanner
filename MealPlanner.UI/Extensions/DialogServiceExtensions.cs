@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using MealPlanner.Shared.Extensions;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace MealPlanner.UI.Extensions;
@@ -13,6 +14,12 @@ public static class DialogServiceExtensions
         NavigationManager navigation,
         CancellationToken cancellationToken = default)
     {
+        if (date.IsInPast())
+        {
+            snackbar.Add("Nie można usunąć menu z przeszłych dni.", Severity.Error);
+            return;
+        }
+        
         var result = await dialogService.ShowMessageBoxAsync(
             title: "Potwierdzenie usunięcia",
             message: $"Czy na pewno chcesz usunąć menu na dzień {date:dd.MM.yyyy}?",
