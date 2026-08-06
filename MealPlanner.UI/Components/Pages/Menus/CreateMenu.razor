@@ -1,5 +1,6 @@
 ﻿@page "/menus/create/{Date:datetime}"
 @using MealPlanner.Shared.Menus.Requests
+@using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @implements IDisposable
 
@@ -73,14 +74,6 @@
     private string? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
 
-    public class MenuItemDto
-    {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string Name { get; set; } = string.Empty;
-        public string ZoneIdentifier { get; set; } = "DayMenuZone";
-        public int Order { get; set; }
-    }
-
     protected override async Task OnParametersSetAsync()
     {
         _menuItems.Clear();
@@ -152,7 +145,7 @@
             return;
         }
 
-        var orderedMeals = _menuItems.Select(x => x.Name).ToArray();
+        var orderedMeals = _menuItems.ToDictionary(x => x.Order, x => x.Name);
 
         var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
         var response = await CreateMenus.CreateMenu(request, _cts.Token);

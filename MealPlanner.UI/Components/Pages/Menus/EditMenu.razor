@@ -9,6 +9,7 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 @inject AppBarService AppBarService
+@inject MenuItemMapper MenuItemMapper
 
 <h3>@($"Edycja menu na dzień {Date:dd.MM.yyyy}")</h3>
 
@@ -75,14 +76,6 @@
     private List<MenuItemDto> _menuItems = [];
     private string? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
-    
-    public class MenuItemDto
-    {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string Name { get; set; } = string.Empty;
-        public string ZoneIdentifier { get; set; } = "DayMenuZone";
-        public int Order { get; set; }
-    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -91,19 +84,8 @@
         var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u270F";
         AppBarService.SetTitle(formattedTitle);
     
-        var initialMeals = await FetchMenuForDateAsync(Date);
-        if (initialMeals.Any())
-        {
-            _menuItems =
-            [
-                .. initialMeals.Select((mealName, index) => new MenuItemDto
-                {
-                    Name = mealName,
-                    Order = index,
-                    ZoneIdentifier = "DayMenuZone"
-                })
-            ];
-        }
+        _menuItems = await FetchMenuForDateAsync(Date);
+        
         AppBarService.SetActions(new AppBarAction
         {
             Icon = Icons.Material.Filled.Undo,
@@ -187,10 +169,10 @@
 
     #region API Calls
     
-    private async Task<List<string>> FetchMenuForDateAsync(DateTime date)
+    private async Task<List<MenuItemDto>> FetchMenuForDateAsync(DateTime date)
     {
         var result = await FindMenus.Get(date, _cts.Token);
-        return result?.Meals.ToList() ?? [];
+        return MenuItemMapper.MapMenuItem(result?.Meals) ?? [];
     }
     
     private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string? query, CancellationToken token)

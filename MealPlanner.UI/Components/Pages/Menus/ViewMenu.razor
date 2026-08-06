@@ -2,10 +2,12 @@
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @inherits LayoutComponentBase
+@implements IDisposable
 @inject IFindMenus FindMenus
 @inject IMenuStateService MenuStateService
-@inject AppBarService AppBarService
 @inject NavigationManager Navigation
+@inject AppBarService AppBarService
+@inject MenuItemMapper MenuItemMapper
 
 
 <MudText Typo="Typo.h5">
@@ -29,8 +31,8 @@ else
 
         @foreach (var meal in _meals)
         {
-            <MudListItem T="string" Value="meal">
-                @meal
+            <MudListItem T="string" Value="meal.Name">
+                @meal.Name
             </MudListItem>
         }
 
@@ -44,7 +46,7 @@ else
         new("pl-PL");
 
 
-    private IEnumerable<string> _meals = [];
+    private List<MenuItemDto> _meals = [];
 
     private readonly CancellationTokenSource _cts = new();
     
@@ -57,7 +59,6 @@ else
         
         if (menuForDay is not null)
         {
-            _meals = menuForDay.Meals;
             AppBarService.SetActions(new AppBarAction
             {
                 Icon = Icons.Material.Filled.Edit,
@@ -74,13 +75,8 @@ else
                 OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(DateOnly.FromDateTime(Date))))
             });
         }
-        _meals = menuForDay?.Meals ?? [];
+        _meals = MenuItemMapper.MapMenuItem(menuForDay?.Meals ?? []);
         MenuStateService.NotifyMenuChanged();
-    }
-
-    private void OnEditMenu()
-    {
-        Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(DateOnly.FromDateTime(Date)));
     }
 
     public void Dispose()

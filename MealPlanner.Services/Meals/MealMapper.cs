@@ -6,32 +6,33 @@ namespace MealPlanner.Services.Meals;
 
 public interface IMapMeals
 {
-    Task<List<Meal>> MapMeals(IEnumerable<string> mealsToBeMapped, CancellationToken ct);
+    Task<List<Meal>> MapMeals(Dictionary<int, string> mealsToBeMapped, CancellationToken ct);
 }
 
 public class MealMapper(MealPlannerDbContext ctx) : IMapMeals
 {
-    public async Task<List<Meal>> MapMeals(IEnumerable<string> mealsToBeMapped, CancellationToken ct)
+    public async Task<List<Meal>> MapMeals(Dictionary<int, string> mealsToBeMapped, CancellationToken ct)
     {
-        List<Meal> mappedMeals = [];
+        var incomingMealsNames = mealsToBeMapped.Values.Select(x => x.ToLower());
         
-        var mealsRequestedToBeAdded = mealsToBeMapped.Select(x => x.ToLower());
-        if (mealsRequestedToBeAdded is null) return mappedMeals;
-        
-        var mealsThatAlreadyExist = await ctx.Meals
-            .Where(x => mealsRequestedToBeAdded.Contains(x.Name.ToLower()))
+        var mealsFromDatabase = await ctx.Meals
+            .Where(x => incomingMealsNames.Contains(x.Name.ToLower()))
             .ToListAsync(ct);
-        // TODO: keep order of everything
-        mealsThatAlreadyExist.ForEach(mappedMeals.Add);
+
+        var mappedMeals = new Dictionary<int, Meal>();
+        
+        foreach (var order in mealsToBeMapped.Keys)
+        {
+            var mealName = mealsToBeMapped[order];
+            var meal = mealsFromDatabase.FirstOrDefault(x => x.Name.Equals(mealName, StringComparison.CurrentCultureIgnoreCase));
+            if (meal is null)
+            {
+                throw new InvalidOperationException($"Meal with name {mealName} does not exist");
+            }
+            
+            mappedMeals.Add(order, meal);
+        }
                 
-        var namesOfMealsThatAlreadyExist = mealsThatAlreadyExist.Select(x => x.Name.ToLower());
-        var mealsToCreate = mealsRequestedToBeAdded
-            .Except(namesOfMealsThatAlreadyExist)
-            .Select(Meal.Create).ToList();
-        
-        // TODO: keep order of everything
-        mealsToCreate.ForEach(mappedMeals.Add);
-        
-        return mappedMeals;
+        return [.. mappedMeals.Values];
     }
 }

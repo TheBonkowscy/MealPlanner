@@ -25,7 +25,7 @@ public class MenuCreator(MealPlannerDbContext ctx,
                 throw new InvalidOperationException($"There is already a Menu defined for {createMenuRequest.Date}.");
             }
 
-            if (createMenuRequest.Meals is { Length: 0 })
+            if (createMenuRequest.Meals.Keys is { Count: 0 })
             {
                 throw new InvalidOperationException("No meals were provided.");
             }

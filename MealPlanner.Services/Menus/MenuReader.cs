@@ -25,7 +25,7 @@ public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
 
     private static GetMenuResponse MapMenu(Menu menu)
     {
-        var mappedMeals = menu.Items.Select(x => x.Meal.Name);
+        var mappedMeals = menu.Items.ToDictionary(x => x.Order, x => x.Meal.Name);
         return new GetMenuResponse(menu.Id, menu.Date, mappedMeals);
     }
 

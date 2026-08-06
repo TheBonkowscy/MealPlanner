@@ -36,7 +36,7 @@ public class MenuUpdater(MealPlannerDbContext ctx,
             throw new InvalidOperationException("No meals were provided.");
         }
         
-        var mappedMeals = await mealsMapper.MapMeals(request.Meals.Values, cancellationToken);
+        var mappedMeals = await mealsMapper.MapMeals(request.Meals, cancellationToken);
         menu.AddMeals(mappedMeals);
         
         ctx.Entry(menu).State = EntityState.Modified; // TODO: Not sure if this is needed

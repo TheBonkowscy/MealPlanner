@@ -1,3 +1,3 @@
 namespace MealPlanner.Shared.Menus.Requests;
 
-public record CreateMenuRequest(DateOnly Date, string[]? Meals = null);
+public record CreateMenuRequest(DateOnly Date, Dictionary<int, string> Meals);
