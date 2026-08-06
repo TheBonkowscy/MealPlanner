@@ -26,7 +26,7 @@ public static class DialogServiceExtensions
             await deleteAction(date, cancellationToken);
             
             snackbar.Add("Menu zostało pomyślnie usunięte.", Severity.Success);
-            navigation.NavigateTo("/");
+            navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(date));
         }
     }
 }
