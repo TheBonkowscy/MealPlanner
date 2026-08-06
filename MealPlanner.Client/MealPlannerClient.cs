@@ -7,7 +7,7 @@ using MealPlanner.Shared.Menus.Responses;
 
 namespace MealPlanner.Client;
 
-internal class MealPlannerClient(HttpClient httpClient) : IMenuFinder, IMenuCreator, IMealFinder
+internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindMeals, IUpdateMenus
 {
     public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
@@ -24,7 +24,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuFinder, IMenuCrea
 
     public async Task<GetMenuResponse?> Get(int id, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MenusRoute.AppendPathSegment(id.ToString());
+        var endpoint = AppendDateToBaseUri(id.ToString());
         var response = await httpClient.GetAsync(endpoint, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
@@ -36,7 +36,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuFinder, IMenuCrea
 
     public async Task<GetMenuResponse?> Get(DateTime date, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MenusRoute.AppendPathSegment(date.ToString("yyyy-MM-dd"));
+        var endpoint = AppendDateToBaseUri(date.ToString("yyyy-MM-dd"));
         var response = await httpClient.GetAsync(endpoint, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
@@ -89,5 +89,23 @@ internal class MealPlannerClient(HttpClient httpClient) : IMenuFinder, IMenuCrea
         }
 
         return GetMealsResponse.Empty;
+    }
+
+    public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
+    {
+        var response = await httpClient.PutAsJsonAsync(AppendDateToBaseUri(request.Date.ToString("yyyy-MM-dd")), request, options: null,
+            cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<UpdateMenuResponse>();
+        }
+
+        throw new Exception("Unable to update menu");   // TODO: concrete types?
+    }
+
+    private static Url AppendDateToBaseUri(string toString)
+    {
+        return Constants.MenusRoute.AppendPathSegment(toString);
     }
 }

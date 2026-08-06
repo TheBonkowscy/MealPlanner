@@ -86,4 +86,14 @@ public class Menu
             throw new ArgumentOutOfRangeException(null, $"Invalid date specified. The date can not be before {MinDateInThePast} and must be in the near future.");
         }
     }
+
+    public void RemoveAllItems()
+    {
+        _items.Clear();
+    }
+
+    public void AddMeals(List<Meal> mappedMeals)
+    {
+        mappedMeals.ForEach(AddMeal);
+    }
 }

@@ -1,18 +1,20 @@
 ﻿@page "/menus/create/{Date:datetime}"
 @using MealPlanner.Shared.Menus.Requests
+@using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @implements IDisposable
 
-@inject IMenuCreator MenuCreator
-@inject IMealFinder MealFinder
+@inject ICreateMenus CreateMenus
+@inject IFindMeals FindMeals
 @inject IMenuStateService MenuStateService
+@inject AppBarService AppBarService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
 <h3>@($"Tworzenie nowego menu na dzień {Date:dd.MM.yyyy}")</h3>
 
 <MudPaper Class="pa-6 ma-4" Elevation="3">
-    <MudText Typo="Typo.h5" Class="mb-4">Posiłki w tym dniu (przeciągnij, aby zmienić kolejność)</MudText>
+    <MudText Typo="Typo.h5" Class="mb-4">Posiłki zaplanowane na ten dzień</MudText>
 
     <MudDropContainer @ref="_container"
                       T="MenuItemDto" 
@@ -72,17 +74,12 @@
     private string? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
 
-    public class MenuItemDto
-    {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string Name { get; set; } = string.Empty;
-        public string ZoneIdentifier { get; set; } = "DayMenuZone";
-        public int Order { get; set; }
-    }
-
     protected override async Task OnParametersSetAsync()
     {
         _menuItems.Clear();
+        
+        var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u002B";
+        AppBarService.SetTitle(formattedTitle);
     }
 
     private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)
@@ -148,10 +145,10 @@
             return;
         }
 
-        var orderedMeals = _menuItems.Select(x => x.Name).ToArray();
+        var orderedMeals = _menuItems.ToDictionary(x => x.Order, x => x.Name);
 
         var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
-        var response = await MenuCreator.CreateMenu(request, _cts.Token);
+        var response = await CreateMenus.CreateMenu(request, _cts.Token);
         Snackbar.Add("Utworzono nowe menu!", Severity.Success);
         
         MenuStateService.NotifyMenuChanged();
@@ -162,7 +159,7 @@
 
     private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string? query, CancellationToken token)
     {
-        var results = await MealFinder.Get(query, token);
+        var results = await FindMeals.Get(query, token);
 
         return results.Meals.Select(x => x.Name);
     }

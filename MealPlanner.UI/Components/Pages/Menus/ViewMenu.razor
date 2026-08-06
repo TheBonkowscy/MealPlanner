@@ -1,0 +1,89 @@
+﻿@page "/menus/day/{Date:datetime}"
+@using MealPlanner.UI.Models
+@using MealPlanner.UI.Services
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject IFindMenus FindMenus
+@inject IMenuStateService MenuStateService
+@inject NavigationManager Navigation
+@inject AppBarService AppBarService
+@inject MenuItemMapper MenuItemMapper
+
+
+<MudText Typo="Typo.h5">
+
+    Menu na dzień @Date.ToString(
+                      "dddd, d MMMM yyyy",
+                      _culture)
+
+</MudText>
+
+@if (!_meals.Any())
+{
+    <MudItem>
+        <MudText>Brak posiłków na ten dzień</MudText>
+        <MudText>Może warto coś przekąsić?</MudText>
+    </MudItem>
+}
+else
+{
+    <MudList T="string">
+
+        @foreach (var meal in _meals)
+        {
+            <MudListItem T="string" Value="meal.Name">
+                @meal.Name
+            </MudListItem>
+        }
+
+    </MudList>
+}
+
+@code {
+    [Parameter] public DateTime Date { get; set; }
+
+    private readonly CultureInfo _culture =
+        new("pl-PL");
+
+
+    private List<MenuItemDto> _meals = [];
+
+    private readonly CancellationTokenSource _cts = new();
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        var menuForDay = await FindMenus.Get(Date, _cts.Token);
+        
+        var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \U0001F4CB";
+        AppBarService.SetTitle(formattedTitle);
+        
+        if (menuForDay is not null)
+        {
+            AppBarService.SetActions(new AppBarAction
+            {
+                Icon = Icons.Material.Filled.Edit,
+                Tooltip = "Edytuj menu",
+                OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(DateOnly.FromDateTime(Date))))
+            });
+        }
+        else
+        {
+            AppBarService.SetActions(new AppBarAction
+            {
+                Icon = Icons.Material.Filled.Add,
+                Tooltip = "Utwórz menu",
+                OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(DateOnly.FromDateTime(Date))))
+            });
+        }
+        _meals = MenuItemMapper.MapMenuItem(menuForDay?.Meals ?? []);
+        MenuStateService.NotifyMenuChanged();
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+        AppBarService.ClearActions();
+    }
+
+}
