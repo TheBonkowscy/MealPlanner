@@ -4,10 +4,13 @@
 @inherits LayoutComponentBase
 @implements IDisposable
 @inject IFindMenus FindMenus
+@inject IDeleteMenus MenusDeleter
 @inject IMenuStateService MenuStateService
 @inject NavigationManager Navigation
 @inject AppBarService AppBarService
 @inject MenuItemMapper MenuItemMapper
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 
 <MudText Typo="Typo.h5">
@@ -56,27 +59,55 @@ else
         
         var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \U0001F4CB";
         AppBarService.SetTitle(formattedTitle);
+
+        List<AppBarAction> actions = [];
         
         if (menuForDay is not null)
         {
-            AppBarService.SetActions(new AppBarAction
-            {
-                Icon = Icons.Material.Filled.Edit,
-                Tooltip = "Edytuj menu",
-                OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(DateOnly.FromDateTime(Date))))
-            });
+            actions.AddRange(
+            [
+                new AppBarAction
+                {
+                    Icon = Icons.Material.Filled.Edit,
+                    Tooltip = "Edytuj menu",
+                    Color = Color.Inherit,
+                    OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(DateOnly.FromDateTime(Date))))
+                },
+                new AppBarAction
+                {
+                    Icon = Icons.Material.Filled.Delete,
+                    Tooltip = "Usuń menu",
+                    Color = Color.Error,
+                    OnClick = EventCallback.Factory.Create(this, ConfirmAndDeleteAsync)
+                }
+            ]);
         }
         else
         {
-            AppBarService.SetActions(new AppBarAction
+            actions.Add(new AppBarAction
             {
                 Icon = Icons.Material.Filled.Add,
                 Tooltip = "Utwórz menu",
+                Color = Color.Inherit,
                 OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(DateOnly.FromDateTime(Date))))
             });
         }
+        
+        AppBarService.SetActions([.. actions]);
+        
         _meals = MenuItemMapper.MapMenuItem(menuForDay?.Meals ?? []);
         MenuStateService.NotifyMenuChanged();
+    }
+    
+    private async Task ConfirmAndDeleteAsync()
+    {
+        await DialogService.ConfirmAndDeleteMenuAsync(
+            DateOnly.FromDateTime(Date),
+            (only, token) => MenusDeleter.Delete(only, token),
+            Snackbar,
+            Navigation,
+            _cts.Token
+        );
     }
 
     public void Dispose()

@@ -1,15 +1,18 @@
 ﻿@page "/menus/edit/{Date:datetime}"
+@using MealPlanner.Services.Menus
 @using MealPlanner.Shared.Menus.Requests
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @inherits ComponentBase
 @inject IUpdateMenus MenusUpdater
 @inject IFindMenus FindMenus
+@inject IDeleteMenus MenusDeleter
 @inject IFindMeals FindMeals
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 @inject AppBarService AppBarService
 @inject MenuItemMapper MenuItemMapper
+@inject IDialogService DialogService
 
 <h3>@($"Edycja menu na dzień {Date:dd.MM.yyyy}")</h3>
 
@@ -92,6 +95,25 @@
             Tooltip = "Powrót do szczegółów",
             OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(DateOnly.FromDateTime(Date))))
         });
+        
+        AppBarService.SetActions(new AppBarAction
+        {
+            Icon = Icons.Material.Filled.Delete,
+            Tooltip = "Usuń menu",
+            Color = Color.Error,
+            OnClick = EventCallback.Factory.Create(this, ConfirmAndDeleteAsync)
+        });
+    }
+    
+    private async Task ConfirmAndDeleteAsync()
+    {
+        await DialogService.ConfirmAndDeleteMenuAsync(
+            DateOnly.FromDateTime(Date),
+            (only, token) => MenusDeleter.Delete(only, token),
+            Snackbar,
+            Navigation,
+            _cts.Token
+        );
     }
 
     private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)

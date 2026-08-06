@@ -5,7 +5,6 @@ using MealPlanner.Domain;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace MealPlanner.API.Tests;
@@ -182,7 +181,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         response.ExistingMenus.Should().Contain(m => m.Id == menu2.Id);
     }
     [Fact]
-    public async Task Put_Edit_UpdatesExistingMenu_WhenMenuExists()
+    public async Task Put_UpdatesExistingMenu_WhenMenuExists()
     {
         // Arrange
         var initialMeal = Meal.Create("Obiad");
@@ -214,7 +213,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     }
 
     [Fact]
-    public async Task Put_Edit_ReturnsNotFound_WhenMenuDoesNotExist()
+    public async Task Put_ReturnsNotFound_WhenMenuDoesNotExist()
     {
         // Arrange
         var request = new UpdateMenuRequest(SpecificDate, Meals);
@@ -227,7 +226,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     }
 
     [Fact]
-    public async Task Put_Edit_ReturnsBadRequest_WhenRouteDateDoesNotMatchRequestBodyDate()
+    public async Task Put_ReturnsBadRequest_WhenRouteDateDoesNotMatchRequestBodyDate()
     {
         // Arrange
         var request = new UpdateMenuRequest(Tomorrow, Meals);
@@ -237,6 +236,33 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Theory]
+    [MemberData(nameof(DeleteMenuData))]
+    public async Task Delete_ReturnsNoContent_WhenMenuExists(DateOnly date, Menu? menu)
+    {
+        // Arrange
+        if (menu is not null)
+        {
+            await AddMenuToDatabase(menu);
+        }
+
+        // Act
+        var result = await Client.DeleteAsync(BuildEditRoute(date));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    public static IEnumerable<object?[]> DeleteMenuData()
+    {
+        yield return [DateOnly.FromDateTime(DateTime.Today), null];
+        yield return
+        [
+            DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
+            Menu.Create(Tomorrow, [.. Meals.Values.Select(Meal.Create)])
+        ];
     }
 
     private static string BuildGetRoute(int id) => $"{Constants.MenusRoute}/{id.ToString()}";

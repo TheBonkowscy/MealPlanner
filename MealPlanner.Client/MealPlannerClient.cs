@@ -7,7 +7,7 @@ using MealPlanner.Shared.Menus.Responses;
 
 namespace MealPlanner.Client;
 
-internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindMeals, IUpdateMenus
+internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindMeals, IUpdateMenus, IDeleteMenus
 {
     public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
@@ -74,6 +74,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
         return GetExistingMenusResponse.Empty;
     }
 
+    // TODO: this should probably live in a separate client
     public async Task<GetMealsResponse> Get(string? query, CancellationToken cancellationToken)
     {
         var endpoint = Constants.MealsRoute;
@@ -102,6 +103,13 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
         }
 
         throw new Exception("Unable to update menu");   // TODO: concrete types?
+    }
+
+    public async Task<bool> Delete(DateOnly date, CancellationToken cancellationToken)
+    {
+        var endpoint = Constants.MenusRoute.AppendPathSegment(date.ToString("O"));
+        var result = await httpClient.DeleteAsync(endpoint, cancellationToken);
+        return result.IsSuccessStatusCode;
     }
 
     private static Url AppendDateToBaseUri(string toString)
