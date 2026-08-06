@@ -5,6 +5,7 @@ using MealPlanner.Domain;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace MealPlanner.API.Tests;
@@ -180,10 +181,69 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         response.ExistingMenus.Should().Contain(m => m.Id == menu1.Id);
         response.ExistingMenus.Should().Contain(m => m.Id == menu2.Id);
     }
+    [Fact]
+    public async Task Put_Edit_UpdatesExistingMenu_WhenMenuExists()
+    {
+        // Arrange
+        var initialMeal = Meal.Create("Obiad");
+        var updatedMeal = Meal.Create("Kolacja");
+        await AddMealToDatabase(initialMeal);
+        await AddMealToDatabase(updatedMeal);
+
+        var existingMenu = Menu.Create(SpecificDate, [initialMeal]);
+        await AddMenuToDatabase(existingMenu);
+
+        var updatedMealsDict = new Dictionary<int, string>
+        {
+            { 0, updatedMeal.Name }
+        };
+        var request = new UpdateMenuRequest(SpecificDate, updatedMealsDict);
+
+        // Act
+        var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
+
+        // Assert
+        result.EnsureSuccessStatusCode();
+
+        var getRequest = await Client.GetAsync(BuildGetRoute(SpecificDate));
+        var getResult = await getRequest.Content.ReadFromJsonAsync<GetMenuResponse>();
+
+        getResult.Should().NotBeNull();
+        getResult.Meals.Should().HaveCount(1);
+        getResult.Meals.First().Value.Should().Be(updatedMeal.Name);
+    }
+
+    [Fact]
+    public async Task Put_Edit_ReturnsNotFound_WhenMenuDoesNotExist()
+    {
+        // Arrange
+        var request = new UpdateMenuRequest(SpecificDate, Meals);
+
+        // Act
+        var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Put_Edit_ReturnsBadRequest_WhenRouteDateDoesNotMatchRequestBodyDate()
+    {
+        // Arrange
+        var request = new UpdateMenuRequest(Tomorrow, Meals);
+
+        // Act
+        var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
 
     private static string BuildGetRoute(int id) => $"{Constants.MenusRoute}/{id.ToString()}";
 
     private static string BuildGetRoute(DateOnly date) => $"{Constants.MenusRoute}/{date.ToString("O")}";
+
+    private static string BuildEditRoute(DateOnly date) => $"{Constants.MenusRoute}/{date.ToString("O")}";
     
     private static string BuildGetForTodayRoute() => $"{Constants.MenusRoute}/today";
 
