@@ -15,6 +15,7 @@ public static class ServiceRegistration
             services.AddHttpClient<ICreateMenus, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
             services.AddHttpClient<IFindMeals, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
             services.AddHttpClient<IUpdateMenus, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IDeleteMenus, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
             return services;
         }    
         

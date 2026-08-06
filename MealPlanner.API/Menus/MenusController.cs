@@ -10,7 +10,8 @@ namespace MealPlanner.API.Menus;
 public class MenusController(
     ICreateMenu menuCreator,
     IReadMenu menuReader,
-    IUpdateMenu menusUpdater) : ControllerBase
+    IUpdateMenu menusUpdater,
+    IDeleteMenu menuDeleter) : ControllerBase
 {
     [ProducesResponseType(typeof(CreateMenuResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -56,7 +57,8 @@ public class MenusController(
         var menu = await menuReader.GetRange(from, to, cancellationToken);
         return Results.Ok(menu);
     }
-    [ProducesResponseType(typeof(CreateMenuResponse), StatusCodes.Status200OK)]
+    
+    [ProducesResponseType(typeof(UpdateMenuResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPut("{day:datetime}")]
@@ -64,4 +66,14 @@ public class MenusController(
         [FromBody] UpdateMenuRequest updateMenuRequest,
         CancellationToken cancellationToken) =>
         await menusUpdater.Update(updateMenuRequest, cancellationToken);
+    
+    [ProducesResponseType(typeof(CreateMenuResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HttpDelete("{day:datetime}")]
+    public async Task<IResult> Delete([FromRoute(Name = "day")] DateTime day, CancellationToken cancellationToken)
+    {
+        await menuDeleter.Delete(DateOnly.FromDateTime(day), cancellationToken);
+        return Results.NoContent();
+    }
 }
