@@ -1,6 +1,7 @@
 ﻿using MealPlanner.Domain;
+using MealPlanner.Domain.Ingredients;
 
-namespace MealPlanner.Services.Tests;
+namespace MealPlanner.Tests.Shared;
 
 // NOTE: Should I be reusable?
 public static class RandomId
@@ -15,5 +16,14 @@ public static class RandomId
     {
         var field = typeof(Meal).GetProperty(nameof(Meal.Id));
         field!.SetValue(meal, Random.Shared.Next(1, 1000));
+    }
+
+    public static void Set(params IngredientUnit[] ingredientUnits)
+    {
+        foreach(var ingredientUnit in ingredientUnits)
+        {
+            var field = typeof(IngredientUnit).GetProperty(nameof(IngredientUnit.Id));
+            field!.SetValue(ingredientUnit, Random.Shared.Next(1, 1000));
+        }
     }
 }

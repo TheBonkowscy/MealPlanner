@@ -4,6 +4,7 @@ using MealPlanner.Persistence;
 using MealPlanner.Services.Meals;
 using MealPlanner.Services.Menus;
 using MealPlanner.Shared.Menus.Requests;
+using MealPlanner.Tests.Shared;
 using Moq;
 using Moq.EntityFrameworkCore;
 

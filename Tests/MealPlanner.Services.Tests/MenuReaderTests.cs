@@ -2,6 +2,7 @@ using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
+using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 using Moq;
 using Moq.EntityFrameworkCore;

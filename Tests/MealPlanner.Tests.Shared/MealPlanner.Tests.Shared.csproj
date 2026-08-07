@@ -10,4 +10,8 @@
       <ProjectReference Include="..\..\MealPlanner.Domain\MealPlanner.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Constants\" />
+    </ItemGroup>
+
 </Project>

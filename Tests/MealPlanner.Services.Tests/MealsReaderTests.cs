@@ -2,6 +2,7 @@
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Meals.Read;
+using MealPlanner.Tests.Shared;
 using Moq;
 using Moq.EntityFrameworkCore;
 
