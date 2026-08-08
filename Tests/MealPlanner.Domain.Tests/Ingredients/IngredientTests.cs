@@ -9,14 +9,14 @@ namespace MealPlanner.Domain.Tests.Ingredients;
 public class IngredientTests
 {
     private const string Name = "Flour";
-    private static readonly List<IngredientUnit> Units = [TestIngredientsUnits.Cups()];
+    private static readonly List<MeasureUnit> Units = [TestIngredientsUnits.Cups()];
     
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
     public void Create_WithEmptyName_Throws(string ingredientName)
     {
         // Act
-        Action<string, List<IngredientUnit>> create = (name, units) => Ingredient.Create(name, units);
+        Action<string, List<MeasureUnit>> create = (name, units) => Ingredient.Create(name, units);
         
         // Assert
         create.Invoking(c => c.Invoke(ingredientName, Units))
@@ -28,7 +28,7 @@ public class IngredientTests
     public void Create_WithEmptyUnits_Throws()
     {
         // Act
-        Action<string, List<IngredientUnit>> create = (name, units) => Ingredient.Create(name, units);
+        Action<string, List<MeasureUnit>> create = (name, units) => Ingredient.Create(name, units);
         
         // Assert
         create.Invoking(c => c.Invoke(Name, []))
@@ -50,7 +50,7 @@ public class IngredientTests
     
     [Theory]
     [MemberData(nameof(IsApplicableTestData))]
-    public void IsApplicable_ReturnsCorrectly(IngredientUnit unit, bool expectedResult)
+    public void IsApplicable_ReturnsCorrectly(MeasureUnit unit, bool expectedResult)
     {
         // Arrange
         var ingredient = Ingredient.Create(Name, Units);
@@ -65,7 +65,7 @@ public class IngredientTests
     public static IEnumerable<object[]> IsApplicableTestData()
     {
         yield return [TestIngredientsUnits.Cups(), true];
-        var teaspoons = IngredientUnit.Create("Teaspoons");
+        var teaspoons = MeasureUnit.Create("Teaspoons");
         RandomId.Set(teaspoons);
         yield return [teaspoons, false];
     }

@@ -8,7 +8,7 @@ namespace MealPlanner.Domain.Tests.Ingredients.Actions;
 
 public class AddIngredientActionTests
 {
-    private static readonly IngredientUnit NotApplicableUnit = IngredientUnit.Create("Pieces");
+    private static readonly MeasureUnit NotApplicableUnit = MeasureUnit.Create("Pieces");
     private const decimal SharedExpectedQuantity = 0.75m;
     
     [Fact]
@@ -19,7 +19,7 @@ public class AddIngredientActionTests
         RandomId.Set([.. ingredientToAdd.ApplicableUnits]);
         
         // Act
-        Action<Ingredient, decimal, IngredientUnit> create = (ingredient, quantity, unit) =>
+        Action<Ingredient, decimal, MeasureUnit> create = (ingredient, quantity, unit) =>
             AddIngredientAction.Create(ingredient, quantity, unit);
         
         // Assert
@@ -34,7 +34,7 @@ public class AddIngredientActionTests
         var ingredientToAdd = TestIngredients.CupsOfFlour();
         
         // Act
-        Action<Ingredient, decimal, IngredientUnit> create = (ingredient, quantity, unit) =>
+        Action<Ingredient, decimal, MeasureUnit> create = (ingredient, quantity, unit) =>
             AddIngredientAction.Create(ingredient, quantity, unit);
         
         // Assert

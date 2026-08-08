@@ -6,14 +6,14 @@ public class AddIngredientAction
     public Ingredient Ingredient { get; private set; }
     public decimal Quantity { get; private set; }
     
-    public IngredientUnit Unit { get; private set; }
+    public MeasureUnit Unit { get; private set; }
 
     private AddIngredientAction()
     {
         // Prevent creating via validation
     }
     
-    public static AddIngredientAction Create(Ingredient ingredient, decimal quantity, IngredientUnit unit)
+    public static AddIngredientAction Create(Ingredient ingredient, decimal quantity, MeasureUnit unit)
     {
         if (!ingredient.IsApplicableUnit(unit))
         {

@@ -3,27 +3,32 @@ using MealPlanner.Domain.Ingredients;
 
 namespace MealPlanner.Tests.Shared;
 
-// NOTE: Should I be reusable?
 public static class RandomId
 {
-    public static void Set(Menu menu)
+    public static void Set(params Menu[] menus)
     {
-        var field = typeof(Menu).GetProperty(nameof(Menu.Id));
-        field!.SetValue(menu, Random.Shared.Next(1, 1000));
-    }
-
-    public static void Set(Recipe recipe)
-    {
-        var field = typeof(Recipe).GetProperty(nameof(Recipe.Id));
-        field!.SetValue(recipe, Random.Shared.Next(1, 1000));
-    }
-
-    public static void Set(params IngredientUnit[] ingredientUnits)
-    {
-        foreach(var ingredientUnit in ingredientUnits)
+        foreach(var menu in menus)
         {
-            var field = typeof(IngredientUnit).GetProperty(nameof(IngredientUnit.Id));
-            field!.SetValue(ingredientUnit, Random.Shared.Next(1, 1000));
+            var field = typeof(Menu).GetProperty(nameof(Menu.Id));
+            field!.SetValue(menu, Random.Shared.Next(1, 1000));
+        }
+    }
+
+    public static void Set(params Recipe[] recipes)
+    {
+        foreach(var recipe in recipes)
+        {
+            var field = typeof(Recipe).GetProperty(nameof(Recipe.Id));
+            field!.SetValue(recipe, Random.Shared.Next(1, 1000));
+        }
+    }
+
+    public static void Set(params MeasureUnit[] measureUnits)
+    {
+        foreach(var measureUnit in measureUnits)
+        {
+            var field = typeof(MeasureUnit).GetProperty(nameof(MeasureUnit.Id));
+            field!.SetValue(measureUnit, Random.Shared.Next(1, 1000));
         }
     }
 }

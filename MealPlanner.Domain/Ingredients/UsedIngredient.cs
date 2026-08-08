@@ -16,14 +16,14 @@ public class UsedIngredient
     
     public int UnitId { get; private set; }
     
-    public IngredientUnit Unit { get; private set; }
+    public MeasureUnit Unit { get; private set; }
 
     private UsedIngredient()
     {
         // For EF Core
     }
     
-    private UsedIngredient(Recipe recipe, Ingredient ingredient, decimal quantity, IngredientUnit unit)
+    private UsedIngredient(Recipe recipe, Ingredient ingredient, decimal quantity, MeasureUnit unit)
     {
         Recipe = recipe;
         RecipeId = recipe.Id;

@@ -6,9 +6,9 @@ public class Ingredient
     
     public string Name { get; private set; }
 
-    private List<IngredientUnit> _applicableUnits = [];
+    private List<MeasureUnit> _applicableUnits = [];
     
-    public IReadOnlyList<IngredientUnit> ApplicableUnits 
+    public IReadOnlyList<MeasureUnit> ApplicableUnits 
     { 
         get => _applicableUnits;
         private set => _applicableUnits = [..value]; 
@@ -19,13 +19,13 @@ public class Ingredient
         // For EF Core
     }
     
-    private Ingredient(string name, List<IngredientUnit> applicableUnits)
+    private Ingredient(string name, List<MeasureUnit> applicableUnits)
     {
         Name = name;
         ApplicableUnits = applicableUnits;
     }
 
-    public static Ingredient Create(string name, List<IngredientUnit> applicableUnits)
+    public static Ingredient Create(string name, List<MeasureUnit> applicableUnits)
     {
         ValidateNameAndThrow(name);
         ValidateUnitsAndThrow(applicableUnits);
@@ -41,7 +41,7 @@ public class Ingredient
         }
     }
 
-    private static void ValidateUnitsAndThrow(List<IngredientUnit> applicableUnits)
+    private static void ValidateUnitsAndThrow(List<MeasureUnit> applicableUnits)
     {
         if (applicableUnits.Count == 0)
         {
@@ -49,5 +49,5 @@ public class Ingredient
         }
     }
 
-    public bool IsApplicableUnit(IngredientUnit unit) => ApplicableUnits.Any(x => x.Id == unit.Id);
+    public bool IsApplicableUnit(MeasureUnit unit) => ApplicableUnits.Any(x => x.Id == unit.Id);
 }

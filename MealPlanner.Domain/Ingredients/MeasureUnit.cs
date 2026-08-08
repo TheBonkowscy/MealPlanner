@@ -1,23 +1,23 @@
 ﻿namespace MealPlanner.Domain.Ingredients;
 
-public class IngredientUnit
+public class MeasureUnit
 {
     public int Id { get; private set; }
     public string Name { get; private set; }
 
-    private IngredientUnit()
+    private MeasureUnit()
     {
         // For EF Core
     }
 
-    public static IngredientUnit Create(string name)
+    public static MeasureUnit Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentNullException(null, "Name cannot be null or whitespace");
         }
 
-        return new IngredientUnit
+        return new MeasureUnit
         {
             Name = name
         };

@@ -4,7 +4,7 @@ namespace MealPlanner.Tests.Shared.Factories;
 
 public static class TestIngredientsUnits
 {
-    public static IngredientUnit Cups() => IngredientUnit.Create("Cups");
+    public static MeasureUnit Cups() => MeasureUnit.Create("Cups");
     
-    public static IngredientUnit Unit(string name) => IngredientUnit.Create(name);
+    public static MeasureUnit Unit(string name) => MeasureUnit.Create(name);
 }

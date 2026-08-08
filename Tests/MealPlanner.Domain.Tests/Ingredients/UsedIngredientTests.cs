@@ -7,7 +7,7 @@ namespace MealPlanner.Domain.Tests.Ingredients;
 public class UsedIngredientTests
 {
     private const string IngredientName = "Flour";
-    private static readonly IngredientUnit Unit = IngredientUnit.Create("Cups");
+    private static readonly MeasureUnit Unit = MeasureUnit.Create("Cups");
     private static readonly Ingredient Ingredient = Ingredient.Create(IngredientName, [Unit]);
 
     [Fact]

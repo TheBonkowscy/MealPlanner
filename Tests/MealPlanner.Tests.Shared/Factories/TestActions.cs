@@ -5,9 +5,9 @@ namespace MealPlanner.Tests.Shared.Factories;
 
 public static class TestActions
 {
-    public static AddIngredientAction AddIngredient(Ingredient ingredient, decimal quantity, IngredientUnit unit) => AddIngredientAction.Create(ingredient, quantity, unit);
+    public static AddIngredientAction AddIngredient(Ingredient ingredient, decimal quantity, MeasureUnit unit) => AddIngredientAction.Create(ingredient, quantity, unit);
     
-    public static AddIngredientAction AddFlour(decimal quantity, IngredientUnit unit) => AddIngredientAction.Create(
+    public static AddIngredientAction AddFlour(decimal quantity, MeasureUnit unit) => AddIngredientAction.Create(
         TestIngredients.CupsOfFlour(),
         quantity,
         unit);
