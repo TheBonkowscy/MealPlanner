@@ -5,7 +5,7 @@
 @implements IDisposable
 
 @inject ICreateMenus CreateMenus
-@inject IFindMeals FindMeals
+@inject IFindRecipes FindRecipes
 @inject IMenuStateService MenuStateService
 @inject AppBarService AppBarService
 @inject ISnackbar Snackbar
@@ -17,13 +17,13 @@
     <MudText Typo="Typo.h5" Class="mb-4">Posiłki zaplanowane na ten dzień</MudText>
 
     <MudDropContainer @ref="_container"
-                      T="MenuItemDto" 
-                      Items="_menuItems" 
+                      T="MealDto" 
+                      Items="_meals" 
                       ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)" 
                       ItemDropped="ItemDropped" 
                       Class="d-flex flex-column flex-grow-1">
         <ChildContent>
-            <MudDropZone T="MenuItemDto" 
+            <MudDropZone T="MealDto" 
                          Identifier="DayMenuZone" 
                          AllowReorder="true" 
                          Class="rounded mud-background-gray pa-4 min-height-200">
@@ -49,7 +49,7 @@
                          Label="Szukaj potrawy..."
                          Value="_selectedMeal"
                          ValueChanged="OnMealSelected"
-                         SearchFunc="SearchMealsAsync"
+                         SearchFunc="SearchRecipesAsync"
                          ResetValueOnSelected="true"
                          AdornmentIcon="@Icons.Material.Filled.Search"
                          AdornmentColor="Color.Primary"
@@ -69,57 +69,57 @@
 @code {
     [Parameter] public DateTime Date { get; set; }
 
-    private MudDropContainer<MenuItemDto>? _container;
-    private readonly List<MenuItemDto> _menuItems = [];
+    private MudDropContainer<MealDto>? _container;
+    private readonly List<MealDto> _meals = [];
     private string? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        _menuItems.Clear();
+        _meals.Clear();
         
         var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u002B";
         AppBarService.SetTitle(formattedTitle);
     }
 
-    private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)
+    private void ItemDropped(MudItemDropInfo<MealDto> dropItem)
     {
         if (dropItem?.Item is null) return;
 
         // 1. Usuwamy przeciągnięty element
-        _menuItems.Remove(dropItem.Item);
+        _meals.Remove(dropItem.Item);
 
         // 2. Wyznaczamy i zabezpieczamy indeks docelowy
         var targetIndex = dropItem.IndexInZone;
         if (targetIndex < 0) targetIndex = 0;
-        if (targetIndex > _menuItems.Count) targetIndex = _menuItems.Count;
+        if (targetIndex > _meals.Count) targetIndex = _meals.Count;
 
         // 3. Wstawiamy go na właściwą pozycję
-        _menuItems.Insert(targetIndex, dropItem.Item);
+        _meals.Insert(targetIndex, dropItem.Item);
 
         // 4. Odświeżamy indeksy Order
-        for (var i = 0; i < _menuItems.Count; i++)
+        for (var i = 0; i < _meals.Count; i++)
         {
-            _menuItems[i].Order = i;
+            _meals[i].Order = i;
         }
 
         _container?.Refresh();
     }
 
-    private async Task<IEnumerable<string>> SearchMealsAsync(string value, CancellationToken token)
+    private async Task<IEnumerable<string>> SearchRecipesAsync(string value, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(value)) return Array.Empty<string>();
-        return await FetchMealsFromApiAsync(value, token);
+        return await FetchRecipesFromApiAsync(value, token);
     }
 
     private void OnMealSelected(string selectedMeal)
     {
         if (string.IsNullOrWhiteSpace(selectedMeal)) return;
 
-        _menuItems.Add(new MenuItemDto
+        _meals.Add(new MealDto
         {
             Name = selectedMeal,
-            Order = _menuItems.Count,
+            Order = _meals.Count,
             ZoneIdentifier = "DayMenuZone"
         });
 
@@ -127,27 +127,27 @@
         _container?.Refresh();
     }
 
-    private void RemoveMeal(MenuItemDto item)
+    private void RemoveMeal(MealDto item)
     {
-        _menuItems.Remove(item);
-        for (int i = 0; i < _menuItems.Count; i++)
+        _meals.Remove(item);
+        for (int i = 0; i < _meals.Count; i++)
         {
-            _menuItems[i].Order = i;
+            _meals[i].Order = i;
         }
         _container?.Refresh();
     }
 
     private async Task SaveMenuAsync()
     {
-        if (!_menuItems.Any())
+        if (!_meals.Any())
         {
             Snackbar.Add("Dodaj co najmniej jeden posiłek!", Severity.Warning);
             return;
         }
 
-        var orderedMeals = _menuItems.ToDictionary(x => x.Order, x => x.Name);
+        var meals = _meals.ToDictionary(x => x.Order, x => x.Name);
 
-        var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
+        var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), meals);
         var response = await CreateMenus.CreateMenu(request, _cts.Token);
         Snackbar.Add("Utworzono nowe menu!", Severity.Success);
         
@@ -157,11 +157,11 @@
 
     #region API Calls
 
-    private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string? query, CancellationToken token)
+    private async Task<IEnumerable<string>> FetchRecipesFromApiAsync(string? query, CancellationToken token)
     {
-        var results = await FindMeals.Get(query, token);
+        var results = await FindRecipes.Get(query, token);
 
-        return results.Meals.Select(x => x.Name);
+        return results.Recipes.Select(x => x.Name);
     }
     #endregion
 

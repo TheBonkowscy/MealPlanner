@@ -8,7 +8,7 @@
 @inject IMenuStateService MenuStateService
 @inject NavigationManager Navigation
 @inject AppBarService AppBarService
-@inject MenuItemMapper MenuItemMapper
+@inject MealMapper MealMapper
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
@@ -49,7 +49,7 @@ else
         new("pl-PL");
 
 
-    private List<MenuItemDto> _meals = [];
+    private List<MealDto> _meals = [];
 
     private readonly CancellationTokenSource _cts = new();
     
@@ -95,7 +95,7 @@ else
         
         AppBarService.SetActions([.. actions]);
         
-        _meals = MenuItemMapper.MapMenuItem(menuForDay?.Meals ?? []);
+        _meals = MealMapper.MapMeals(menuForDay?.Meals ?? []);
         MenuStateService.NotifyMenuChanged();
     }
     

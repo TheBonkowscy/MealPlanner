@@ -2,6 +2,7 @@ using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
+using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 using Moq;
 using Moq.EntityFrameworkCore;
@@ -15,7 +16,7 @@ public class MenuReaderTests
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly MenuReader _sut;
 
-    private static List<Menu> _menus = [];
+    private static readonly List<Menu> _menus = [];
     public MenuReaderTests()
     {
         _menus.Clear();
@@ -138,7 +139,7 @@ public class MenuReaderTests
     {
         // Arrange
         var menuWithMeals = CreateAndSaveMenu(Today);
-        menuWithMeals.AddMeal(Meal.Create("Pizza"));
+        menuWithMeals.AddMeal(Recipe.Create("Pizza"));
         
         var menuWithoutMeals = CreateAndSaveMenu(Today.AddDays(1));
         

@@ -10,7 +10,8 @@ public class MealConfiguration : IEntityTypeConfiguration<Meal>
     {
         builder.ToTable("Meals");
         
-        builder.HasKey(x => x.Id);
-        builder.Property(x => x.Name).IsRequired();
+        builder.HasKey(x => new { x.MenuId, x.RecipeId });
+        
+        builder.Property(x => x.Order).IsRequired();
     }
 }

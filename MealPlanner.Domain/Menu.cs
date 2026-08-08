@@ -4,14 +4,14 @@ public class Menu
 {
     public static readonly DateOnly MinDateInThePast = new(2019, 9, 28);
 
-    private List<MenuItem> _items = [];
+    private List<Meal> _meals = [];
 
     public int Id { get; private set; }
     public DateOnly Date { get; private set; }
-    public IReadOnlyList<MenuItem> Items
+    public IReadOnlyList<Meal> Meals
     {
-        get => _items;
-        private set => _items = [..value];
+        get => _meals;
+        private set => _meals = [..value];
     }
 
     private Menu()
@@ -23,27 +23,27 @@ public class Menu
     {
     }
 
-    private Menu(DateOnly date, List<MenuItem> items)
+    private Menu(DateOnly date, List<Meal> meals)
     {
         Date = date;
-        Items = items;
+        Meals = meals;
     }
     
-    public void AddMeal(Meal meal) => TryAddMeal(_items.Count, meal);
+    public void AddMeal(Recipe recipe) => TryAddMeal(_meals.Count, recipe);
 
-    public void AddMeal(int order, Meal meal) => TryAddMeal(order, meal);
+    public void AddMeal(int order, Recipe recipe) => TryAddMeal(order, recipe);
 
-    private void TryAddMeal(int order, Meal meal)
+    private void TryAddMeal(int order, Recipe recipe)
     {
         ValidateOrderAndThrow(order);
-        ValidateMealAndThrow(meal);
-        var item = MenuItem.Create(this, meal, order);
-        _items.Add(item);
+        ValidateRecipeAndThrow(recipe);
+        var item = Meal.Create(this, recipe, order);
+        _meals.Add(item);
     }
 
     private void ValidateOrderAndThrow(int order)
     {
-        if (order > _items.Count)
+        if (order > _meals.Count)
         {
             throw new ArgumentOutOfRangeException(null, "Order must not exceed the number of already added meals.");
         }
@@ -55,23 +55,23 @@ public class Menu
         }
     }
     
-    public Meal? GetMeal(int order) => _items.FirstOrDefault(x => x.Order == order)?.Meal;
+    public Recipe? GetMeal(int order) => _meals.FirstOrDefault(x => x.Order == order)?.Recipe;
 
-    private void ValidateMealAndThrow(Meal meal)
+    private void ValidateRecipeAndThrow(Recipe recipe)
     {
-        if (HasMeal(meal))
+        if (HasRecipe(recipe))
         {
-            throw new InvalidOperationException($"Meal '{meal}' is already present in the menu for {Date}.");
+            throw new InvalidOperationException($"Meal '{recipe}' is already present in the menu for {Date}.");
         }
     }
 
-    private bool HasMeal(Meal meal) => _items.Any(x => x.Meal.Equals(meal));
+    private bool HasRecipe(Recipe recipe) => _meals.Any(x => x.Recipe.Equals(recipe));
     
-    public static Menu Create(DateOnly date, List<Meal> meals)
+    public static Menu Create(DateOnly date, List<Recipe> recipes)
     {
         ValidateDateAndThrow(date);
         var menu = new Menu(date);
-        meals.ForEach(menu.AddMeal);
+        recipes.ForEach(menu.AddMeal);
         return menu;
     }
 
@@ -89,11 +89,11 @@ public class Menu
 
     public void RemoveAllItems()
     {
-        _items.Clear();
+        _meals.Clear();
     }
 
-    public void AddMeals(List<Meal> mappedMeals)
+    public void AddRecipes(List<Recipe> recipes)
     {
-        mappedMeals.ForEach(AddMeal);
+        recipes.ForEach(AddMeal);
     }
 }

@@ -7,7 +7,7 @@ using MealPlanner.Shared.Menus.Responses;
 
 namespace MealPlanner.Client;
 
-internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindMeals, IUpdateMenus, IDeleteMenus
+internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindRecipes, IUpdateMenus, IDeleteMenus
 {
     public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
@@ -75,9 +75,9 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
     }
 
     // TODO: this should probably live in a separate client
-    public async Task<GetMealsResponse> Get(string? query, CancellationToken cancellationToken)
+    public async Task<GetRecipesResponse> Get(string? query, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MealsRoute;
+        var endpoint = Constants.RecipesRoute;
         if (!string.IsNullOrWhiteSpace(query))
         {
             endpoint = endpoint.AppendQueryParam("q", query);
@@ -86,10 +86,10 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
         var result = await httpClient.GetAsync(endpoint, cancellationToken);
         if (result.IsSuccessStatusCode)
         {
-            return await result.Content.ReadFromJsonAsync<GetMealsResponse?>();
+            return await result.Content.ReadFromJsonAsync<GetRecipesResponse?>();
         }
 
-        return GetMealsResponse.Empty;
+        return GetRecipesResponse.Empty;
     }
 
     public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)

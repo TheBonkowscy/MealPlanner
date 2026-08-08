@@ -18,7 +18,7 @@ builder.Services.AddMealPlannerClient();
 builder.Services.AddSingleton<IMenuStateService, MenuStateService>();
 builder.Services.AddScoped<AppBarService>();
 builder.Services.AddScoped<MenuDialogService>();
-builder.Services.AddSingleton<MenuItemMapper>();
+builder.Services.AddSingleton<MealMapper>();
 
 builder.Services.AddMudServices();
 

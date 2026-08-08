@@ -6,17 +6,11 @@ public static class TestMenu
 {
     public static Menu Create(DateOnly date)
     {
-        return Create(date, [CreateMeal()]);
+        return Create(date, [TestRecipes.Create()]);
     }
 
-    public static Menu Create(DateOnly date, List<Meal> meal)
+    public static Menu Create(DateOnly date, List<Recipe> recipes)
     {
-        return Menu.Create(date, meal);
-    }
-
-    private static Meal CreateMeal(string? name = null)
-    {
-        var randomMeal = Meal.Create(Guid.NewGuid().ToString());
-        return randomMeal;
+        return Menu.Create(date, recipes);
     }
 }

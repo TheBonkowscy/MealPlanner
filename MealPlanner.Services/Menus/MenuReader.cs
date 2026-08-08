@@ -17,23 +17,23 @@ public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
     public async Task<GetMenuResponse?> Get(int id, CancellationToken ct)
     {
         var menu = await ctx.Menus
-            .Include(x => x.Items)
-            .ThenInclude(x => x.Meal)
+            .Include(x => x.Meals)
+            .ThenInclude(x => x.Recipe)
             .FirstOrDefaultAsync(x => x.Id == id, ct);
         return menu is null ? null : MapMenu(menu);
     }
 
     private static GetMenuResponse MapMenu(Menu menu)
     {
-        var mappedMeals = menu.Items.ToDictionary(x => x.Order, x => x.Meal.Name);
+        var mappedMeals = menu.Meals.ToDictionary(x => x.Order, x => x.Recipe.Name);
         return new GetMenuResponse(menu.Id, menu.Date, mappedMeals);
     }
 
     public async Task<GetMenuResponse?> Get(DateOnly date, CancellationToken ct)
     {
         var menuForDate = await ctx.Menus
-            .Include(x => x.Items)
-            .ThenInclude(x => x.Meal)
+            .Include(x => x.Meals)
+            .ThenInclude(x => x.Recipe)
             .FirstOrDefaultAsync(x => x.Date == date, ct);
         
         return menuForDate is null ? null : MapMenu(menuForDate);

@@ -1,33 +1,59 @@
-namespace MealPlanner.Domain;
+﻿namespace MealPlanner.Domain;
 
 public class Meal
 {
-    public int Id { get; private set; }
+    public int MenuId { get; private set; }
+    public Menu Menu { get; private set; }
+    
+    public int RecipeId { get; private set; }
+    public Recipe Recipe { get; private set; }
+    
+    public int Order { get; private set; }
 
     private Meal()
     {
         // For EF Core
     }
     
-    private Meal(string name)
+    private Meal(Menu menu, Recipe recipe, int order)
     {
-        Name = name;
+        Menu = menu;
+        MenuId = menu.Id;
+        Recipe = recipe;
+        RecipeId = recipe.Id;
+        Order = order;
     }
 
-    public string Name { get; private set; }
-
-    public static Meal Create(string name)
+    public static Meal Create(Menu menu, Recipe recipe, int order)
     {
-        ValidateNameAndThrow(name);
-
-        return new Meal(name);
+        ValidateMenuAndThrow(menu);
+        ValidateRecipeAndThrow(recipe);
+        ValidateOrderAndThrow(order);
+        
+        return new Meal(menu, recipe, order);
     }
-
-    private static void ValidateNameAndThrow(string meal)
+    
+    private static void ValidateMenuAndThrow(Menu menu)
     {
-        if (string.IsNullOrWhiteSpace(meal))
+        if (menu is null)
         {
-            throw new ArgumentNullException(null, "Please specify a name of the meal");
+            throw new ArgumentNullException(nameof(menu));
         }
     }
+    
+    private static void ValidateRecipeAndThrow(Recipe recipe)
+    {
+        if (recipe is null)
+        {
+            throw new ArgumentNullException(nameof(recipe));
+        }
+    }
+    
+    private static void ValidateOrderAndThrow(int order)
+    {
+        if (order < 0)
+        {
+            throw new ArgumentOutOfRangeException(null, "Order must be a positive number.");
+        }
+    }   
 }

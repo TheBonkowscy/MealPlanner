@@ -17,8 +17,8 @@ public class MenuUpdater(MealPlannerDbContext ctx,
     public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
     {
         var menu = await ctx.Menus
-            .Include(x => x.Items)
-            .ThenInclude(x => x.Meal)
+            .Include(x => x.Meals)
+            .ThenInclude(x => x.Recipe)
             .FirstOrDefaultAsync(x => x.Date == request.Date, cancellationToken);
         if (menu is null)
         {
@@ -35,7 +35,7 @@ public class MenuUpdater(MealPlannerDbContext ctx,
         }
         
         var mappedMeals = await mealsMapper.MapMeals(request.Meals, cancellationToken);
-        menu.AddMeals(mappedMeals);
+        menu.AddRecipes(mappedMeals);
         
         await ctx.SaveChangesAsync(cancellationToken);
 
