@@ -22,13 +22,4 @@ public static class RandomId
             field!.SetValue(recipe, Random.Shared.Next(1, 1000));
         }
     }
-
-    public static void Set(params MeasureUnit[] measureUnits)
-    {
-        foreach(var measureUnit in measureUnits)
-        {
-            var field = typeof(MeasureUnit).GetProperty(nameof(MeasureUnit.Id));
-            field!.SetValue(measureUnit, Random.Shared.Next(1, 1000));
-        }
-    }
 }

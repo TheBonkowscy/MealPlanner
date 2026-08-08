@@ -8,7 +8,6 @@ namespace MealPlanner.Domain.Tests.Ingredients.Actions;
 
 public class AddIngredientActionTests
 {
-    private static readonly MeasureUnit NotApplicableUnit = MeasureUnit.Create("Pieces");
     private const decimal SharedExpectedQuantity = 0.75m;
     
     [Fact]
@@ -16,14 +15,13 @@ public class AddIngredientActionTests
     {
         // Arrange
         var ingredientToAdd = TestIngredients.CupsOfFlour();
-        RandomId.Set([.. ingredientToAdd.ApplicableUnits]);
         
         // Act
         Action<Ingredient, decimal, MeasureUnit> create = (ingredient, quantity, unit) =>
             AddIngredientAction.Create(ingredient, quantity, unit);
         
         // Assert
-        create.Invoking(x => x.Invoke(ingredientToAdd, SharedExpectedQuantity, NotApplicableUnit))
+        create.Invoking(x => x.Invoke(ingredientToAdd, SharedExpectedQuantity, MeasureUnit.Kilogram))
             .Should().Throw<InvalidOperationException>("Ingredient does not support the specified unit");
     }
     
@@ -38,7 +36,7 @@ public class AddIngredientActionTests
             AddIngredientAction.Create(ingredient, quantity, unit);
         
         // Assert
-        create.Invoking(x => x.Invoke(ingredientToAdd, -SharedExpectedQuantity, TestIngredientsUnits.Cups()))
+        create.Invoking(x => x.Invoke(ingredientToAdd, -SharedExpectedQuantity, MeasureUnit.GlassCup))
             .Should().Throw<ArgumentOutOfRangeException>("Ingredient quantity must be positive");
     }
     
@@ -47,7 +45,7 @@ public class AddIngredientActionTests
     {
         // Arrange
         var ingredientToAdd = TestIngredients.CupsOfFlour();
-        var expectedUnit = TestIngredientsUnits.Cups();
+        const MeasureUnit expectedUnit = MeasureUnit.GlassCup;
         
         // Act
         var result = AddIngredientAction.Create(ingredientToAdd, SharedExpectedQuantity, expectedUnit);

@@ -9,7 +9,7 @@ namespace MealPlanner.Domain.Tests.Ingredients;
 public class IngredientTests
 {
     private const string Name = "Flour";
-    private static readonly List<MeasureUnit> Units = [TestIngredientsUnits.Cups()];
+    private static readonly List<MeasureUnit> Units = [MeasureUnit.GlassCup];
     
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
@@ -64,9 +64,7 @@ public class IngredientTests
 
     public static IEnumerable<object[]> IsApplicableTestData()
     {
-        yield return [TestIngredientsUnits.Cups(), true];
-        var teaspoons = MeasureUnit.Create("Teaspoons");
-        RandomId.Set(teaspoons);
-        yield return [teaspoons, false];
+        yield return [MeasureUnit.GlassCup, true];
+        yield return [MeasureUnit.Milliliters, false];
     }
 }

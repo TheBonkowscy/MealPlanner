@@ -7,15 +7,14 @@ namespace MealPlanner.Domain.Tests.Ingredients;
 public class UsedIngredientTests
 {
     private const string IngredientName = "Flour";
-    private static readonly MeasureUnit Unit = MeasureUnit.Create("Cups");
-    private static readonly Ingredient Ingredient = Ingredient.Create(IngredientName, [Unit]);
+    private static readonly Ingredient Ingredient = Ingredient.Create(IngredientName, [MeasureUnit.GlassCup]);
 
     [Fact]
     public void Create_FromAction_Succeeds()
     {
         // Arrange
         var recipe = Recipe.Create("Test Recipe");
-        var action = AddIngredientAction.Create(Ingredient, 0.75m, Unit);
+        var action = AddIngredientAction.Create(Ingredient, 0.75m, MeasureUnit.GlassCup);
         
         // Act
         var result = UsedIngredient.Create(recipe, action);

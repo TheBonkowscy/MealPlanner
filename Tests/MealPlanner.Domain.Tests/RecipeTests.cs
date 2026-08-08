@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
 using MealPlanner.Tests.Shared.Factories;
 
@@ -7,7 +8,7 @@ namespace MealPlanner.Domain.Tests;
 public class RecipeTests
 {
     private const string Name = "Fish and chips";
-    private static readonly AddIngredientAction SharedIngredient = TestActions.AddFlour(0.75m, TestIngredientsUnits.Cups());
+    private static readonly AddIngredientAction SharedIngredient = TestActions.AddFlour(0.75m, MeasureUnit.GlassCup);
     private static readonly List<RecipeStep> SharedSteps = [RecipeStep.Create(1, "Step 1"), RecipeStep.Create(1, "Step 2")];
     
     [Fact]
