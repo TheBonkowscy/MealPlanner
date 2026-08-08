@@ -49,5 +49,5 @@ public class Ingredient
         }
     }
 
-    public bool IsApplicableUnit(MeasureUnit unit) => ApplicableUnits.Any(x => x.Id == unit.Id);
+    public bool IsApplicableUnit(MeasureUnit unit) => ApplicableUnits.Any(x => x == unit);
 }
