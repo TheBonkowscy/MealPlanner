@@ -8,9 +8,9 @@ using Xunit;
 namespace MealPlanner.API.Tests;
 
 [Collection("IntegrationTests")]
-public class MealsIntegrationTests : IntegrationTestBase
+public class RecipesIntegrationTests : IntegrationTestBase
 {
-    public MealsIntegrationTests(MealPlannerWebApplicationFactory factory) : base(factory)
+    public RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) : base(factory)
     {
     }
 

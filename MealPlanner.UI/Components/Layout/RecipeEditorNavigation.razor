@@ -1,0 +1,75 @@
+﻿@using MealPlanner.UI.Models
+@implements IDisposable
+
+@inject NavigationManager Navigation
+
+<MudNavMenu>
+    <MudNavGroup 
+        Title="Recipe Editor"
+        Expanded="@IsActiveEditorCategory(EditorCategory.Recipes)"
+        Class="@GetActiveEditorCategoryClass(EditorCategory.Recipes)">
+        <MudNavMenu Class="ml-4">
+            <div class="d-flex align-center justify-space-between @GetActiveEditorClass(RecipeEditorNavigationLink.List)">
+                <MudNavLink Href="@(RoutingConstants.Editors.Recipe.List)">List</MudNavLink>
+                <MudIconButton
+                    Icon="@Icons.Material.Filled.List"
+                    Size="Size.Small"
+                    Color="Color.Primary"
+                    OnClick="@(() => Navigation.NavigateTo(RoutingConstants.Editors.Recipe.List))" />
+            </div>
+            <div class="d-flex align-center justify-space-between @GetActiveEditorClass(RecipeEditorNavigationLink.Create)">
+                <MudNavLink Href="@(RoutingConstants.Editors.Recipe.Create)">Create</MudNavLink>
+                <MudIconButton
+                    Icon="@Icons.Material.Filled.Add"
+                    Size="Size.Small"
+                    Color="Color.Primary"
+                    OnClick="@(() => Navigation.NavigateTo(RoutingConstants.Editors.Recipe.Create))" />
+            </div>
+        </MudNavMenu>
+    </MudNavGroup>
+</MudNavMenu>
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    private bool IsActiveEditorCategory(EditorCategory recipes)
+    {
+        var relativePath = Navigation.ToBaseRelativePath(Navigation.Uri);
+        
+        return recipes switch
+        {
+            EditorCategory.Recipes => RoutingConstants.Editors.Recipe.IsList(relativePath) || RoutingConstants.Editors.Recipe.IsCreate(relativePath),
+            _ => false
+        };
+    }
+
+    private string? GetActiveEditorCategoryClass(EditorCategory recipes)
+    {
+        return IsActiveEditorCategory(recipes) ? "active-editor-category" : null;
+    }
+
+    private string? GetActiveEditorClass(RecipeEditorNavigationLink recipeEditorLink)
+    {
+        var route = Navigation.ToBaseRelativePath(Navigation.Uri);
+ 
+        if (RoutingConstants.Editors.Recipe.IsCreate(route) 
+            && recipeEditorLink == RecipeEditorNavigationLink.Create)
+        {
+            return "active-editor-view";
+        }
+ 
+        if (RoutingConstants.Editors.Recipe.IsList(route) 
+            && recipeEditorLink == RecipeEditorNavigationLink.List)
+        {
+            return "active-editor-view";
+        }
+
+        return null;
+    }
+}

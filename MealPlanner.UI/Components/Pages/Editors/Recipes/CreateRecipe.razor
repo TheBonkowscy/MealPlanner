@@ -1,0 +1,87 @@
+﻿@page "/editors/recipes/create"
+
+@using MealPlanner.UI.Models
+
+<h3>@($"Dodawanie nowego posiłku")</h3>
+
+<MudPaper Class="pa-6 ma-4" Elevation="3">
+    <MudText Typo="Typo.h5" Class="mb-4">Posiłki zaplanowane na ten dzień</MudText>
+
+    <MudDropContainer @ref="_container"
+                      T="MealDto" 
+                      Items="_meals" 
+                      ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)" 
+                      ItemDropped="ItemDropped" 
+                      Class="d-flex flex-column flex-grow-1">
+        <ChildContent>
+            <MudDropZone T="MealDto" 
+                         Identifier="DayMenuZone" 
+                         AllowReorder="true" 
+                         Class="rounded mud-background-gray pa-4 min-height-200">
+                <ItemRenderer>
+                    <MudPaper Class="pa-3 my-2 d-flex justify-space-between align-center" Elevation="2">
+                        <div class="d-flex align-center">
+                            <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="mr-3 cursor-grab" />
+                            <MudText Typo="Typo.body1">@context.Name</MudText>
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                       Color="Color.Error" 
+                                       Size="Size.Small" 
+                                       OnClick="@(() => RemoveMeal(context))" />
+                    </MudPaper>
+                </ItemRenderer>
+            </MudDropZone>
+        </ChildContent>
+    </MudDropContainer>
+
+    <MudPaper Class="pa-4 mt-4 mud-theme-light" Elevation="1">
+        <MudText Typo="Typo.subtitle2" Class="mb-2">Dodaj nowy posiłek do menu:</MudText>
+        <MudAutocomplete T="string"
+                         Label="Szukaj potrawy..."
+                         Value="_selectedMeal"
+                         ValueChanged="OnMealSelected"
+                         SearchFunc="SearchRecipesAsync"
+                         ResetValueOnSelected="true"
+                         AdornmentIcon="@Icons.Material.Filled.Search"
+                         AdornmentColor="Color.Primary"
+                         DebounceInterval="300" 
+                         MinCharacters="2" />
+    </MudPaper>
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               Class="mt-6"
+               OnClick="SaveMenuAsync">
+        Utwórz menu
+    </MudButton>
+</MudPaper>
+@code {
+    private MudDropContainer<MealDto>? _container;
+    private readonly List<MealDto> _meals = [];
+    
+    private void ItemDropped(MudItemDropInfo<MealDto> dropItem)
+    {
+        if (dropItem?.Item is null) return;
+
+        // 1. Usuwamy przeciągnięty element
+        _meals.Remove(dropItem.Item);
+
+        // 2. Wyznaczamy i zabezpieczamy indeks docelowy
+        var targetIndex = dropItem.IndexInZone;
+        if (targetIndex < 0) targetIndex = 0;
+        if (targetIndex > _meals.Count) targetIndex = _meals.Count;
+
+        // 3. Wstawiamy go na właściwą pozycję
+        _meals.Insert(targetIndex, dropItem.Item);
+
+        // 4. Odświeżamy indeksy Order
+        for (var i = 0; i < _meals.Count; i++)
+        {
+            _meals[i].Order = i;
+        }
+
+        _container?.Refresh();
+    }
+
+}

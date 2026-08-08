@@ -10,7 +10,7 @@ public class AddIngredientAction
 
     private AddIngredientAction()
     {
-        // Prevent creating via validation
+        // Prevent creating without validation
     }
     
     public static AddIngredientAction Create(Ingredient ingredient, decimal quantity, MeasureUnit unit)

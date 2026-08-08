@@ -63,7 +63,6 @@ h1:focus {
     font-weight: 700;
 }
 
-
 .today-day {
     font-weight: 700;
     background-color: var(--mud-palette-secondary);
@@ -72,4 +71,14 @@ h1:focus {
 
 .fw-bold {
     font-weight: 700;
+}
+
+.active-editor-category .mud-nav-group-title {
+    font-weight: 700;
+}
+
+.active-editor-view {
+    font-weight: 700;
+    background-color: var(--mud-palette-secondary);
+    border-radius: 4px;
 }
