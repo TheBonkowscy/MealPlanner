@@ -7,6 +7,8 @@ namespace MealPlanner.Domain.Tests;
 public class MealTests
 {
     private const string Name = "Fish and chips";
+    private static readonly AddIngredientAction SharedIngredient = TestActions.AddFlour(0.75m, TestIngredientsUnits.Cups());
+    private static readonly List<RecipeStep> SharedSteps = [RecipeStep.Create(1, "Step 1"), RecipeStep.Create(1, "Step 2")];
     
     [Fact]
     public void Create_WithoutName_ThrowsException()
@@ -35,40 +37,34 @@ public class MealTests
     public void Create_WithEmptyIngredients_ThrowsException()
     {
         // Act
-        Action<string, List<AddIngredientAction>> createMeal = (name, ingredients) => Meal.Create(name, ingredients);
+        Action<string, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, ingredients, recipeSteps) => Meal.Create(name, ingredients, recipeSteps);
         
         // Assert
-        createMeal.Invoking(x => x.Invoke(Name, []))
+        createMeal.Invoking(x => x.Invoke(Name, [], SharedSteps))
             .Should().Throw<ArgumentNullException>()
             .WithMessage("At least one ingredient must be specified");
     }
 
     [Fact]
-    public void Create_WithIngredients_Succeeds()
+    public void Create_WithEmptySteps_ThrowsException()
     {
-        // Arrange
-        var addedIngredients = TestActions.AddFlour(0.75m, TestIngredientsUnits.Cups());
-        
         // Act
-        Action<string, List<AddIngredientAction>> createMeal = (name, ingredients) => Meal.Create(name, ingredients);
+        Action<string, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, ingredients, recipeSteps) => Meal.Create(name, ingredients, recipeSteps);
         
         // Assert
-        createMeal.Invoking(x => x.Invoke("", [addedIngredients]))
+        createMeal.Invoking(x => x.Invoke(Name, [SharedIngredient], []))
             .Should().Throw<ArgumentNullException>()
-            .WithMessage("Please specify a name of the meal");
+            .WithMessage("At least one recipe step must be specified");
     }
 
     [Fact]
     public void Create_WithNameAndIngredients_Succeeds()
     {
-        // Arrange
-        var addedIngredients = TestActions.AddFlour(0.75m, TestIngredientsUnits.Cups());
-        
         // Act
-        Action<string, List<AddIngredientAction>> createMeal = (name, ingredients) => Meal.Create(name, ingredients);
+        Action<string, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, ingredients, recipeSteps) => Meal.Create(name, ingredients, recipeSteps);
         
         // Assert
-        createMeal.Invoking(x => x.Invoke("", [addedIngredients]))
+        createMeal.Invoking(x => x.Invoke("", [SharedIngredient], SharedSteps))
             .Should().Throw<ArgumentNullException>()
             .WithMessage("Please specify a name of the meal");        
     }

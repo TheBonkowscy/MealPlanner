@@ -28,7 +28,7 @@ public class AddIngredientActionTests
     }
     
     [Fact]
-    public void Create_WithNonPositiveQuantity_Throws()
+    public void Create_WithNegativeQuantity_Throws()
     {
         // Arrange
         var ingredientToAdd = TestIngredients.CupsOfFlour();

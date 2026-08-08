@@ -22,60 +22,6 @@ namespace MealPlanner.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.Ingredient", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Ingredient");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.IngredientUnit", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("IngredientUnit");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.UsedIngredient", b =>
-                {
-                    b.Property<int>("MealId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("IngredientId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("MealId", "IngredientId", "UnitId");
-
-                    b.HasIndex("IngredientId");
-
-                    b.HasIndex("UnitId");
-
-                    b.ToTable("UsedIngredient");
-                });
-
             modelBuilder.Entity("MealPlanner.Domain.Meal", b =>
                 {
                     b.Property<int>("Id")
@@ -130,42 +76,6 @@ namespace MealPlanner.Persistence.Migrations
                     b.ToTable("MenuItems", (string)null);
                 });
 
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.IngredientUnit", b =>
-                {
-                    b.HasOne("MealPlanner.Domain.Ingredients.Ingredient", null)
-                        .WithMany("ApplicableUnits")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.UsedIngredient", b =>
-                {
-                    b.HasOne("MealPlanner.Domain.Ingredients.Ingredient", "Ingredient")
-                        .WithMany()
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MealPlanner.Domain.Meal", "Meal")
-                        .WithMany("Ingredients")
-                        .HasForeignKey("MealId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MealPlanner.Domain.Ingredients.IngredientUnit", "Unit")
-                        .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ingredient");
-
-                    b.Navigation("Meal");
-
-                    b.Navigation("Unit");
-                });
-
             modelBuilder.Entity("MealPlanner.Domain.MenuItem", b =>
                 {
                     b.HasOne("MealPlanner.Domain.Meal", "Meal")
@@ -183,16 +93,6 @@ namespace MealPlanner.Persistence.Migrations
                     b.Navigation("Meal");
 
                     b.Navigation("Menu");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.Ingredient", b =>
-                {
-                    b.Navigation("ApplicableUnits");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Meal", b =>
-                {
-                    b.Navigation("Ingredients");
                 });
 
             modelBuilder.Entity("MealPlanner.Domain.Menu", b =>
