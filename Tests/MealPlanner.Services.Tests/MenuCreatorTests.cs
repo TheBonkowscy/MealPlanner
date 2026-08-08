@@ -12,16 +12,16 @@ namespace MealPlanner.Services.Tests;
 
 public class MenuCreatorTests
 {
-    private static readonly Meal PreExistingMeal = Meal.Create("Fish and chips");
+    private static readonly Recipe PreExistingRecipe = Recipe.Create("Fish and chips");
     private static readonly Dictionary<int, string> Meals = new()
     {
-        { 1, PreExistingMeal.Name }
+        { 1, PreExistingRecipe.Name }
     };
 
     private readonly MenuCreator _sut;
 
     private readonly List<Menu> _menus = [];
-    private readonly List<Meal> _meals = [PreExistingMeal];
+    private readonly List<Recipe> _recipes = [PreExistingRecipe];
     
     public MenuCreatorTests()
     {
@@ -34,14 +34,14 @@ public class MenuCreatorTests
 
             menu.Items.ToList().ForEach(meal =>
             {
-                if (_meals.All(x => x.Name != meal.Meal.Name))
+                if (_recipes.All(x => x.Name != meal.Recipe.Name))
                 {
-                    _meals.Add(meal.Meal);
+                    _recipes.Add(meal.Recipe);
                 }
             });
         });
 
-        ctx.Setup(x => x.Meals).ReturnsDbSet(_meals);
+        ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
         
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
         IMapMeals mealsMapper = new MealMapper(ctx.Object);
@@ -79,18 +79,18 @@ public class MenuCreatorTests
     public async Task Create_ThrowsWhenMealDoesNotExist()
     {
         // Arrange
-        var newMeal = Meal.Create("Quesadilla");
-        var updatedMeals = new Dictionary<int, string>(Meals) { { 2, newMeal.Name } };
+        var newRecipe = Recipe.Create("Quesadilla");
+        var updatedMeals = new Dictionary<int, string>(Meals) { { 2, newRecipe.Name } };
         var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), updatedMeals);
         // Act
         var result = () => _sut.Create(request, CancellationToken.None);
         
         // Assert
         await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"Meal with name {newMeal.Name} does not exist");
+            .WithMessage($"Meal with name {newRecipe.Name} does not exist");
         
         // Cleanup
-        _meals.Remove(newMeal);
+        _recipes.Remove(newRecipe);
     }
 
     [Fact]

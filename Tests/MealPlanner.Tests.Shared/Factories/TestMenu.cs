@@ -9,14 +9,14 @@ public static class TestMenu
         return Create(date, [CreateMeal()]);
     }
 
-    public static Menu Create(DateOnly date, List<Meal> meal)
+    public static Menu Create(DateOnly date, List<Recipe> meal)
     {
         return Menu.Create(date, meal);
     }
 
-    private static Meal CreateMeal(string? name = null)
+    private static Recipe CreateMeal(string? name = null)
     {
-        var randomMeal = Meal.Create(Guid.NewGuid().ToString());
+        var randomMeal = Recipe.Create(Guid.NewGuid().ToString());
         return randomMeal;
     }
 }

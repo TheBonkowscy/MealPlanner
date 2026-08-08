@@ -5,21 +5,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Meals.Read;
 
-public interface IReadMeals
+public interface IReadRecipes
 {
-    Task<GetMealsResponse> GetByQuery(string? query, CancellationToken cancellationToken = default);
+    Task<GetRecipesResponse> GetByQuery(string? query, CancellationToken cancellationToken = default);
 }
-public class MealsReader(MealPlannerDbContext ctx) : IReadMeals
+public class RecipesReader(MealPlannerDbContext ctx) : IReadRecipes
 {
-    public async Task<GetMealsResponse> GetByQuery(string? query, CancellationToken cancellationToken = default)
+    public async Task<GetRecipesResponse> GetByQuery(string? query, CancellationToken cancellationToken = default)
     {
-        IQueryable<Meal> dbQuery = ctx.Meals;
+        IQueryable<Recipe> dbQuery = ctx.Recipes;
         if (!string.IsNullOrWhiteSpace(query))
         {
             dbQuery = dbQuery.Where(x => x.Name.ToLower().Contains(query.ToLower()));
         }
 
         var result = await dbQuery.ToListAsync(cancellationToken);
-        return new GetMealsResponse(result.Select(x => new MealListItemResponse(x.Id, x.Name)));
+        return new GetRecipesResponse(result.Select(x => new MealListItemResponse(x.Id, x.Name)));
     }
 }

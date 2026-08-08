@@ -18,14 +18,14 @@ public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
     {
         var menu = await ctx.Menus
             .Include(x => x.Items)
-            .ThenInclude(x => x.Meal)
+            .ThenInclude(x => x.Recipe)
             .FirstOrDefaultAsync(x => x.Id == id, ct);
         return menu is null ? null : MapMenu(menu);
     }
 
     private static GetMenuResponse MapMenu(Menu menu)
     {
-        var mappedMeals = menu.Items.ToDictionary(x => x.Order, x => x.Meal.Name);
+        var mappedMeals = menu.Items.ToDictionary(x => x.Order, x => x.Recipe.Name);
         return new GetMenuResponse(menu.Id, menu.Date, mappedMeals);
     }
 
@@ -33,7 +33,7 @@ public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
     {
         var menuForDate = await ctx.Menus
             .Include(x => x.Items)
-            .ThenInclude(x => x.Meal)
+            .ThenInclude(x => x.Recipe)
             .FirstOrDefaultAsync(x => x.Date == date, ct);
         
         return menuForDate is null ? null : MapMenu(menuForDate);

@@ -6,7 +6,7 @@ public class UsedIngredient
 {
     public int MealId { get; private set; }
     
-    public Meal Meal { get; private set; }
+    public Recipe Recipe { get; private set; }
 
     public int IngredientId { get; private set; }
     
@@ -23,16 +23,16 @@ public class UsedIngredient
         // For EF Core
     }
     
-    private UsedIngredient(Meal meal, Ingredient ingredient, decimal quantity, IngredientUnit unit)
+    private UsedIngredient(Recipe recipe, Ingredient ingredient, decimal quantity, IngredientUnit unit)
     {
-        Meal = meal;
-        MealId = meal.Id;
+        Recipe = recipe;
+        MealId = recipe.Id;
         Ingredient = ingredient;
         IngredientId = ingredient.Id;
         Quantity = quantity;
         Unit = unit;
     }
 
-    public static UsedIngredient Create(Meal meal, AddIngredientAction action) =>
-        new(meal, action.Ingredient, action.Quantity, action.Unit);
+    public static UsedIngredient Create(Recipe recipe, AddIngredientAction action) =>
+        new(recipe, action.Ingredient, action.Quantity, action.Unit);
 }

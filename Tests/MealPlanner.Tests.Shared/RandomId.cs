@@ -12,10 +12,10 @@ public static class RandomId
         field!.SetValue(menu, Random.Shared.Next(1, 1000));
     }
 
-    public static void Set(Meal meal)
+    public static void Set(Recipe recipe)
     {
-        var field = typeof(Meal).GetProperty(nameof(Meal.Id));
-        field!.SetValue(meal, Random.Shared.Next(1, 1000));
+        var field = typeof(Recipe).GetProperty(nameof(Recipe.Id));
+        field!.SetValue(recipe, Random.Shared.Next(1, 1000));
     }
 
     public static void Set(params IngredientUnit[] ingredientUnits)

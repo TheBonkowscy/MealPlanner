@@ -6,7 +6,7 @@ namespace MealPlanner.Persistence;
 public class MealPlannerDbContext : DbContext
 {
     public virtual DbSet<Menu> Menus { get; set; }
-    public virtual DbSet<Meal> Meals { get; set; }
+    public virtual DbSet<Recipe> Recipes { get; set; }
     public virtual DbSet<MenuItem> MenuItems { get; set; }
 
     public MealPlannerDbContext(DbContextOptions<MealPlannerDbContext> options) : base(options)

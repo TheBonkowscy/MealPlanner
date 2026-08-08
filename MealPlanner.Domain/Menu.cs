@@ -29,15 +29,15 @@ public class Menu
         Items = items;
     }
     
-    public void AddMeal(Meal meal) => TryAddMeal(_items.Count, meal);
+    public void AddMeal(Recipe recipe) => TryAddMeal(_items.Count, recipe);
 
-    public void AddMeal(int order, Meal meal) => TryAddMeal(order, meal);
+    public void AddMeal(int order, Recipe recipe) => TryAddMeal(order, recipe);
 
-    private void TryAddMeal(int order, Meal meal)
+    private void TryAddMeal(int order, Recipe recipe)
     {
         ValidateOrderAndThrow(order);
-        ValidateMealAndThrow(meal);
-        var item = MenuItem.Create(this, meal, order);
+        ValidateMealAndThrow(recipe);
+        var item = MenuItem.Create(this, recipe, order);
         _items.Add(item);
     }
 
@@ -55,19 +55,19 @@ public class Menu
         }
     }
     
-    public Meal? GetMeal(int order) => _items.FirstOrDefault(x => x.Order == order)?.Meal;
+    public Recipe? GetMeal(int order) => _items.FirstOrDefault(x => x.Order == order)?.Recipe;
 
-    private void ValidateMealAndThrow(Meal meal)
+    private void ValidateMealAndThrow(Recipe recipe)
     {
-        if (HasMeal(meal))
+        if (HasMeal(recipe))
         {
-            throw new InvalidOperationException($"Meal '{meal}' is already present in the menu for {Date}.");
+            throw new InvalidOperationException($"Meal '{recipe}' is already present in the menu for {Date}.");
         }
     }
 
-    private bool HasMeal(Meal meal) => _items.Any(x => x.Meal.Equals(meal));
+    private bool HasMeal(Recipe recipe) => _items.Any(x => x.Recipe.Equals(recipe));
     
-    public static Menu Create(DateOnly date, List<Meal> meals)
+    public static Menu Create(DateOnly date, List<Recipe> meals)
     {
         ValidateDateAndThrow(date);
         var menu = new Menu(date);
@@ -92,7 +92,7 @@ public class Menu
         _items.Clear();
     }
 
-    public void AddMeals(List<Meal> mappedMeals)
+    public void AddMeals(List<Recipe> mappedMeals)
     {
         mappedMeals.ForEach(AddMeal);
     }

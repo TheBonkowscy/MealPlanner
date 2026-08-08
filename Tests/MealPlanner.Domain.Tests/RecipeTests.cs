@@ -4,7 +4,7 @@ using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests;
 
-public class MealTests
+public class RecipeTests
 {
     private const string Name = "Fish and chips";
     private static readonly AddIngredientAction SharedIngredient = TestActions.AddFlour(0.75m, TestIngredientsUnits.Cups());
@@ -14,7 +14,7 @@ public class MealTests
     public void Create_WithoutName_ThrowsException()
     {   
         // Act
-        Action<string> createMeal = (name) => Meal.Create(name);
+        Action<string> createMeal = (name) => Recipe.Create(name);
         
         // Assert
         createMeal.Invoking(x => x.Invoke(""))
@@ -26,7 +26,7 @@ public class MealTests
     public void Create_WithName_Succeeds()
     {
         // Act
-        var meal = Meal.Create(Name);
+        var meal = Recipe.Create(Name);
         
         // Assert
         meal.Should().NotBeNull();
@@ -37,7 +37,7 @@ public class MealTests
     public void Create_WithEmptyIngredients_ThrowsException()
     {
         // Act
-        Action<string, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, ingredients, recipeSteps) => Meal.Create(name, ingredients, recipeSteps);
+        Action<string, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, ingredients, recipeSteps) => Recipe.Create(name, ingredients, recipeSteps);
         
         // Assert
         createMeal.Invoking(x => x.Invoke(Name, [], SharedSteps))
@@ -49,7 +49,7 @@ public class MealTests
     public void Create_WithEmptySteps_ThrowsException()
     {
         // Act
-        Action<string, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, ingredients, recipeSteps) => Meal.Create(name, ingredients, recipeSteps);
+        Action<string, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, ingredients, recipeSteps) => Recipe.Create(name, ingredients, recipeSteps);
         
         // Assert
         createMeal.Invoking(x => x.Invoke(Name, [SharedIngredient], []))
@@ -61,7 +61,7 @@ public class MealTests
     public void Create_WithNameAndIngredients_Succeeds()
     {
         // Act
-        Action<string, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, ingredients, recipeSteps) => Meal.Create(name, ingredients, recipeSteps);
+        Action<string, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, ingredients, recipeSteps) => Recipe.Create(name, ingredients, recipeSteps);
         
         // Assert
         createMeal.Invoking(x => x.Invoke("", [SharedIngredient], SharedSteps))

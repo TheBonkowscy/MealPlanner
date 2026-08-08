@@ -10,9 +10,9 @@ public class UsedIngredientConfiguration : IEntityTypeConfiguration<UsedIngredie
     {
         builder.HasKey(x => new { x.MealId, x.IngredientId, x.UnitId });
         builder.HasOne(x => x.Ingredient).WithMany().HasForeignKey(x => x.IngredientId);
-        builder.HasOne(x => x.Meal).WithMany(x => x.Ingredients).HasForeignKey(x => x.MealId);
+        builder.HasOne(x => x.Recipe).WithMany(x => x.Ingredients).HasForeignKey(x => x.MealId);
         
-        builder.Metadata.FindNavigation(nameof(UsedIngredient.Meal))!.SetPropertyAccessMode(PropertyAccessMode.Field);
+        builder.Metadata.FindNavigation(nameof(UsedIngredient.Recipe))!.SetPropertyAccessMode(PropertyAccessMode.Field);
         builder.Metadata.FindNavigation(nameof(UsedIngredient.Ingredient))!.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

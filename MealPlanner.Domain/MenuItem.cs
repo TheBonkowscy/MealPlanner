@@ -5,8 +5,8 @@ public class MenuItem
     public int MenuId { get; private set; }
     public Menu Menu { get; private set; }
     
-    public int MealId { get; private set; }
-    public Meal Meal { get; private set; }
+    public int RecipeId { get; private set; }
+    public Recipe Recipe { get; private set; }
     
     public int Order { get; private set; }
 
@@ -15,22 +15,22 @@ public class MenuItem
         // For EF Core
     }
     
-    private MenuItem(Menu menu, Meal meal, int order)
+    private MenuItem(Menu menu, Recipe recipe, int order)
     {
         Menu = menu;
         MenuId = menu.Id;
-        Meal = meal;
-        MealId = meal.Id;
+        Recipe = recipe;
+        RecipeId = recipe.Id;
         Order = order;
     }
 
-    public static MenuItem Create(Menu menu, Meal meal, int order)
+    public static MenuItem Create(Menu menu, Recipe recipe, int order)
     {
         ValidateMenuAndThrow(menu);
-        ValidateMealAndThrow(meal);
+        ValidateMealAndThrow(recipe);
         ValidateOrderAndThrow(order);
         
-        return new MenuItem(menu, meal, order);
+        return new MenuItem(menu, recipe, order);
     }
     
     private static void ValidateMenuAndThrow(Menu menu)
@@ -41,11 +41,11 @@ public class MenuItem
         }
     }
     
-    private static void ValidateMealAndThrow(Meal meal)
+    private static void ValidateMealAndThrow(Recipe recipe)
     {
-        if (meal is null)
+        if (recipe is null)
         {
-            throw new ArgumentNullException(nameof(meal));
+            throw new ArgumentNullException(nameof(recipe));
         }
     }
     

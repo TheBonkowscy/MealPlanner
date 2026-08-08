@@ -14,8 +14,8 @@ public static class Extensions
         services.AddTransient<IUpdateMenu, MenuUpdater>();
         services.AddTransient<IDeleteMenu, MenuDeleter>();
         
-        /* Meals */
-        services.AddTransient<IReadMeals, MealsReader>();
+        /* Meals & Recipes */
+        services.AddTransient<IReadRecipes, RecipesReader>();
         services.AddTransient<IMapMeals, MealMapper>();
         
         return Task.CompletedTask;

@@ -3,7 +3,7 @@ using MealPlanner.Domain.Ingredients.Actions;
 
 namespace MealPlanner.Domain;
 
-public class Meal
+public class Recipe
 {
     public int Id { get; private set; }
     
@@ -25,36 +25,36 @@ public class Meal
         private set => _recipeSteps = [.. value];
     }
 
-    private Meal()
+    private Recipe()
     {
         // For EF Core
     }
     
-    private Meal(string name, List<UsedIngredient> ingredients)
+    private Recipe(string name, List<UsedIngredient> ingredients)
     {
         Name = name;
         Ingredients = ingredients;
     }
 
-    private Meal(string name) : this(name, [])
+    private Recipe(string name) : this(name, [])
     {
         // TODO: remove when meal editor is updated to require at least one ingredient
     }
 
-    public static Meal Create(string name)
+    public static Recipe Create(string name)
     {
         ValidateNameAndThrow(name);
 
-        return new Meal(name);
+        return new Recipe(name);
     }
     
-    public static Meal Create(string name, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
+    public static Recipe Create(string name, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
     {
         ValidateNameAndThrow(name);
         ValidateIngredientsAndThrow(ingredientsToAdd);
         ValidateRecipeStepsAndThrow(recipeSteps);
         
-        var meal = new Meal(name);
+        var meal = new Recipe(name);
         var mappedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(meal, ingredient)).ToList();
         mappedIngredients.ForEach(meal._ingredients.Add);
         

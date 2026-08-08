@@ -8,30 +8,30 @@ using Moq.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Tests;
 
-public class MealsReaderTests
+public class RecipesReaderTests
 {
     private readonly Mock<MealPlannerDbContext> _ctx;
-    private readonly MealsReader _sut;
-    private readonly List<Meal> _meals = [];
+    private readonly RecipesReader _sut;
+    private readonly List<Recipe> _recipes = [];
 
-    public MealsReaderTests()
+    public RecipesReaderTests()
     {
         _ctx = new Mock<MealPlannerDbContext>();
-        _ctx.Setup(x => x.Meals).ReturnsDbSet(_meals);
-        _sut = new MealsReader(_ctx.Object);
+        _ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
+        _sut = new RecipesReader(_ctx.Object);
     }
 
     [Fact]
     public async Task GetByQuery_NoQuery_ReturnsAllMeals()
     {
         // Arrange
-        var meal1 = Meal.Create("Pasta");
+        var meal1 = Recipe.Create("Pasta");
         RandomId.Set(meal1);
-        _meals.Add(meal1);
+        _recipes.Add(meal1);
         
-        var meal2 = Meal.Create("Pizza");
+        var meal2 = Recipe.Create("Pizza");
         RandomId.Set(meal2);
-        _meals.Add(meal2);
+        _recipes.Add(meal2);
 
         // Act
         var result = await _sut.GetByQuery(null, CancellationToken.None);
@@ -48,13 +48,13 @@ public class MealsReaderTests
     public async Task GetByQuery_CaseInsensitiveQuery_ReturnsFilteredMeals(string query)
     {
         // Arrange
-        var meal1 = Meal.Create("Pasta");
+        var meal1 = Recipe.Create("Pasta");
         RandomId.Set(meal1);
-        _meals.Add(meal1);
+        _recipes.Add(meal1);
         
-        var meal2 = Meal.Create("Pizza");
+        var meal2 = Recipe.Create("Pizza");
         RandomId.Set(meal2);
-        _meals.Add(meal2);
+        _recipes.Add(meal2);
 
         // Act
         var result = await _sut.GetByQuery(query, CancellationToken.None);

@@ -10,7 +10,7 @@ public class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
     {
         builder.ToTable("MenuItems");
         
-        builder.HasKey(x => new { x.MenuId, x.MealId });
+        builder.HasKey(x => new { x.MenuId, MealId = x.RecipeId });
         
         builder.Property(x => x.Order).IsRequired();
     }

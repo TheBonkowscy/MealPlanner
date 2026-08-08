@@ -16,7 +16,7 @@ public class MenuReaderTests
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly MenuReader _sut;
 
-    private static List<Menu> _menus = [];
+    private static readonly List<Menu> _menus = [];
     public MenuReaderTests()
     {
         _menus.Clear();
@@ -139,7 +139,7 @@ public class MenuReaderTests
     {
         // Arrange
         var menuWithMeals = CreateAndSaveMenu(Today);
-        menuWithMeals.AddMeal(Meal.Create("Pizza"));
+        menuWithMeals.AddMeal(Recipe.Create("Pizza"));
         
         var menuWithoutMeals = CreateAndSaveMenu(Today.AddDays(1));
         

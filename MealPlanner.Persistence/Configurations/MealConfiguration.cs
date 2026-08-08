@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MealPlanner.Persistence.Configurations;
 
-public class MealConfiguration : IEntityTypeConfiguration<Meal>
+public class MealConfiguration : IEntityTypeConfiguration<Recipe>
 {
-    public void Configure(EntityTypeBuilder<Meal> builder)
+    public void Configure(EntityTypeBuilder<Recipe> builder)
     {
         builder.ToTable("Meals");
         

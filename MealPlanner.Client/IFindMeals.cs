@@ -4,5 +4,5 @@ namespace MealPlanner.Client;
 
 public interface IFindMeals
 {
-    Task<GetMealsResponse> Get(string? query, CancellationToken cancellationToken = default);
+    Task<GetRecipesResponse> Get(string? query, CancellationToken cancellationToken = default);
 }

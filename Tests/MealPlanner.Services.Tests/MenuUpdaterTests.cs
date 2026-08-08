@@ -12,14 +12,14 @@ namespace MealPlanner.Services.Tests;
 
 public class MenuUpdaterTests
 {
-    private static readonly Meal PreExistingMeal = Meal.Create("Fish and chips");
+    private static readonly Recipe PreExistingRecipe = Recipe.Create("Fish and chips");
 
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly Mock<IMapMeals> _mealsMapper;
     private readonly MenuUpdater _sut;
 
     private readonly List<Menu> _menus = [];
-    private readonly List<Meal> _meals = [PreExistingMeal];
+    private readonly List<Recipe> _recipes = [PreExistingRecipe];
     
 
     public MenuUpdaterTests()
@@ -36,14 +36,14 @@ public class MenuUpdaterTests
 
             menu.Items.ToList().ForEach(meal =>
             {
-                if (_meals.All(x => x.Name != meal.Meal.Name))
+                if (_recipes.All(x => x.Name != meal.Recipe.Name))
                 {
-                    _meals.Add(meal.Meal);
+                    _recipes.Add(meal.Recipe);
                 }
             });
         });
 
-        _ctx.Setup(x => x.Meals).ReturnsDbSet(_meals);
+        _ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
         
         _ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
         _sut = new MenuUpdater(_ctx.Object, _mealsMapper.Object);
@@ -70,7 +70,7 @@ public class MenuUpdaterTests
     {
         // Arrange
         var date = new DateOnly(2026, 8, 6);
-        var menuForDate = Menu.Create(date, [PreExistingMeal]);
+        var menuForDate = Menu.Create(date, [PreExistingRecipe]);
         _menus.Add(menuForDate);
         var request = new UpdateMenuRequest(date, new Dictionary<int, string>());
 
@@ -92,13 +92,13 @@ public class MenuUpdaterTests
     {
         // Arrange
         var date = new DateOnly(2026, 8, 6);
-        var menuForDate = Menu.Create(date, [PreExistingMeal]);
+        var menuForDate = Menu.Create(date, [PreExistingRecipe]);
         _menus.Add(menuForDate);
-        var mealDtos = new Dictionary<int, string>() { { 0, PreExistingMeal.Name } };
+        var mealDtos = new Dictionary<int, string>() { { 0, PreExistingRecipe.Name } };
 
         _mealsMapper
             .Setup(x => x.MapMeals(mealDtos, It.IsAny<CancellationToken>()))
-            .ReturnsAsync([PreExistingMeal]);
+            .ReturnsAsync([PreExistingRecipe]);
 
         var request = new UpdateMenuRequest(date, mealDtos);
 

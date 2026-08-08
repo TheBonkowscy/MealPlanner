@@ -18,7 +18,7 @@ public class MenuUpdater(MealPlannerDbContext ctx,
     {
         var menu = await ctx.Menus
             .Include(x => x.Items)
-            .ThenInclude(x => x.Meal)
+            .ThenInclude(x => x.Recipe)
             .FirstOrDefaultAsync(x => x.Date == request.Date, cancellationToken);
         if (menu is null)
         {
