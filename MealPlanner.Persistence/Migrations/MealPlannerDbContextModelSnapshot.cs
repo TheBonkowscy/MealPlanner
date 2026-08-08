@@ -22,7 +22,7 @@ namespace MealPlanner.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.Ingredient", b =>
+            modelBuilder.Entity("MealPlanner.Domain.Meal", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,61 +35,6 @@ namespace MealPlanner.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.ToTable("Ingredient");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.MeasureUnit", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MeasureUnit");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.UsedIngredient", b =>
-                {
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("IngredientId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("RecipeId", "IngredientId", "UnitId");
-
-                    b.HasIndex("IngredientId");
-
-                    b.HasIndex("UnitId");
-
-                    b.ToTable("UsedIngredient");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Meal", b =>
-                {
-                    b.Property<int>("MenuId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.HasKey("MenuId", "RecipeId");
-
-                    b.HasIndex("RecipeId");
 
                     b.ToTable("Meals", (string)null);
                 });
@@ -113,125 +58,46 @@ namespace MealPlanner.Persistence.Migrations
                     b.ToTable("Menus", (string)null);
                 });
 
-            modelBuilder.Entity("MealPlanner.Domain.Recipe", b =>
+            modelBuilder.Entity("MealPlanner.Domain.MenuItem", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("MenuId")
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Recipes", (string)null);
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.RecipeStep", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("MealId")
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Instructions")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("RecipeId")
-                        .HasColumnType("integer");
+                    b.HasKey("MenuId", "MealId");
 
-                    b.HasKey("Id");
+                    b.HasIndex("MealId");
 
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("RecipeStep");
+                    b.ToTable("MenuItems", (string)null);
                 });
 
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.MeasureUnit", b =>
+            modelBuilder.Entity("MealPlanner.Domain.MenuItem", b =>
                 {
-                    b.HasOne("MealPlanner.Domain.Ingredients.Ingredient", null)
-                        .WithMany("ApplicableUnits")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.UsedIngredient", b =>
-                {
-                    b.HasOne("MealPlanner.Domain.Ingredients.Ingredient", "Ingredient")
+                    b.HasOne("MealPlanner.Domain.Meal", "Meal")
                         .WithMany()
-                        .HasForeignKey("IngredientId")
+                        .HasForeignKey("MealId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MealPlanner.Domain.Recipe", "Recipe")
-                        .WithMany("Ingredients")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MealPlanner.Domain.Ingredients.MeasureUnit", "Unit")
-                        .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ingredient");
-
-                    b.Navigation("Recipe");
-
-                    b.Navigation("Unit");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Meal", b =>
-                {
                     b.HasOne("MealPlanner.Domain.Menu", "Menu")
-                        .WithMany("Meals")
+                        .WithMany("Items")
                         .HasForeignKey("MenuId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MealPlanner.Domain.Recipe", "Recipe")
-                        .WithMany()
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Meal");
 
                     b.Navigation("Menu");
-
-                    b.Navigation("Recipe");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.RecipeStep", b =>
-                {
-                    b.HasOne("MealPlanner.Domain.Recipe", null)
-                        .WithMany("RecipeSteps")
-                        .HasForeignKey("RecipeId");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Ingredients.Ingredient", b =>
-                {
-                    b.Navigation("ApplicableUnits");
                 });
 
             modelBuilder.Entity("MealPlanner.Domain.Menu", b =>
                 {
-                    b.Navigation("Meals");
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Recipe", b =>
-                {
-                    b.Navigation("Ingredients");
-
-                    b.Navigation("RecipeSteps");
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
