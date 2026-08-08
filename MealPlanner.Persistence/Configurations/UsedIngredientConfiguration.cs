@@ -9,9 +9,12 @@ public class UsedIngredientConfiguration : IEntityTypeConfiguration<UsedIngredie
     public void Configure(EntityTypeBuilder<UsedIngredient> builder)
     {
         builder.HasKey(x => new { x.RecipeId, x.IngredientId, x.UnitId });
-        builder.HasOne(x => x.Ingredient).WithMany().HasForeignKey(x => x.IngredientId);
-        builder.HasOne(x => x.Recipe).WithMany(x => x.Ingredients).HasForeignKey(x => x.RecipeId);
         
+        builder.Property(x => x.Unit).HasConversion<string>();
+        
+        builder.HasOne(x => x.Recipe).WithMany(x => x.Ingredients).HasForeignKey(x => x.RecipeId);
+        builder.HasOne(x => x.Ingredient).WithMany().HasForeignKey(x => x.IngredientId);
+
         builder.Metadata.FindNavigation(nameof(UsedIngredient.Recipe))!.SetPropertyAccessMode(PropertyAccessMode.Field);
         builder.Metadata.FindNavigation(nameof(UsedIngredient.Ingredient))!.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
