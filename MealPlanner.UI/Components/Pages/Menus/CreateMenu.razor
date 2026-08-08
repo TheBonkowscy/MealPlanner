@@ -5,7 +5,7 @@
 @implements IDisposable
 
 @inject ICreateMenus CreateMenus
-@inject IFindMeals FindMeals
+@inject IFindRecipes FindRecipes
 @inject IMenuStateService MenuStateService
 @inject AppBarService AppBarService
 @inject ISnackbar Snackbar
@@ -49,7 +49,7 @@
                          Label="Szukaj potrawy..."
                          Value="_selectedMeal"
                          ValueChanged="OnMealSelected"
-                         SearchFunc="SearchMealsAsync"
+                         SearchFunc="SearchRecipesAsync"
                          ResetValueOnSelected="true"
                          AdornmentIcon="@Icons.Material.Filled.Search"
                          AdornmentColor="Color.Primary"
@@ -106,10 +106,10 @@
         _container?.Refresh();
     }
 
-    private async Task<IEnumerable<string>> SearchMealsAsync(string value, CancellationToken token)
+    private async Task<IEnumerable<string>> SearchRecipesAsync(string value, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(value)) return Array.Empty<string>();
-        return await FetchMealsFromApiAsync(value, token);
+        return await FetchRecipesFromApiAsync(value, token);
     }
 
     private void OnMealSelected(string selectedMeal)
@@ -145,9 +145,9 @@
             return;
         }
 
-        var orderedMeals = _meals.ToDictionary(x => x.Order, x => x.Name);
+        var meals = _meals.ToDictionary(x => x.Order, x => x.Name);
 
-        var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
+        var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), meals);
         var response = await CreateMenus.CreateMenu(request, _cts.Token);
         Snackbar.Add("Utworzono nowe menu!", Severity.Success);
         
@@ -157,11 +157,11 @@
 
     #region API Calls
 
-    private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string? query, CancellationToken token)
+    private async Task<IEnumerable<string>> FetchRecipesFromApiAsync(string? query, CancellationToken token)
     {
-        var results = await FindMeals.Get(query, token);
+        var results = await FindRecipes.Get(query, token);
 
-        return results.Meals.Select(x => x.Name);
+        return results.Recipes.Select(x => x.Name);
     }
     #endregion
 

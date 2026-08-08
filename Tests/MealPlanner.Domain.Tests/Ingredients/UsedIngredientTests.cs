@@ -14,15 +14,15 @@ public class UsedIngredientTests
     public void Create_FromAction_Succeeds()
     {
         // Arrange
-        var meal = Recipe.Create("Test Meal");
+        var recipe = Recipe.Create("Test Recipe");
         var action = AddIngredientAction.Create(Ingredient, 0.75m, Unit);
         
         // Act
-        var result = UsedIngredient.Create(meal, action);
+        var result = UsedIngredient.Create(recipe, action);
         
         // Assert
         result.Should().NotBeNull();
-        result.Recipe.Should().Be(meal);
+        result.Recipe.Should().Be(recipe);
         result.Ingredient.Should().Be(action.Ingredient);
         result.Unit.Should().Be(action.Unit);
         result.Quantity.Should().Be(action.Quantity);

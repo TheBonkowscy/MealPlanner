@@ -34,7 +34,7 @@ public class MenuUpdaterTests
             RandomId.Set(menu);
             _menus.Add(menu);
 
-            menu.Items.ToList().ForEach(meal =>
+            menu.Meals.ToList().ForEach(meal =>
             {
                 if (_recipes.All(x => x.Name != meal.Recipe.Name))
                 {

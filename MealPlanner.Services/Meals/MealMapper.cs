@@ -6,31 +6,31 @@ namespace MealPlanner.Services.Meals;
 
 public interface IMapMeals
 {
-    Task<List<Recipe>> MapMeals(Dictionary<int, string> mealsToBeMapped, CancellationToken ct);
+    Task<List<Recipe>> MapMeals(Dictionary<int, string> chosenMeals, CancellationToken ct);
 }
 
 public class MealMapper(MealPlannerDbContext ctx) : IMapMeals
 {
-    public async Task<List<Recipe>> MapMeals(Dictionary<int, string> mealsToBeMapped, CancellationToken ct)
+    public async Task<List<Recipe>> MapMeals(Dictionary<int, string> chosenMeals, CancellationToken ct)
     {
-        var incomingRecipes = mealsToBeMapped.Values.Select(x => x.ToLower());
+        var incomingRecipes = chosenMeals.Values.Select(x => x.ToLower());
         
-        var recipesFromDatabase = await ctx.Recipes
+        var matchingRecipes = await ctx.Recipes
             .Where(x => incomingRecipes.Contains(x.Name.ToLower()))
             .ToListAsync(ct);
 
         var mappedMeals = new Dictionary<int, Recipe>();
         
-        foreach (var order in mealsToBeMapped.Keys)
+        foreach (var order in chosenMeals.Keys)
         {
-            var recipeName = mealsToBeMapped[order];
-            var meal = recipesFromDatabase.FirstOrDefault(x => x.Name.Equals(recipeName, StringComparison.CurrentCultureIgnoreCase));
-            if (meal is null)
+            var recipeName = chosenMeals[order];
+            var recipe = matchingRecipes.FirstOrDefault(x => x.Name.Equals(recipeName, StringComparison.CurrentCultureIgnoreCase));
+            if (recipe is null)
             {
-                throw new InvalidOperationException($"Recipe {recipeName} does not exist");
+                throw new InvalidOperationException($"Recipe for {recipeName} does not exist");
             }
             
-            mappedMeals.Add(order, meal);
+            mappedMeals.Add(order, recipe);
         }
                 
         return [.. mappedMeals.Values];

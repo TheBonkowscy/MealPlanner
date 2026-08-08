@@ -12,11 +12,11 @@ public class MenuConfiguration : IEntityTypeConfiguration<Menu>
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Date).IsRequired();
         
-        builder.HasMany(x => x.Items)
+        builder.HasMany(x => x.Meals)
             .WithOne(x => x.Menu)
             .HasForeignKey(x => x.MenuId);
         
-        builder.Metadata.FindNavigation(nameof(Menu.Items))!.SetPropertyAccessMode(PropertyAccessMode.Field);
+        builder.Metadata.FindNavigation(nameof(Menu.Meals))!.SetPropertyAccessMode(PropertyAccessMode.Field);
         
         builder.HasIndex(x => x.Date).IsUnique();
     }

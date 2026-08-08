@@ -7,7 +7,7 @@
 @inject IUpdateMenus MenusUpdater
 @inject IFindMenus FindMenus
 @inject IDeleteMenus MenusDeleter
-@inject IFindMeals FindMeals
+@inject IFindRecipes FindRecipes
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 @inject AppBarService AppBarService
@@ -52,7 +52,7 @@
                          Label="Szukaj potrawy..."
                          Value="_selectedMeal"
                          ValueChanged="OnMealSelected"
-                         SearchFunc="SearchMealsAsync"
+                         SearchFunc="SearchRecipesAsync"
                          ResetValueOnSelected="true"
                          AdornmentIcon="@Icons.Material.Filled.Search"
                          AdornmentColor="Color.Primary"
@@ -140,10 +140,10 @@
         _container?.Refresh();
     }
 
-    private async Task<IEnumerable<string>> SearchMealsAsync(string value, CancellationToken token)
+    private async Task<IEnumerable<string>> SearchRecipesAsync(string value, CancellationToken token)
     {
-        if (string.IsNullOrWhiteSpace(value)) return Array.Empty<string>();
-        return await FetchMealsFromApiAsync(value, token);
+        if (string.IsNullOrWhiteSpace(value)) return [];
+        return await FetchRecipesFromApiAsync(value, token);
     }
 
     private void OnMealSelected(string selectedMeal)
@@ -197,11 +197,11 @@
         return MealMapper.MapMeals(result?.Meals) ?? [];
     }
     
-    private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string? query, CancellationToken token)
+    private async Task<IEnumerable<string>> FetchRecipesFromApiAsync(string? query, CancellationToken token)
     {
-        var results = await FindMeals.Get(query, token);
+        var results = await FindRecipes.Get(query, token);
 
-        return results.Meals.Select(x => x.Name);
+        return results.Recipes.Select(x => x.Name);
     }
     #endregion
 

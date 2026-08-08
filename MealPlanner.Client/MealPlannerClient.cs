@@ -7,7 +7,7 @@ using MealPlanner.Shared.Menus.Responses;
 
 namespace MealPlanner.Client;
 
-internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindMeals, IUpdateMenus, IDeleteMenus
+internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindRecipes, IUpdateMenus, IDeleteMenus
 {
     public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
@@ -77,7 +77,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
     // TODO: this should probably live in a separate client
     public async Task<GetRecipesResponse> Get(string? query, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MealsRoute;
+        var endpoint = Constants.RecipesRoute;
         if (!string.IsNullOrWhiteSpace(query))
         {
             endpoint = endpoint.AppendQueryParam("q", query);

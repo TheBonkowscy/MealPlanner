@@ -32,7 +32,7 @@ public class MenuCreatorTests
             RandomId.Set(menu);
             _menus.Add(menu);
 
-            menu.Items.ToList().ForEach(meal =>
+            menu.Meals.ToList().ForEach(meal =>
             {
                 if (_recipes.All(x => x.Name != meal.Recipe.Name))
                 {
@@ -87,7 +87,7 @@ public class MenuCreatorTests
         
         // Assert
         await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"Meal with name {newRecipe.Name} does not exist");
+            .WithMessage($"Recipe for {newRecipe.Name} does not exist");
         
         // Cleanup
         _recipes.Remove(newRecipe);

@@ -37,9 +37,9 @@ public class RecipesReaderTests
         var result = await _sut.GetByQuery(null, CancellationToken.None);
 
         // Assert
-        result.Meals.Should().HaveCount(2);
-        result.Meals.Should().Contain(x => x.Name == "Pasta");
-        result.Meals.Should().Contain(x => x.Name == "Pizza");
+        result.Recipes.Should().HaveCount(2);
+        result.Recipes.Should().Contain(x => x.Name == "Pasta");
+        result.Recipes.Should().Contain(x => x.Name == "Pizza");
     }
 
     [Theory]
@@ -60,7 +60,7 @@ public class RecipesReaderTests
         var result = await _sut.GetByQuery(query, CancellationToken.None);
 
         // Assert
-        result.Meals.Should().HaveCount(1);
-        result.Meals.Should().Contain(x => x.Name == "Pasta");
+        result.Recipes.Should().HaveCount(1);
+        result.Recipes.Should().Contain(x => x.Name == "Pasta");
     }
 }

@@ -54,13 +54,13 @@ public class Recipe
         ValidateIngredientsAndThrow(ingredientsToAdd);
         ValidateRecipeStepsAndThrow(recipeSteps);
         
-        var meal = new Recipe(name);
-        var mappedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(meal, ingredient)).ToList();
-        mappedIngredients.ForEach(meal._ingredients.Add);
+        var recipe = new Recipe(name);
+        var mappedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(recipe, ingredient)).ToList();
+        mappedIngredients.ForEach(recipe._ingredients.Add);
         
-        meal._recipeSteps = recipeSteps;
+        recipe._recipeSteps = recipeSteps;
         
-        return meal;
+        return recipe;
     }
 
     private static void ValidateNameAndThrow(string meal)

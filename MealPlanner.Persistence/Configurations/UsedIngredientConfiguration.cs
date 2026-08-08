@@ -8,7 +8,7 @@ public class UsedIngredientConfiguration : IEntityTypeConfiguration<UsedIngredie
 {
     public void Configure(EntityTypeBuilder<UsedIngredient> builder)
     {
-        builder.HasKey(x => new { MealId = x.RecipeId, x.IngredientId, x.UnitId });
+        builder.HasKey(x => new { x.RecipeId, x.IngredientId, x.UnitId });
         builder.HasOne(x => x.Ingredient).WithMany().HasForeignKey(x => x.IngredientId);
         builder.HasOne(x => x.Recipe).WithMany(x => x.Ingredients).HasForeignKey(x => x.RecipeId);
         

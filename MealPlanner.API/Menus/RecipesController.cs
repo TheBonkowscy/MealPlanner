@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace MealPlanner.API.Menus;
 
 [ApiController]
-[Route(Shared.Menus.Constants.MealsRoute)]
-public class MealsController(IReadRecipes recipesReader) : ControllerBase
+[Route(Shared.Menus.Constants.RecipesRoute)]
+public class RecipesController(IReadRecipes recipesReader) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]
@@ -15,7 +15,7 @@ public class MealsController(IReadRecipes recipesReader) : ControllerBase
     public async Task<IResult> GetByQuery([FromQuery(Name = "q")] string? query,
         CancellationToken cancellationToken)
     {
-        var menu = await recipesReader.GetByQuery(query, cancellationToken);
-        return Results.Ok(menu);
+        var recipe = await recipesReader.GetByQuery(query, cancellationToken);
+        return Results.Ok(recipe);
     }
 }
