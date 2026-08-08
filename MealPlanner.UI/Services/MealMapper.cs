@@ -2,11 +2,11 @@
 
 namespace MealPlanner.UI.Services;
 
-public class MenuItemMapper
+public class MealMapper
 {
-    public List<MenuItemDto> MapMenuItem(Dictionary<int, string> menuItems)
+    public List<MealDto> MapMeals(Dictionary<int, string> orderedMeals)
     {
-        var meals = menuItems.Select(x => new MenuItemDto
+        var meals = orderedMeals.Select(x => new MealDto
         {
             Name = x.Value,
             Order = x.Key,

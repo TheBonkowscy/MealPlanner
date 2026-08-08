@@ -4,11 +4,11 @@ public class Menu
 {
     public static readonly DateOnly MinDateInThePast = new(2019, 9, 28);
 
-    private List<MenuItem> _items = [];
+    private List<Meal> _items = [];
 
     public int Id { get; private set; }
     public DateOnly Date { get; private set; }
-    public IReadOnlyList<MenuItem> Items
+    public IReadOnlyList<Meal> Items
     {
         get => _items;
         private set => _items = [..value];
@@ -23,7 +23,7 @@ public class Menu
     {
     }
 
-    private Menu(DateOnly date, List<MenuItem> items)
+    private Menu(DateOnly date, List<Meal> items)
     {
         Date = date;
         Items = items;
@@ -37,7 +37,7 @@ public class Menu
     {
         ValidateOrderAndThrow(order);
         ValidateMealAndThrow(recipe);
-        var item = MenuItem.Create(this, recipe, order);
+        var item = Meal.Create(this, recipe, order);
         _items.Add(item);
     }
 

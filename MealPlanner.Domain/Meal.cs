@@ -1,6 +1,6 @@
 ﻿namespace MealPlanner.Domain;
 
-public class MenuItem
+public class Meal
 {
     public int MenuId { get; private set; }
     public Menu Menu { get; private set; }
@@ -10,12 +10,12 @@ public class MenuItem
     
     public int Order { get; private set; }
 
-    private MenuItem()
+    private Meal()
     {
         // For EF Core
     }
     
-    private MenuItem(Menu menu, Recipe recipe, int order)
+    private Meal(Menu menu, Recipe recipe, int order)
     {
         Menu = menu;
         MenuId = menu.Id;
@@ -24,13 +24,13 @@ public class MenuItem
         Order = order;
     }
 
-    public static MenuItem Create(Menu menu, Recipe recipe, int order)
+    public static Meal Create(Menu menu, Recipe recipe, int order)
     {
         ValidateMenuAndThrow(menu);
-        ValidateMealAndThrow(recipe);
+        ValidateRecipeAndThrow(recipe);
         ValidateOrderAndThrow(order);
         
-        return new MenuItem(menu, recipe, order);
+        return new Meal(menu, recipe, order);
     }
     
     private static void ValidateMenuAndThrow(Menu menu)
@@ -41,7 +41,7 @@ public class MenuItem
         }
     }
     
-    private static void ValidateMealAndThrow(Recipe recipe)
+    private static void ValidateRecipeAndThrow(Recipe recipe)
     {
         if (recipe is null)
         {

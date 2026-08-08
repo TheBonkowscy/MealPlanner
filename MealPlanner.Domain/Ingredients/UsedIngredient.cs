@@ -4,7 +4,7 @@ namespace MealPlanner.Domain.Ingredients;
 
 public class UsedIngredient
 {
-    public int MealId { get; private set; }
+    public int RecipeId { get; private set; }
     
     public Recipe Recipe { get; private set; }
 
@@ -26,7 +26,7 @@ public class UsedIngredient
     private UsedIngredient(Recipe recipe, Ingredient ingredient, decimal quantity, IngredientUnit unit)
     {
         Recipe = recipe;
-        MealId = recipe.Id;
+        RecipeId = recipe.Id;
         Ingredient = ingredient;
         IngredientId = ingredient.Id;
         Quantity = quantity;

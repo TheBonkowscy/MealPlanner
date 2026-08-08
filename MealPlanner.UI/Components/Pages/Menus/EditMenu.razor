@@ -11,7 +11,7 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 @inject AppBarService AppBarService
-@inject MenuItemMapper MenuItemMapper
+@inject MealMapper MealMapper
 @inject IDialogService DialogService
 
 <h3>@($"Edycja menu na dzień {Date:dd.MM.yyyy}")</h3>
@@ -20,13 +20,13 @@
     <MudText Typo="Typo.h5" Class="mb-4">Przeciągnij, aby zmienić kolejność posiłków</MudText>
 
     <MudDropContainer @ref="_container"
-                      T="MenuItemDto" 
-                      Items="_menuItems" 
+                      T="MealDto" 
+                      Items="_meals" 
                       ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)" 
                       ItemDropped="ItemDropped" 
                       Class="d-flex flex-column flex-grow-1">
         <ChildContent>
-            <MudDropZone T="MenuItemDto" 
+            <MudDropZone T="MealDto" 
                          Identifier="DayMenuZone" 
                          AllowReorder="true" 
                          Class="rounded mud-background-gray pa-4 min-height-200">
@@ -75,19 +75,19 @@
     private readonly CultureInfo _culture =
         new("pl-PL");
 
-    private MudDropContainer<MenuItemDto>? _container;
-    private List<MenuItemDto> _menuItems = [];
+    private MudDropContainer<MealDto>? _container;
+    private List<MealDto> _meals = [];
     private string? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        _menuItems.Clear();
+        _meals.Clear();
         
         var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u270F";
         AppBarService.SetTitle(formattedTitle);
     
-        _menuItems = await FetchMenuForDateAsync(Date);
+        _meals = await FetchMenuForDateAsync(Date);
         
         AppBarService.SetActions(new AppBarAction
         {
@@ -116,25 +116,25 @@
         );
     }
 
-    private void ItemDropped(MudItemDropInfo<MenuItemDto> dropItem)
+    private void ItemDropped(MudItemDropInfo<MealDto> dropItem)
     {
         if (dropItem?.Item is null) return;
 
         // 1. Usuwamy przeciągnięty element
-        _menuItems.Remove(dropItem.Item);
+        _meals.Remove(dropItem.Item);
 
         // 2. Wyznaczamy i zabezpieczamy indeks docelowy
         var targetIndex = dropItem.IndexInZone;
         if (targetIndex < 0) targetIndex = 0;
-        if (targetIndex > _menuItems.Count) targetIndex = _menuItems.Count;
+        if (targetIndex > _meals.Count) targetIndex = _meals.Count;
 
         // 3. Wstawiamy go na właściwą pozycję
-        _menuItems.Insert(targetIndex, dropItem.Item);
+        _meals.Insert(targetIndex, dropItem.Item);
 
         // 4. Odświeżamy indeksy Order
-        for (var i = 0; i < _menuItems.Count; i++)
+        for (var i = 0; i < _meals.Count; i++)
         {
-            _menuItems[i].Order = i;
+            _meals[i].Order = i;
         }
 
         _container?.Refresh();
@@ -150,10 +150,10 @@
     {
         if (string.IsNullOrWhiteSpace(selectedMeal)) return;
 
-        _menuItems.Add(new MenuItemDto
+        _meals.Add(new MealDto
         {
             Name = selectedMeal,
-            Order = _menuItems.Count,
+            Order = _meals.Count,
             ZoneIdentifier = "DayMenuZone"
         });
 
@@ -161,25 +161,25 @@
         _container?.Refresh();
     }
 
-    private void RemoveMeal(MenuItemDto item)
+    private void RemoveMeal(MealDto item)
     {
-        _menuItems.Remove(item);
-        for (int i = 0; i < _menuItems.Count; i++)
+        _meals.Remove(item);
+        for (int i = 0; i < _meals.Count; i++)
         {
-            _menuItems[i].Order = i;
+            _meals[i].Order = i;
         }
         _container?.Refresh();
     }
 
     private async Task SaveMenuAsync()
     {
-        if (!_menuItems.Any())
+        if (!_meals.Any())
         {
             Snackbar.Add("Dodaj co najmniej jeden posiłek!", Severity.Warning);
             return;
         }
 
-        var orderedMeals = _menuItems.ToDictionary(x => x.Order, x => x.Name);
+        var orderedMeals = _meals.ToDictionary(x => x.Order, x => x.Name);
         
 
         var request = new UpdateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
@@ -191,10 +191,10 @@
 
     #region API Calls
     
-    private async Task<List<MenuItemDto>> FetchMenuForDateAsync(DateTime date)
+    private async Task<List<MealDto>> FetchMenuForDateAsync(DateTime date)
     {
         var result = await FindMenus.Get(date, _cts.Token);
-        return MenuItemMapper.MapMenuItem(result?.Meals) ?? [];
+        return MealMapper.MapMeals(result?.Meals) ?? [];
     }
     
     private async Task<IEnumerable<string>> FetchMealsFromApiAsync(string? query, CancellationToken token)
