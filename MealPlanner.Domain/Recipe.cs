@@ -17,12 +17,12 @@ public class Recipe
         private set => _ingredients = [.. value];
     }
     
-    private List<RecipeStep> _recipeSteps = [];
+    private List<RecipeStep> _steps = [];
 
-    public IReadOnlyList<RecipeStep> RecipeSteps
+    public IReadOnlyList<RecipeStep> Steps
     {
-        get => _recipeSteps;
-        private set => _recipeSteps = [.. value];
+        get => _steps;
+        private set => _steps = [.. value];
     }
 
     private Recipe()
@@ -58,7 +58,7 @@ public class Recipe
         var mappedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(recipe, ingredient)).ToList();
         mappedIngredients.ForEach(recipe._ingredients.Add);
         
-        recipe._recipeSteps = recipeSteps;
+        recipe._steps = recipeSteps;
         
         return recipe;
     }
@@ -94,5 +94,34 @@ public class Recipe
         {
             throw new ArgumentNullException(null, "At least one recipe step must be specified");
         }
+    }
+
+    internal void UpdateIngredients(List<UsedIngredient> recipeIngredients)
+    {
+        ValidateIngredientsAndThrow(recipeIngredients);
+        Ingredients = recipeIngredients;
+    }
+
+    private static void ValidateIngredientsAndThrow(List<UsedIngredient> ingredients)
+    {
+        if (ingredients.Count == 0)
+        {
+            throw new ArgumentNullException(null, "At least one ingredient must be specified");
+        }
+        
+        // TODO: is this required?
+        ingredients.ForEach(ingredient =>
+        {
+            if (ingredient.Quantity <= 0)
+            {
+                throw new ArgumentNullException(null, "Ingredient quantity must be greater than zero");
+            }
+        });
+    }
+
+    internal void UpdateSteps(List<RecipeStep> steps)
+    {
+        ValidateRecipeStepsAndThrow(steps);
+        Steps = steps;
     }
 }

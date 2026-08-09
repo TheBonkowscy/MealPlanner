@@ -3,21 +3,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Persistence.Seeders;
 
-public static class IngredientSeeder
+internal static class IngredientSeeder
 {
-    public static async Task Seed(DbContext context, CancellationToken cancellationToken)
+    internal static async Task Seed(DbContext context, CancellationToken cancellationToken)
     {
         var seedData = InitialData.Ingredients();
-        var allNames = seedData.Select(i => i.Name.ToLower()).Distinct().ToList();
+        var allLowercaseNames = seedData.Select(i => i.Name.ToLower()).Distinct().ToList();
         var existingIngredients = await context
             .Set<Ingredient>()
-            .Where(x => allNames.Contains(x.Name.ToLower()))
-            .ToDictionaryAsync(x => x.Name, x => x, cancellationToken);
+            .Where(x => allLowercaseNames.Contains(x.Name.ToLower()))
+            .ToDictionaryAsync(x => x.Name.ToLower(), x => x, cancellationToken);
 
-        allNames.ForEach(name =>
+        allLowercaseNames.ForEach(lowercaseName =>
         {
-            var ingredient = seedData.First(x => x.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
-            var existingIngredient = existingIngredients.GetValueOrDefault(name);
+            var ingredient = seedData.First(x => x.Name.Equals(lowercaseName, StringComparison.CurrentCultureIgnoreCase));
+            var existingIngredient = existingIngredients.GetValueOrDefault(lowercaseName);
             if (existingIngredient != null)
             {
                 existingIngredient.UpdateApplicableUnits(ingredient.ApplicableUnits);

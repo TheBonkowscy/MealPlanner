@@ -2,7 +2,7 @@
 
 namespace MealPlanner.Persistence.Seeders;
 
-internal static class InitialData
+internal static partial class InitialData
 {
     public static Ingredient[] Ingredients() =>
     [
@@ -67,7 +67,7 @@ internal static class InitialData
         Ingredient.Create("Papryka zielona, średnia", [MeasureUnit.Piece, MeasureUnit.Gram]),
         Ingredient.Create("Papryka zielona, duża", [MeasureUnit.Piece, MeasureUnit.Gram]),
         Ingredient.Create("Papryczki na grilla", [MeasureUnit.Package]),
-        Ingredient.Create("Jalapeno", [MeasureUnit.Package, MeasureUnit.Piece, MeasureUnit.Gram]),
+        Ingredient.Create("Jalapeno, świeże", [MeasureUnit.Package, MeasureUnit.Piece, MeasureUnit.Gram]),
         Ingredient.Create("Ostra papryczka", [MeasureUnit.Package, MeasureUnit.Piece, MeasureUnit.Gram]),
         Ingredient.Create("Ogórek krótki, mały", [MeasureUnit.Piece, MeasureUnit.Gram]),
         Ingredient.Create("Ogórek krótki, średni", [MeasureUnit.Piece, MeasureUnit.Gram]),
@@ -179,6 +179,10 @@ internal static class InitialData
         Ingredient.Create("Pomidory w puszce, obrane, kawałki", [MeasureUnit.Can]),
         Ingredient.Create("Koncentrat pomidorowy", [MeasureUnit.Teaspoon, MeasureUnit.Tablespoon, MeasureUnit.Gram]),
         Ingredient.Create("Passata", [MeasureUnit.Milliliter, MeasureUnit.Gram]),
+        
+        Ingredient.Create("Oliwki zielone", [MeasureUnit.Gram, MeasureUnit.Tablespoon]),
+        Ingredient.Create("Oliwki czarne", [MeasureUnit.Gram, MeasureUnit.Tablespoon]),
+        Ingredient.Create("Ogórki kiszone", [MeasureUnit.Gram, MeasureUnit.Piece]),
         
         Ingredient.Create("Olej", [MeasureUnit.Tablespoon, MeasureUnit.Milliliter]),
         Ingredient.Create("Oliwa z oliwek EE", [MeasureUnit.Tablespoon, MeasureUnit.Milliliter]),
