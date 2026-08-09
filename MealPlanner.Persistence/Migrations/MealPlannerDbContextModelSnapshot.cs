@@ -20,6 +20,7 @@ namespace MealPlanner.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "measure_unit", new[] { "glass_cup", "tablespoon", "teaspoon", "milligram", "gram", "kilogram", "milliliter", "liter", "piece", "package", "can", "bottle", "pinch" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("MealPlanner.Domain.Ingredients.Ingredient", b =>
@@ -30,9 +31,9 @@ namespace MealPlanner.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.PrimitiveCollection<int[]>("ApplicableUnits")
+                    b.PrimitiveCollection<string[]>("ApplicableUnits")
                         .IsRequired()
-                        .HasColumnType("integer[]");
+                        .HasColumnType("text[]");
 
                     b.Property<string>("Name")
                         .IsRequired()

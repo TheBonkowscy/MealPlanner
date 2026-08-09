@@ -14,7 +14,7 @@ public class AddIngredientActionTests
     public void Create_WithNotApplicableUnit_Throws()
     {
         // Arrange
-        var ingredientToAdd = TestIngredients.CupsOfFlour();
+        var ingredientToAdd = TestInitialData.CupsOfFlour();
         
         // Act
         Action<Ingredient, decimal, MeasureUnit> create = (ingredient, quantity, unit) =>
@@ -29,7 +29,7 @@ public class AddIngredientActionTests
     public void Create_WithNegativeQuantity_Throws()
     {
         // Arrange
-        var ingredientToAdd = TestIngredients.CupsOfFlour();
+        var ingredientToAdd = TestInitialData.CupsOfFlour();
         
         // Act
         Action<Ingredient, decimal, MeasureUnit> create = (ingredient, quantity, unit) =>
@@ -44,7 +44,7 @@ public class AddIngredientActionTests
     public void Create_WithApplicableUnitAndPositiveQuantity_Succeeds()
     {
         // Arrange
-        var ingredientToAdd = TestIngredients.CupsOfFlour();
+        var ingredientToAdd = TestInitialData.CupsOfFlour();
         const MeasureUnit expectedUnit = MeasureUnit.GlassCup;
         
         // Act
