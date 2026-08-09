@@ -30,8 +30,14 @@ public class MealPlannerDbContext : DbContext
     {
         optionsBuilder.UseAsyncSeeding(async (context, _, cancellationToken) =>
         {
-            await IngredientSeeder.Seed(context, cancellationToken);
-            await RecipeSeeder.Seed(context, cancellationToken);
+            await IngredientSeeder.SeedAsync(context, cancellationToken);
+            await RecipeSeeder.SeedAsync(context, cancellationToken);
+        })
+        .UseSeeding((context, _) =>
+        {
+            IngredientSeeder.Seed(context);
+            RecipeSeeder.Seed(context);
         });
+        
     }
 }

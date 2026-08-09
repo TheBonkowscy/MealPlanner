@@ -18,7 +18,6 @@ public class MealsIntegrationTests : IntegrationTestBase
     public async Task Get_ReturnsAllMeals_WhenNoQueryProvided()
     {
         // Arrange
-        await AddMealToDatabase(Recipe.Create("Pizza"));
         await AddMealToDatabase(Recipe.Create("Burger"));
 
         // Act
@@ -28,25 +27,25 @@ public class MealsIntegrationTests : IntegrationTestBase
         result.EnsureSuccessStatusCode();
         var response = await result.Content.ReadFromJsonAsync<GetRecipesResponse>();
         response.Should().NotBeNull();
-        response.Recipes.Should().HaveCount(2);
+        response.Recipes.Should().HaveCountGreaterThan(1);
     }
 
     [Fact]
     public async Task Get_ReturnsFilteredMeals_WhenQueryProvided()
     {
         // Arrange
-        await AddMealToDatabase(Recipe.Create("Pizza"));
-        await AddMealToDatabase(Recipe.Create("Burger"));
+        var uniqueMealName = "Burger";
+        await AddMealToDatabase(Recipe.Create(uniqueMealName));
 
         // Act
-        var result = await Client.GetAsync($"{Constants.RecipesRoute}?q=pi");
+        var result = await Client.GetAsync($"{Constants.RecipesRoute}?q=bur");
 
         // Assert
         result.EnsureSuccessStatusCode();
         var response = await result.Content.ReadFromJsonAsync<GetRecipesResponse>();
         response.Should().NotBeNull();
         response.Recipes.Should().HaveCount(1);
-        response.Recipes.Should().Contain(m => m.Name == "Pizza");
+        response.Recipes.Should().Contain(m => m.Name == uniqueMealName);
     }
 
     [Fact]
