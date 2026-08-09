@@ -6,13 +6,7 @@ public class Ingredient
     
     public string Name { get; private set; }
 
-    private List<MeasureUnit> _applicableUnits = [];
-    
-    public IReadOnlyList<MeasureUnit> ApplicableUnits 
-    { 
-        get => _applicableUnits;
-        private set => _applicableUnits = [..value]; 
-    }
+    public List<MeasureUnit> ApplicableUnits { get; private set; } = [];
 
     private Ingredient()
     {
@@ -50,4 +44,10 @@ public class Ingredient
     }
 
     public bool IsApplicableUnit(MeasureUnit unit) => ApplicableUnits.Any(x => x == unit);
+
+    public void UpdateApplicableUnits(List<MeasureUnit> applicableUnits)
+    {
+        ValidateUnitsAndThrow(applicableUnits);
+        ApplicableUnits = applicableUnits;
+    }
 }

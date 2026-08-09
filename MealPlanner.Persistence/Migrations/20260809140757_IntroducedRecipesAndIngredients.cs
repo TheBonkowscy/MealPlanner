@@ -27,6 +27,9 @@ namespace MealPlanner.Persistence.Migrations
                 table: "Meals",
                 newName: "Order");
 
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:measure_unit", "glass_cup,tablespoon,teaspoon,milligram,gram,kilogram,milliliter,liter,piece,package,can,bottle,pinch");
+
             migrationBuilder.AlterColumn<int>(
                 name: "Order",
                 table: "Meals",
@@ -62,7 +65,7 @@ namespace MealPlanner.Persistence.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    ApplicableUnits = table.Column<int[]>(type: "integer[]", nullable: false)
+                    ApplicableUnits = table.Column<string[]>(type: "text[]", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -204,6 +207,9 @@ namespace MealPlanner.Persistence.Migrations
                 name: "Order",
                 table: "Meals",
                 newName: "Id");
+
+            migrationBuilder.AlterDatabase()
+                .OldAnnotation("Npgsql:Enum:measure_unit", "glass_cup,tablespoon,teaspoon,milligram,gram,kilogram,milliliter,liter,piece,package,can,bottle,pinch");
 
             migrationBuilder.AlterColumn<int>(
                 name: "Id",

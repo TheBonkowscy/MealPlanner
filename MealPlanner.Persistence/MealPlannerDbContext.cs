@@ -1,4 +1,6 @@
 ﻿using MealPlanner.Domain;
+using MealPlanner.Domain.Ingredients;
+using MealPlanner.Persistence.Seeders;
 using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Persistence;
@@ -21,5 +23,21 @@ public class MealPlannerDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(MealPlannerDbContext).Assembly);
+        modelBuilder.HasPostgresEnum<MeasureUnit>();
+    }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseAsyncSeeding(async (context, _, cancellationToken) =>
+        {
+            await IngredientSeeder.SeedAsync(context, cancellationToken);
+            await RecipeSeeder.SeedAsync(context, cancellationToken);
+        })
+        .UseSeeding((context, _) =>
+        {
+            IngredientSeeder.Seed(context);
+            RecipeSeeder.Seed(context);
+        });
+        
     }
 }

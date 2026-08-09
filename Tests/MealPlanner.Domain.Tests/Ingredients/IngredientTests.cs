@@ -65,6 +65,6 @@ public class IngredientTests
     public static IEnumerable<object[]> IsApplicableTestData()
     {
         yield return [MeasureUnit.GlassCup, true];
-        yield return [MeasureUnit.Milliliters, false];
+        yield return [MeasureUnit.Milliliter, false];
     }
 }

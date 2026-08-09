@@ -8,7 +8,7 @@ public static class TestActions
     public static AddIngredientAction AddIngredient(Ingredient ingredient, decimal quantity, MeasureUnit unit) => AddIngredientAction.Create(ingredient, quantity, unit);
     
     public static AddIngredientAction AddFlour(decimal quantity, MeasureUnit unit) => AddIngredientAction.Create(
-        TestIngredients.CupsOfFlour(),
+        TestInitialData.CupsOfFlour(),
         quantity,
         unit);
 }
