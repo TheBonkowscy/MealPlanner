@@ -15,7 +15,7 @@ public class MenuUpdaterTests
     private static readonly Recipe PreExistingRecipe = Recipe.Create("Fish and chips");
 
     private readonly Mock<MealPlannerDbContext> _ctx;
-    private readonly Mock<IMapRecipes> _mealsMapper;
+    private readonly Mock<IMapRecipe> _mealsMapper;
     private readonly MenuUpdater _sut;
 
     private readonly List<Menu> _menus = [];
@@ -27,7 +27,7 @@ public class MenuUpdaterTests
         _ctx = new Mock<MealPlannerDbContext>();
         _ctx.Setup(x => x.Menus).ReturnsDbSet([]);
         
-        _mealsMapper = new Mock<IMapRecipes>();
+        _mealsMapper = new Mock<IMapRecipe>();
         _ctx.Setup(x => x.Menus).ReturnsDbSet(_menus);
         _ctx.Setup(x => x.Menus.AddAsync(It.IsAny<Menu>(), It.IsAny<CancellationToken>())).Callback<Menu, CancellationToken>((menu, _) =>
         {

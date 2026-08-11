@@ -7,7 +7,7 @@ namespace MealPlanner.API.Menus;
 
 [ApiController]
 [Route(Shared.Menus.Constants.RecipesRoute)]
-public class RecipesController(IReadRecipes recipesReader) : ControllerBase
+public class RecipesController(IReadRecipe recipeReader) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]
@@ -15,7 +15,7 @@ public class RecipesController(IReadRecipes recipesReader) : ControllerBase
     public async Task<IResult> GetByQuery([FromQuery(Name = "q")] string? query,
         CancellationToken cancellationToken)
     {
-        var recipe = await recipesReader.GetByQuery(query, cancellationToken);
+        var recipe = await recipeReader.GetByQuery(query, cancellationToken);
         return Results.Ok(recipe);
     }
 }

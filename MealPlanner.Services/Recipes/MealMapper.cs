@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Recipes;
 
-public interface IMapRecipes
+public interface IMapRecipe
 {
     Task<List<Recipe>> MapRecipes(Dictionary<int, string> chosenMeals, CancellationToken ct);
 }
 
-public class RecipeMapper(MealPlannerDbContext ctx) : IMapRecipes
+public class RecipeMapper(MealPlannerDbContext ctx) : IMapRecipe
 {
     public async Task<List<Recipe>> MapRecipes(Dictionary<int, string> chosenMeals, CancellationToken ct)
     {

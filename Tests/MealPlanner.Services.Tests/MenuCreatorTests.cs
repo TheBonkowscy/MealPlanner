@@ -44,8 +44,8 @@ public class MenuCreatorTests
         ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
         
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
-        IMapRecipes recipesMapper = new RecipeMapper(ctx.Object);
-        _sut = new MenuCreator(ctx.Object, recipesMapper);
+        IMapRecipe recipeMapper = new RecipeMapper(ctx.Object);
+        _sut = new MenuCreator(ctx.Object, recipeMapper);
     }
     
     [Fact]

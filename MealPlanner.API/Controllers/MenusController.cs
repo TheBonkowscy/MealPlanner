@@ -3,7 +3,7 @@ using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MealPlanner.API.Menus;
+namespace MealPlanner.API.Controllers;
 
 [ApiController]
 [Route(Shared.Menus.Constants.MenusRoute)]

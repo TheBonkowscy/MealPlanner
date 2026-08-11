@@ -1,10 +1,11 @@
 using MealPlanner.Services.Menus;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Services.Recipes.Read;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MealPlanner.API.Menus;
+namespace MealPlanner.Services;
 
-public static class Extensions
+public static class ServiceRegistration
 {
     public static Task RegisterMenuServices(this IServiceCollection services)
     {
@@ -15,8 +16,8 @@ public static class Extensions
         services.AddTransient<IDeleteMenu, MenuDeleter>();
         
         /* Meals & Recipes */
-        services.AddTransient<IReadRecipes, RecipesReader>();
-        services.AddTransient<IMapRecipes, RecipeMapper>();
+        services.AddTransient<IReadRecipe, RecipeReader>();
+        services.AddTransient<IMapRecipe, RecipeMapper>();
         
         return Task.CompletedTask;
     }

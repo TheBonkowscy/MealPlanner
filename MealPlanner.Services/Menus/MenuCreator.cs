@@ -13,7 +13,7 @@ public interface ICreateMenu
 }
 
 public class MenuCreator(MealPlannerDbContext ctx,
-    IMapRecipes recipesMapper) : ICreateMenu
+    IMapRecipe recipeMapper) : ICreateMenu
 {
     public async Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest, CancellationToken ct)
     {
@@ -30,7 +30,7 @@ public class MenuCreator(MealPlannerDbContext ctx,
                 throw new InvalidOperationException("No meals were provided.");
             }
             
-            var chosenRecipes = await recipesMapper.MapRecipes(createMenuRequest.Meals, ct);
+            var chosenRecipes = await recipeMapper.MapRecipes(createMenuRequest.Meals, ct);
             
             var result = Menu.Create(createMenuRequest.Date, chosenRecipes);
 

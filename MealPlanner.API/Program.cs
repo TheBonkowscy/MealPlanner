@@ -1,6 +1,7 @@
 using MealPlanner.API;
 using MealPlanner.API.Menus;
 using MealPlanner.Persistence;
+using MealPlanner.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;

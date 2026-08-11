@@ -12,7 +12,7 @@ public interface IUpdateMenu
 }
 
 public class MenuUpdater(MealPlannerDbContext ctx,
-    IMapRecipes recipesMapper) : IUpdateMenu
+    IMapRecipe recipeMapper) : IUpdateMenu
 {
     public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
     {
@@ -34,7 +34,7 @@ public class MenuUpdater(MealPlannerDbContext ctx,
             throw new InvalidOperationException("No meals were provided.");
         }
         
-        var mappedMeals = await recipesMapper.MapRecipes(request.Meals, cancellationToken);
+        var mappedMeals = await recipeMapper.MapRecipes(request.Meals, cancellationToken);
         menu.AddRecipes(mappedMeals);
         
         await ctx.SaveChangesAsync(cancellationToken);

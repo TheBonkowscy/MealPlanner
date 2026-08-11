@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Recipes.Read;
 
-public interface IReadRecipes
+public interface IReadRecipe
 {
     Task<GetRecipesResponse> GetByQuery(string? query, CancellationToken cancellationToken = default);
 }
-public class RecipesReader(MealPlannerDbContext ctx) : IReadRecipes
+public class RecipeReader(MealPlannerDbContext ctx) : IReadRecipe
 {
     public async Task<GetRecipesResponse> GetByQuery(string? query, CancellationToken cancellationToken = default)
     {
