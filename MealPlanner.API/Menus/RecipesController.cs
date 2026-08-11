@@ -1,6 +1,6 @@
-﻿using MealPlanner.Services.Meals.Read;
-using MealPlanner.Shared.Meals;
+﻿using MealPlanner.Services.Recipes.Read;
 using MealPlanner.Shared.Menus.Responses;
+using MealPlanner.Shared.Recipes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MealPlanner.API.Menus;

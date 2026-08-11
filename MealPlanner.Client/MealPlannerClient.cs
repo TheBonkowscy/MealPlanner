@@ -1,9 +1,9 @@
 ﻿using System.Net.Http.Json;
 using Flurl;
-using MealPlanner.Shared.Meals;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
+using MealPlanner.Shared.Recipes;
 
 namespace MealPlanner.Client;
 

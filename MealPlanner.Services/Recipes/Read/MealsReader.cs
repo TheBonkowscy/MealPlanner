@@ -1,9 +1,9 @@
 ﻿using MealPlanner.Domain;
 using MealPlanner.Persistence;
-using MealPlanner.Shared.Meals;
+using MealPlanner.Shared.Recipes;
 using Microsoft.EntityFrameworkCore;
 
-namespace MealPlanner.Services.Meals.Read;
+namespace MealPlanner.Services.Recipes.Read;
 
 public interface IReadRecipes
 {

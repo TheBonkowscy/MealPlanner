@@ -1,8 +1,8 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
-using MealPlanner.Shared.Meals;
 using MealPlanner.Shared.Menus;
+using MealPlanner.Shared.Recipes;
 using Xunit;
 
 namespace MealPlanner.API.Tests;
