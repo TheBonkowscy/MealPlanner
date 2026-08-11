@@ -1,5 +1,4 @@
 ﻿@page "/editors/recipes/create"
-@using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @using MealPlanner.UI.Models.Editors
 @using MealPlanner.Shared.Recipes.Requests
@@ -7,6 +6,7 @@
 
 @implements IDisposable
 @inject NavigationManager Navigation
+@inject IFindIngredients IngredientsFinder
 @inject ISnackbar Snackbar
 @inject AppBarService AppBarService
 
@@ -40,19 +40,22 @@
                         <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
 
                         <!-- Wybór nazwy z listy zdefiniowanych produktów -->
-                        <MudSelect T="PredefinedProductDto"
-                                   Label="Składnik"
-                                   Value="@context.SelectedProduct"
-                                   ValueChanged="@(product => OnProductChanged(context, product))"
-                                   ToStringFunc="@(p => p?.Name)"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   Dense="true">
-                            @foreach (var product in _predefinedProducts)
-                            {
-                                <MudSelectItem Value="@product">@product.Name</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <MudAutocomplete T="PredefinedProductDto"
+                                         Label="Szukaj składnika..."
+                                         Value="@context.SelectedProduct"
+                                         ValueChanged="@(product => OnProductChanged(context, product))"
+                                         SearchFunc="SearchIngredientsAsync"
+                                         ToStringFunc="@(p => p?.Name)"
+                                         ResetValueOnSelected="false"
+                                         CoerceText="true"
+                                         AdornmentIcon="@Icons.Material.Filled.Search"
+                                         AdornmentColor="Color.Primary"
+                                         Dense="true"
+                                         Margin="Margin.Dense"
+                                         Variant="Variant.Outlined"
+                                         DebounceInterval="200"
+                                         MinCharacters="0" />
+                        
 
                         <!-- Ilość -->
                         <MudNumericField @bind-Value="context.Quantity"
@@ -177,32 +180,15 @@
 
     private async Task LoadPredefinedProductsAsync()
     {
-        // Symulacja odpowiedzi z backendu — zdefiniowane produkty posiadają już w sobie tablicę UnitDto[]
-        await Task.Delay(100); 
+        var response = await IngredientsFinder.Get(_cts.Token);
         _predefinedProducts =
         [
-
-            new PredefinedProductDto(1, "Mąka pszenna", [
-                new UnitDto("Gram", "g"),
-                new UnitDto("Kilogram", "kg"),
-                new UnitDto("Szklanka", "glass")
-            ]),
-
-            new PredefinedProductDto(2, "Mleko", [
-                new UnitDto("Mililitr", "ml"),
-                new UnitDto("Litr", "l"),
-                new UnitDto("Szklanka", "glass")
-            ]),
-
-            new PredefinedProductDto(3, "Jajka", [
-                new UnitDto("Sztuka", "pcs")
-            ]),
-
-            new PredefinedProductDto(4, "Cukier", [
-                new("Gram", "g"),
-                new("Łyżeczka", "tsp"),
-                new("Łyżka", "tbsp")
-            ])
+            .. response.Ingredients.Select(i => new PredefinedProductDto(i.Id,
+                i.Name,
+                [
+                    .. i.Units.Select(u => new UnitDto(u.DisplayName,
+                        u.Value))
+                ]))
         ];
     }
 
@@ -318,5 +304,19 @@
     {
         _cts.Cancel();
         _cts.Dispose();
+    }
+
+    private Task<IEnumerable<PredefinedProductDto>> SearchIngredientsAsync(string value, CancellationToken arg2)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Task.FromResult<IEnumerable<PredefinedProductDto>>([.. _predefinedProducts.Take(20)]);
+        }
+
+        return Task.FromResult<IEnumerable<PredefinedProductDto>>([
+            .. _predefinedProducts
+                .Where(p => p.Name.Contains(value, StringComparison.OrdinalIgnoreCase))
+                .Take(20)
+        ]);
     }
 }
