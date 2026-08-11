@@ -1,9 +1,8 @@
-﻿using MealPlanner.Services.Recipes.Read;
-using MealPlanner.Shared.Menus.Responses;
+﻿using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Recipes;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MealPlanner.API.Menus;
+namespace MealPlanner.API.Controllers;
 
 [ApiController]
 [Route(Shared.Menus.Constants.RecipesRoute)]
