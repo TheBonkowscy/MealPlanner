@@ -1,5 +1,5 @@
 ﻿using MealPlanner.Persistence;
-using MealPlanner.Services.Meals;
+using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +12,7 @@ public interface IUpdateMenu
 }
 
 public class MenuUpdater(MealPlannerDbContext ctx,
-    IMapMeals mealsMapper) : IUpdateMenu
+    IMapRecipe recipeMapper) : IUpdateMenu
 {
     public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
     {
@@ -34,7 +34,7 @@ public class MenuUpdater(MealPlannerDbContext ctx,
             throw new InvalidOperationException("No meals were provided.");
         }
         
-        var mappedMeals = await mealsMapper.MapMeals(request.Meals, cancellationToken);
+        var mappedMeals = await recipeMapper.MapRecipes(request.Meals, cancellationToken);
         menu.AddRecipes(mappedMeals);
         
         await ctx.SaveChangesAsync(cancellationToken);

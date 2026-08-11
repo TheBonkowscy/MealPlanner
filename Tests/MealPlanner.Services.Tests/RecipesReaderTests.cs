@@ -1,24 +1,24 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
-using MealPlanner.Services.Meals.Read;
+using MealPlanner.Services.Recipes;
 using MealPlanner.Tests.Shared;
 using Moq;
 using Moq.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Tests;
 
-public class RecipesReaderTests
+public class RecipeReaderTests
 {
     private readonly Mock<MealPlannerDbContext> _ctx;
-    private readonly RecipesReader _sut;
+    private readonly RecipeReader _sut;
     private readonly List<Recipe> _recipes = [];
 
-    public RecipesReaderTests()
+    public RecipeReaderTests()
     {
         _ctx = new Mock<MealPlannerDbContext>();
         _ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
-        _sut = new RecipesReader(_ctx.Object);
+        _sut = new RecipeReader(_ctx.Object);
     }
 
     [Fact]

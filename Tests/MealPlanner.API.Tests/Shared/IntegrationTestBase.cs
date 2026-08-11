@@ -1,6 +1,7 @@
 using MealPlanner.Persistence;
 using MealPlanner.Services;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace MealPlanner.API.Tests.Shared;
@@ -9,35 +10,46 @@ public abstract class IntegrationTestBase : IDisposable, IAsyncDisposable
 {
     private readonly MealPlannerWebApplicationFactory _factory;
     private readonly WebApplicationFactoryClientOptions _options;
-    
-    protected IServiceScope ServiceScope;
+
+    private readonly IServiceScope _serviceScope;
 
     protected IntegrationTestBase(MealPlannerWebApplicationFactory factory)
     {
         _factory = factory;
-        _options = new()
+        _options = new WebApplicationFactoryClientOptions
         {
             BaseAddress = new Uri("https://localhost:5001"),
             AllowAutoRedirect = true
         };
-        ServiceScope = _factory.Services.CreateScope();
+        _serviceScope = _factory.Services.CreateScope();
         
-        lock (_dbLock)
+        lock (DbLock)
         {
             DatabaseContext.Database.EnsureDeleted();
             DatabaseContext.Database.EnsureCreated();
+
+            ClearDatabase();
         }
     }
 
-    private static readonly object _dbLock = new();
+    private static readonly Lock DbLock = new();
 
-    public HttpClient Client => _factory.CreateClient(_options);
+    protected HttpClient Client => _factory.CreateClient(_options);
     
-    protected MealPlannerDbContext DatabaseContext => ServiceScope.ServiceProvider.GetRequiredService<MealPlannerDbContext>() ?? throw new Exception("Could not retrieve database instance");
-
+    protected MealPlannerDbContext DatabaseContext => _serviceScope.ServiceProvider.GetRequiredService<MealPlannerDbContext>() ?? throw new Exception("Could not retrieve database instance");
+    
+    private void ClearDatabase()
+    {
+        DatabaseContext.Meals.ExecuteDelete();
+        DatabaseContext.Menus.ExecuteDelete();
+        DatabaseContext.RecipeSteps.ExecuteDelete();
+        DatabaseContext.Recipes.ExecuteDelete();
+        DatabaseContext.Ingredients.ExecuteDelete();
+    }
+    
     public void Dispose()
     {
-        ServiceScope.Dispose();
+        _serviceScope.Dispose();
     }
 
     public async ValueTask DisposeAsync()

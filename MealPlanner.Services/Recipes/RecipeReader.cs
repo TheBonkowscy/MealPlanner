@@ -1,15 +1,15 @@
 ﻿using MealPlanner.Domain;
 using MealPlanner.Persistence;
-using MealPlanner.Shared.Meals;
+using MealPlanner.Shared.Recipes;
 using Microsoft.EntityFrameworkCore;
 
-namespace MealPlanner.Services.Meals.Read;
+namespace MealPlanner.Services.Recipes;
 
-public interface IReadRecipes
+public interface IReadRecipe
 {
     Task<GetRecipesResponse> GetByQuery(string? query, CancellationToken cancellationToken = default);
 }
-public class RecipesReader(MealPlannerDbContext ctx) : IReadRecipes
+public class RecipeReader(MealPlannerDbContext ctx) : IReadRecipe
 {
     public async Task<GetRecipesResponse> GetByQuery(string? query, CancellationToken cancellationToken = default)
     {

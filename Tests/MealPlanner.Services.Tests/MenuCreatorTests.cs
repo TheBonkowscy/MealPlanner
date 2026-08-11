@@ -1,8 +1,8 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
-using MealPlanner.Services.Meals;
 using MealPlanner.Services.Menus;
+using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared;
 using Moq;
@@ -44,8 +44,8 @@ public class MenuCreatorTests
         ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
         
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
-        IMapMeals mealsMapper = new MealMapper(ctx.Object);
-        _sut = new MenuCreator(ctx.Object, mealsMapper);
+        IMapRecipe recipeMapper = new RecipeMapper(ctx.Object);
+        _sut = new MenuCreator(ctx.Object, recipeMapper);
     }
     
     [Fact]

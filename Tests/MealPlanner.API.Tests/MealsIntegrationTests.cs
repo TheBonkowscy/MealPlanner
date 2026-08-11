@@ -1,8 +1,8 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
-using MealPlanner.Shared.Meals;
 using MealPlanner.Shared.Menus;
+using MealPlanner.Shared.Recipes;
 using Xunit;
 
 namespace MealPlanner.API.Tests;
@@ -27,18 +27,18 @@ public class MealsIntegrationTests : IntegrationTestBase
         result.EnsureSuccessStatusCode();
         var response = await result.Content.ReadFromJsonAsync<GetRecipesResponse>();
         response.Should().NotBeNull();
-        response.Recipes.Should().HaveCountGreaterThan(1);
+        response.Recipes.Should().HaveCount(1);
     }
 
     [Fact]
     public async Task Get_ReturnsFilteredMeals_WhenQueryProvided()
     {
         // Arrange
-        var uniqueMealName = "Burger";
+        var uniqueMealName = "Unique Sandwich";
         await AddMealToDatabase(Recipe.Create(uniqueMealName));
 
         // Act
-        var result = await Client.GetAsync($"{Constants.RecipesRoute}?q=bur");
+        var result = await Client.GetAsync($"{Constants.RecipesRoute}?q=sandw");
 
         // Assert
         result.EnsureSuccessStatusCode();

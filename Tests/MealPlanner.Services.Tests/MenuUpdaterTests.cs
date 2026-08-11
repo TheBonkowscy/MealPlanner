@@ -1,8 +1,8 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
-using MealPlanner.Services.Meals;
 using MealPlanner.Services.Menus;
+using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared;
 using Moq;
@@ -15,7 +15,7 @@ public class MenuUpdaterTests
     private static readonly Recipe PreExistingRecipe = Recipe.Create("Fish and chips");
 
     private readonly Mock<MealPlannerDbContext> _ctx;
-    private readonly Mock<IMapMeals> _mealsMapper;
+    private readonly Mock<IMapRecipe> _mealsMapper;
     private readonly MenuUpdater _sut;
 
     private readonly List<Menu> _menus = [];
@@ -27,7 +27,7 @@ public class MenuUpdaterTests
         _ctx = new Mock<MealPlannerDbContext>();
         _ctx.Setup(x => x.Menus).ReturnsDbSet([]);
         
-        _mealsMapper = new Mock<IMapMeals>();
+        _mealsMapper = new Mock<IMapRecipe>();
         _ctx.Setup(x => x.Menus).ReturnsDbSet(_menus);
         _ctx.Setup(x => x.Menus.AddAsync(It.IsAny<Menu>(), It.IsAny<CancellationToken>())).Callback<Menu, CancellationToken>((menu, _) =>
         {
@@ -97,7 +97,7 @@ public class MenuUpdaterTests
         var mealDtos = new Dictionary<int, string>() { { 0, PreExistingRecipe.Name } };
 
         _mealsMapper
-            .Setup(x => x.MapMeals(mealDtos, It.IsAny<CancellationToken>()))
+            .Setup(x => x.MapRecipes(mealDtos, It.IsAny<CancellationToken>()))
             .ReturnsAsync([PreExistingRecipe]);
 
         var request = new UpdateMenuRequest(date, mealDtos);
@@ -109,6 +109,6 @@ public class MenuUpdaterTests
         result.Should().NotBeNull();
         result.Date.Should().Be(date);
 
-        _mealsMapper.Verify(x => x.MapMeals(mealDtos, It.IsAny<CancellationToken>()), Times.Once);
+        _mealsMapper.Verify(x => x.MapRecipes(mealDtos, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

@@ -1,13 +1,14 @@
 ﻿using System.Net.Http.Json;
 using Flurl;
-using MealPlanner.Shared.Meals;
+using MealPlanner.Shared.Ingredients;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
+using MealPlanner.Shared.Recipes;
 
 namespace MealPlanner.Client;
 
-internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindRecipes, IUpdateMenus, IDeleteMenus
+internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindRecipes, IUpdateMenus, IDeleteMenus, IFindIngredients
 {
     public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
@@ -115,5 +116,18 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
     private static Url AppendDateToBaseUri(string toString)
     {
         return Constants.MenusRoute.AppendPathSegment(toString);
+    }
+
+    public async Task<GetIngredientsResponse> Get(CancellationToken cancellationToken = default)
+    {
+        const string endpoint = Constants.IngredientsRoute;
+        
+        var result = await httpClient.GetAsync(endpoint, cancellationToken);
+        if (result.IsSuccessStatusCode)
+        {
+            return await result.Content.ReadFromJsonAsync<GetIngredientsResponse>();
+        }
+
+        return GetIngredientsResponse.Empty;
     }
 }

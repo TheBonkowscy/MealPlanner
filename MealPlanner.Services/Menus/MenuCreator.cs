@@ -1,6 +1,6 @@
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
-using MealPlanner.Services.Meals;
+using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +13,7 @@ public interface ICreateMenu
 }
 
 public class MenuCreator(MealPlannerDbContext ctx,
-    IMapMeals mealsMapper) : ICreateMenu
+    IMapRecipe recipeMapper) : ICreateMenu
 {
     public async Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest, CancellationToken ct)
     {
@@ -30,9 +30,9 @@ public class MenuCreator(MealPlannerDbContext ctx,
                 throw new InvalidOperationException("No meals were provided.");
             }
             
-            var mappedMeals = await mealsMapper.MapMeals(createMenuRequest.Meals!, ct);
+            var chosenRecipes = await recipeMapper.MapRecipes(createMenuRequest.Meals, ct);
             
-            var result = Menu.Create(createMenuRequest.Date, mappedMeals);
+            var result = Menu.Create(createMenuRequest.Date, chosenRecipes);
 
             await ctx.Menus.AddAsync(result, ct);
             await ctx.SaveChangesAsync(ct);

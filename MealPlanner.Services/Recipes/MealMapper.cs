@@ -2,16 +2,16 @@
 using MealPlanner.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace MealPlanner.Services.Meals;
+namespace MealPlanner.Services.Recipes;
 
-public interface IMapMeals
+public interface IMapRecipe
 {
-    Task<List<Recipe>> MapMeals(Dictionary<int, string> chosenMeals, CancellationToken ct);
+    Task<List<Recipe>> MapRecipes(Dictionary<int, string> chosenMeals, CancellationToken ct);
 }
 
-public class MealMapper(MealPlannerDbContext ctx) : IMapMeals
+public class RecipeMapper(MealPlannerDbContext ctx) : IMapRecipe
 {
-    public async Task<List<Recipe>> MapMeals(Dictionary<int, string> chosenMeals, CancellationToken ct)
+    public async Task<List<Recipe>> MapRecipes(Dictionary<int, string> chosenMeals, CancellationToken ct)
     {
         var incomingRecipes = chosenMeals.Values.Select(x => x.ToLower());
         

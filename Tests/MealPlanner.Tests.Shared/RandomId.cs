@@ -22,4 +22,13 @@ public static class RandomId
             field!.SetValue(recipe, Random.Shared.Next(1, 1000));
         }
     }
+
+    public static void Set(params Ingredient[] ingredients)
+    {
+        foreach(var ingredient in ingredients)
+        {
+            var field = typeof(Ingredient).GetProperty(nameof(Ingredient.Id));
+            field!.SetValue(ingredient, Random.Shared.Next(1, 1000));
+        }
+    }
 }
