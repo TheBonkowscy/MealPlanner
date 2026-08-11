@@ -5,6 +5,7 @@ using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using MealPlanner.Shared.Recipes;
+using MealPlanner.Shared.Recipes.Responses;
 
 namespace MealPlanner.Client;
 

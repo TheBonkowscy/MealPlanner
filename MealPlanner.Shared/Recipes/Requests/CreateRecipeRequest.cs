@@ -2,9 +2,9 @@
 
 public record CreateRecipeRequest(
     string Name,
-    List<IngredientListItemRequest> Ingredients,
-    List<StepListItemRequest> Steps);
+    List<AddIngredientRequest> Ingredients,
+    List<AddStepRequest> Steps);
 
-public class StepListItemRequest(int Id, int Order, string Instructions);
+public record AddIngredientRequest(int Id, decimal Amount, string Unit);
 
-public class IngredientListItemRequest(int Id, decimal Amount, string Unit);
+public record AddStepRequest(int Order, string Instructions);

@@ -3,6 +3,7 @@ using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Recipes;
+using MealPlanner.Shared.Recipes.Responses;
 using Xunit;
 
 namespace MealPlanner.API.Tests;

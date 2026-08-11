@@ -1,5 +1,6 @@
 ﻿using MealPlanner.Persistence;
 using MealPlanner.Shared.Recipes.Requests;
+using MealPlanner.Shared.Recipes.Responses;
 
 namespace MealPlanner.Services.Recipes;
 
