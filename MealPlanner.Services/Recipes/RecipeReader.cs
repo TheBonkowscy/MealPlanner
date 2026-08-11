@@ -3,7 +3,7 @@ using MealPlanner.Persistence;
 using MealPlanner.Shared.Recipes;
 using Microsoft.EntityFrameworkCore;
 
-namespace MealPlanner.Services.Recipes.Read;
+namespace MealPlanner.Services.Recipes;
 
 public interface IReadRecipe
 {

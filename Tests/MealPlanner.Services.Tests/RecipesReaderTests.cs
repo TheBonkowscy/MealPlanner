@@ -1,7 +1,7 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
-using MealPlanner.Services.Recipes.Read;
+using MealPlanner.Services.Recipes;
 using MealPlanner.Tests.Shared;
 using Moq;
 using Moq.EntityFrameworkCore;

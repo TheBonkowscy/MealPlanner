@@ -1,6 +1,6 @@
+using MealPlanner.Services.Ingredients;
 using MealPlanner.Services.Menus;
 using MealPlanner.Services.Recipes;
-using MealPlanner.Services.Recipes.Read;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MealPlanner.Services;
@@ -18,6 +18,9 @@ public static class ServiceRegistration
         /* Meals & Recipes */
         services.AddTransient<IReadRecipe, RecipeReader>();
         services.AddTransient<IMapRecipe, RecipeMapper>();
+        
+        /* Ingredients */
+        services.AddTransient<IReadIngredient, IngredientReader>();
         
         return Task.CompletedTask;
     }
