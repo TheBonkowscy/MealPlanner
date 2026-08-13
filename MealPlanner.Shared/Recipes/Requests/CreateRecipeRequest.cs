@@ -5,6 +5,6 @@ public record CreateRecipeRequest(
     List<AddIngredientRequest> Ingredients,
     List<AddStepRequest> Steps);
 
-public record AddIngredientRequest(int Id, decimal Amount, string Unit);
+public record AddIngredientRequest(int Id, decimal Quantity, string Unit);
 
 public record AddStepRequest(int Order, string Instructions);

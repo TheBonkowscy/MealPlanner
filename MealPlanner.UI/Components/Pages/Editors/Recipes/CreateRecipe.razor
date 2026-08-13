@@ -14,7 +14,6 @@
 <h3>Tworzenie nowego przepisu</h3>
 
 <MudPaper Class="pa-6 ma-4" Elevation="3">
-    <!-- Nazwa przepisu -->
     <MudTextField @bind-Value="_recipeName"
                   Label="Nazwa przepisu"
                   Variant="Variant.Outlined"
@@ -22,7 +21,6 @@
                   Required="true"
                   RequiredError="Nazwa jest wymagana" />
 
-    <!-- SEKCJA 1: SKŁADNIKI -->
     <MudText Typo="Typo.h6" Class="mb-2">Składniki</MudText>
     
     <MudDropContainer @ref="_ingredientsContainer"
@@ -40,7 +38,6 @@
                     <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
                         <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
 
-                        <!-- Wybór nazwy z listy zdefiniowanych produktów -->
                         <MudAutocomplete T="PredefinedProductDto"
                                          Label="Szukaj składnika..."
                                          Value="@context.SelectedProduct"
@@ -57,8 +54,6 @@
                                          DebounceInterval="200"
                                          MinCharacters="0" />
                         
-
-                        <!-- Ilość -->
                         <MudNumericField @bind-Value="context.Quantity"
                                          Label="Ilość"
                                          Min="0.01m"
@@ -66,7 +61,6 @@
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense" />
 
-                        <!-- Wybór jednostki spośród UnitDto przypisanych do produktu -->
                         <MudSelect T="UnitDto"
                                    Label="Jednostka"
                                    @bind-Value="context.SelectedUnit"
@@ -103,7 +97,6 @@
 
     <MudDivider Class="my-4" />
 
-    <!-- SEKCJA 2: KROKI PRZEPISU -->
     <MudText Typo="Typo.h6" Class="mb-2">Kroki instrukcji</MudText>
 
     <MudDropContainer @ref="_stepsContainer"
@@ -150,7 +143,6 @@
 
     <MudDivider Class="my-4" />
 
-    <!-- PRZYCISK ZAPISU -->
     <MudButton Variant="Variant.Filled"
                Color="Color.Primary"
                StartIcon="@Icons.Material.Filled.Add"
@@ -199,7 +191,7 @@
         _ingredientsContainer?.Refresh();
     }
 
-    private void OnProductChanged(IngredientDto item, PredefinedProductDto? product)
+    private static void OnProductChanged(IngredientDto item, PredefinedProductDto? product)
     {
         item.SelectedProduct = product;
         item.Id = product?.Id ?? 0;
@@ -214,7 +206,7 @@
 
     private void IngredientDropped(MudItemDropInfo<IngredientDto> dropItem)
     {
-        if (dropItem?.Item is null) return;
+        if (dropItem.Item is null) return;
 
         _ingredients.Remove(dropItem.Item);
         var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _ingredients.Count);
@@ -286,17 +278,15 @@
                     i.SelectedUnit!.UnderlyingValue)).ToList();
 
         var finalSteps = _steps.Select(s => 
-            new AddStepRequest(s.Order, s.Instructions)
+            new AddStepRequest(s.Order + 1, s.Instructions)
         ).ToList();
 
         var request = new CreateRecipeRequest(_recipeName, finalIngredients, finalSteps);
         var response = await RecipeCreator.CreateRecipe(request, _cts.Token);
-        
-        var createdRecipeId = Random.Shared.Next(1, 1000);
 
         Snackbar.Add("Pomyślnie dodano nowy przepis!", Severity.Success);
 
-         Navigation.NavigateTo($"/recipes/details/{createdRecipeId}");
+         Navigation.NavigateTo(RoutingConstants.Editors.Recipes.DetailsFor(response.Id));
     }
 
     public void Dispose()

@@ -22,14 +22,18 @@ public static class RoutingConstants
     {
         private const string BasePath = "editors";
         
-        public static class Recipe
+        public static class Recipes
         {
             private const string BaseRecipePath = "/recipes";
+            private const string BaseEditorPath = BasePath + BaseRecipePath;
+            
             public const string List = BasePath + BaseRecipePath;
             public const string Create = BasePath + BaseRecipePath + "/create";
             
             public static bool IsList(string relativePath) => relativePath == List;
             public static bool IsCreate(string relativePath) => relativePath == Create;
+
+            public static string DetailsFor(int id) => $"/{BaseEditorPath}/{id}";
         }
     }
 }

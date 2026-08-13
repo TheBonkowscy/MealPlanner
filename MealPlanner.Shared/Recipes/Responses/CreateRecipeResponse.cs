@@ -1,6 +1,3 @@
 ﻿namespace MealPlanner.Shared.Recipes.Responses;
 
-public class CreateRecipeResponse
-{
-    
-}
+public record CreateRecipeResponse(int Id);
