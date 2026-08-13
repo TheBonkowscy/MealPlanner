@@ -33,7 +33,7 @@ builder.Services.AddControllers();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-await builder.Services.RegisterMenuServices();
+await ServiceRegistration.RegisterMenuServices(builder.Services);
 
 var app = builder.Build();
 

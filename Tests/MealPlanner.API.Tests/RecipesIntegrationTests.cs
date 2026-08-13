@@ -3,14 +3,15 @@ using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Recipes;
+using MealPlanner.Shared.Recipes.Responses;
 using Xunit;
 
 namespace MealPlanner.API.Tests;
 
 [Collection("IntegrationTests")]
-public class MealsIntegrationTests : IntegrationTestBase
+public class RecipesIntegrationTests : IntegrationTestBase
 {
-    public MealsIntegrationTests(MealPlannerWebApplicationFactory factory) : base(factory)
+    public RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) : base(factory)
     {
     }
 

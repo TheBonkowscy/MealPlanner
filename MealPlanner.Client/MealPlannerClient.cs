@@ -5,10 +5,14 @@ using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using MealPlanner.Shared.Recipes;
+using MealPlanner.Shared.Recipes.Requests;
+using MealPlanner.Shared.Recipes.Responses;
 
 namespace MealPlanner.Client;
 
-internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IFindRecipes, IUpdateMenus, IDeleteMenus, IFindIngredients
+internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IUpdateMenus, IDeleteMenus, 
+    IFindRecipes, ICreateRecipes,
+    IFindIngredients
 {
     public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
@@ -129,5 +133,18 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
         }
 
         return GetIngredientsResponse.Empty;
+    }
+
+    public async Task<CreateRecipeResponse> CreateRecipe(CreateRecipeRequest createRecipeRequest, CancellationToken cancellationToken)
+    {
+        var response = await httpClient.PostAsJsonAsync(Constants.RecipesRoute, createRecipeRequest, options: null,
+            cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<CreateRecipeResponse>();
+        }
+
+        throw new Exception("Unable to create recipe");   // TODO: concrete types?
     }
 }

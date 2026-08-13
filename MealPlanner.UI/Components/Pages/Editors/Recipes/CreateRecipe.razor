@@ -1,0 +1,311 @@
+﻿@page "/editors/recipes/create"
+@using MealPlanner.UI.Services
+@using MealPlanner.UI.Models.Editors
+@using MealPlanner.Shared.Recipes.Requests
+@using System.Linq
+
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject IFindIngredients IngredientsFinder
+@inject ICreateRecipes RecipeCreator
+@inject ISnackbar Snackbar
+@inject AppBarService AppBarService
+
+<h3>Tworzenie nowego przepisu</h3>
+
+<MudPaper Class="pa-6 ma-4" Elevation="3">
+    <MudTextField @bind-Value="_recipeName"
+                  Label="Nazwa przepisu"
+                  Variant="Variant.Outlined"
+                  Class="mb-6"
+                  Required="true"
+                  RequiredError="Nazwa jest wymagana" />
+
+    <MudText Typo="Typo.h6" Class="mb-2">Składniki</MudText>
+    
+    <MudDropContainer @ref="_ingredientsContainer"
+                      T="IngredientDto"
+                      Items="_ingredients"
+                      ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)"
+                      ItemDropped="IngredientDropped"
+                      Class="d-flex flex-column mb-4">
+        <ChildContent>
+            <MudDropZone T="IngredientDto"
+                         Identifier="IngredientsZone"
+                         AllowReorder="true"
+                         Class="rounded mud-background-gray pa-3 min-height-100">
+                <ItemRenderer>
+                    <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
+                        <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
+
+                        <MudAutocomplete T="PredefinedProductDto"
+                                         Label="Szukaj składnika..."
+                                         Value="@context.SelectedProduct"
+                                         ValueChanged="@(product => OnProductChanged(context, product))"
+                                         SearchFunc="SearchIngredientsAsync"
+                                         ToStringFunc="@(p => p?.Name)"
+                                         ResetValueOnSelected="false"
+                                         CoerceText="true"
+                                         AdornmentIcon="@Icons.Material.Filled.Search"
+                                         AdornmentColor="Color.Primary"
+                                         Dense="true"
+                                         Margin="Margin.Dense"
+                                         Variant="Variant.Outlined"
+                                         DebounceInterval="200"
+                                         MinCharacters="0" />
+                        
+                        <MudNumericField @bind-Value="context.Quantity"
+                                         Label="Ilość"
+                                         Min="0.01m"
+                                         Step="0.1m"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense" />
+
+                        <MudSelect T="UnitDto"
+                                   Label="Jednostka"
+                                   @bind-Value="context.SelectedUnit"
+                                   ToStringFunc="@(u => u?.DisplayName)"
+                                   Disabled="@(!context.AvailableUnits.Any())"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Dense="true">
+                            @foreach (var unit in context.AvailableUnits)
+                            {
+                                <MudSelectItem Value="@unit">@unit.DisplayName</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudSpacer />
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="@(() => RemoveIngredient(context))" />
+                    </MudPaper>
+                </ItemRenderer>
+            </MudDropZone>
+        </ChildContent>
+    </MudDropContainer>
+
+    <MudButton StartIcon="@Icons.Material.Filled.Add"
+               Color="Color.Secondary"
+               Variant="Variant.Outlined"
+               OnClick="AddIngredient"
+               Class="mb-6">
+        Dodaj składnik
+    </MudButton>
+
+    <MudDivider Class="my-4" />
+
+    <MudText Typo="Typo.h6" Class="mb-2">Kroki instrukcji</MudText>
+
+    <MudDropContainer @ref="_stepsContainer"
+                      T="StepDto"
+                      Items="_steps"
+                      ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)"
+                      ItemDropped="StepDropped"
+                      Class="d-flex flex-column mb-4">
+        <ChildContent>
+            <MudDropZone T="StepDto"
+                         Identifier="StepsZone"
+                         AllowReorder="true"
+                         Class="rounded mud-background-gray pa-3 min-height-100">
+                <ItemRenderer>
+                    <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
+                        <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
+                        
+                        <MudChip T="string" Color="Color.Primary" Size="Size.Small">Krok @(context.Order + 1)</MudChip>
+
+                        <MudTextField @bind-Value="context.Instructions"
+                                      Label="Opis kroku"
+                                      Lines="2"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Class="flex-grow-1" />
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="@(() => RemoveStep(context))" />
+                    </MudPaper>
+                </ItemRenderer>
+            </MudDropZone>
+        </ChildContent>
+    </MudDropContainer>
+
+    <MudButton StartIcon="@Icons.Material.Filled.Add"
+               Color="Color.Secondary"
+               Variant="Variant.Outlined"
+               OnClick="AddStep"
+               Class="mb-6">
+        Dodaj krok
+    </MudButton>
+
+    <MudDivider Class="my-4" />
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               Size="Size.Large"
+               Class="mt-2"
+               OnClick="SaveRecipeAsync">
+        Dodaj przepis +
+    </MudButton>
+</MudPaper>
+
+@code {
+    private string _recipeName = string.Empty;
+    
+    private MudDropContainer<IngredientDto>? _ingredientsContainer;
+    private readonly List<IngredientDto> _ingredients = [];
+
+    private MudDropContainer<StepDto>? _stepsContainer;
+    private readonly List<StepDto> _steps = [];
+
+    private List<PredefinedProductDto> _predefinedProducts = [];
+    private readonly CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppBarService.SetTitle("Dodaj Nowy Przepis");
+        await LoadPredefinedProductsAsync();
+    }
+
+    private async Task LoadPredefinedProductsAsync()
+    {
+        var response = await IngredientsFinder.Get(_cts.Token);
+        _predefinedProducts =
+        [
+            .. response.Ingredients.Select(i => new PredefinedProductDto(i.Id,
+                i.Name,
+                [
+                    .. i.Units.Select(u => new UnitDto(u.DisplayName,
+                        u.Value))
+                ]))
+        ];
+    }
+
+    private void AddIngredient()
+    {
+        _ingredients.Add(new IngredientDto());
+        _ingredientsContainer?.Refresh();
+    }
+
+    private static void OnProductChanged(IngredientDto item, PredefinedProductDto? product)
+    {
+        item.SelectedProduct = product;
+        item.Id = product?.Id ?? 0;
+        item.SelectedUnit = product?.Units.FirstOrDefault();
+    }
+
+    private void RemoveIngredient(IngredientDto item)
+    {
+        _ingredients.Remove(item);
+        _ingredientsContainer?.Refresh();
+    }
+
+    private void IngredientDropped(MudItemDropInfo<IngredientDto> dropItem)
+    {
+        if (dropItem.Item is null) return;
+
+        _ingredients.Remove(dropItem.Item);
+        var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _ingredients.Count);
+        _ingredients.Insert(targetIndex, dropItem.Item);
+        
+        _ingredientsContainer?.Refresh();
+    }
+
+    private void AddStep()
+    {
+        _steps.Add(new StepDto
+        {
+            Order = _steps.Count,
+            Instructions = string.Empty
+        });
+        _stepsContainer?.Refresh();
+    }
+
+    private void RemoveStep(StepDto item)
+    {
+        _steps.Remove(item);
+        ReindexSteps();
+        _stepsContainer?.Refresh();
+    }
+
+    private void StepDropped(MudItemDropInfo<StepDto> dropItem)
+    {
+        if (dropItem?.Item is null) return;
+
+        _steps.Remove(dropItem.Item);
+        var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _steps.Count);
+        _steps.Insert(targetIndex, dropItem.Item);
+
+        ReindexSteps();
+        _stepsContainer?.Refresh();
+    }
+
+    private void ReindexSteps()
+    {
+        for (int i = 0; i < _steps.Count; i++)
+        {
+            _steps[i].Order = i;
+        }
+    }
+
+    private async Task SaveRecipeAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_recipeName))
+        {
+            Snackbar.Add("Podaj nazwę przepisu!", Severity.Warning);
+            return;
+        }
+
+        if (!_ingredients.Any() || _ingredients.Any(i => i.SelectedProduct == null || i.SelectedUnit == null))
+        {
+            Snackbar.Add("Uzupełnij wszystkie dodane składniki oraz ich jednostki!", Severity.Warning);
+            return;
+        }
+
+        if (!_steps.Any() || _steps.Any(s => string.IsNullOrWhiteSpace(s.Instructions)))
+        {
+            Snackbar.Add("Uzupełnij treść wszystkich kroków!", Severity.Warning);
+            return;
+        }
+
+        var finalIngredients = _ingredients.Select(i => 
+                new AddIngredientRequest(i.Id, 
+                    i.Quantity, 
+                    i.SelectedUnit!.UnderlyingValue)).ToList();
+
+        var finalSteps = _steps.Select(s => 
+            new AddStepRequest(s.Order + 1, s.Instructions)
+        ).ToList();
+
+        var request = new CreateRecipeRequest(_recipeName, finalIngredients, finalSteps);
+        var response = await RecipeCreator.CreateRecipe(request, _cts.Token);
+
+        Snackbar.Add("Pomyślnie dodano nowy przepis!", Severity.Success);
+
+         Navigation.NavigateTo(RoutingConstants.Editors.Recipes.DetailsFor(response.Id));
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    private Task<IEnumerable<PredefinedProductDto>> SearchIngredientsAsync(string value, CancellationToken arg2)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Task.FromResult<IEnumerable<PredefinedProductDto>>([.. _predefinedProducts.Take(20)]);
+        }
+
+        return Task.FromResult<IEnumerable<PredefinedProductDto>>([
+            .. _predefinedProducts
+                .Where(p => p.Name.Contains(value, StringComparison.OrdinalIgnoreCase))
+                .Take(20)
+        ]);
+    }
+}

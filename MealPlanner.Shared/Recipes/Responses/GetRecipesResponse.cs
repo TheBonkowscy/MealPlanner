@@ -1,4 +1,4 @@
-﻿namespace MealPlanner.Shared.Recipes;
+﻿namespace MealPlanner.Shared.Recipes.Responses;
 
 public record GetRecipesResponse(IEnumerable<RecipeListItemResponse> Recipes)
 {
