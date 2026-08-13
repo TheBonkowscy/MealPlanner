@@ -31,4 +31,13 @@ public static class RandomId
             field!.SetValue(ingredient, Random.Shared.Next(1, 1000));
         }
     }
+
+    public static void Set(params RecipeStep[] recipeSteps)
+    {
+        foreach(var recipeStep in recipeSteps)
+        {
+            var field = typeof(RecipeStep).GetProperty(nameof(RecipeStep.Id));
+            field!.SetValue(recipeStep, Random.Shared.Next(1, 1000));
+        }
+    }
 }

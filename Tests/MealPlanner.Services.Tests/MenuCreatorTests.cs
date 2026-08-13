@@ -66,6 +66,7 @@ public class MenuCreatorTests
     {
         // Arrange
         var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), new Dictionary<int, string>());
+        
         // Act
         var result = () => _sut.Create(request, CancellationToken.None);
         

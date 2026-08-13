@@ -20,7 +20,7 @@ public class RecipeCreator(MealPlannerDbContext ctx) : ICreateRecipe
         var existingRecipe = await ctx.Recipes.FirstOrDefaultAsync(x => x.Name.ToLower() == request.Name.ToLower(), cancellationToken);
         if (existingRecipe is not null)
         {
-            throw new InvalidOperationException("Recipe already exists");   // TODO: custom exceptions?
+            throw new InvalidOperationException($"Recipe '{request.Name}' already exists");   // TODO: custom exceptions?
         }
 
         var mappedIngredients = await MapIngredients(request, cancellationToken);
