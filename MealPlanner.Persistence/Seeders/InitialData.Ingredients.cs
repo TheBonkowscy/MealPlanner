@@ -6,8 +6,8 @@ internal static partial class InitialData
 {
     public static Ingredient[] Ingredients() =>
     [
-        Ingredient.Create("Bułka", [MeasureUnit.Piece]),
-        Ingredient.Create("Chleb", [MeasureUnit.Piece]),
+        Ingredient.Create("Bułka", [MeasureUnit.Piece, MeasureUnit.Slice1]),
+        Ingredient.Create("Chleb", [MeasureUnit.Piece, MeasureUnit.Slice1]),
         Ingredient.Create("Wrapy", [MeasureUnit.Piece, MeasureUnit.Package]),
         
         Ingredient.Create("Parówki Dolina Dobra", [MeasureUnit.Piece, MeasureUnit.Package]),
@@ -29,10 +29,10 @@ internal static partial class InitialData
         Ingredient.Create("Mozzarella wędzona", [MeasureUnit.Piece]),
         Ingredient.Create("Mozzarella Mini", [MeasureUnit.Package]),
         
-        Ingredient.Create("Ser żółty w plastrach, zwykły", [MeasureUnit.Gram, MeasureUnit.Piece]),
-        Ingredient.Create("Ser żółty w plastrach, wędzony", [MeasureUnit.Gram, MeasureUnit.Piece]),
-        Ingredient.Create("Ser żółty w plastrach, dojrzewający", [MeasureUnit.Gram, MeasureUnit.Piece]),
-        Ingredient.Create("Mimolette", [MeasureUnit.Gram, MeasureUnit.Piece]),
+        Ingredient.Create("Ser żółty w plastrach, zwykły", [MeasureUnit.Gram, MeasureUnit.Piece, MeasureUnit.Slice2]),
+        Ingredient.Create("Ser żółty w plastrach, wędzony", [MeasureUnit.Gram, MeasureUnit.Piece, MeasureUnit.Slice2]),
+        Ingredient.Create("Ser żółty w plastrach, dojrzewający", [MeasureUnit.Gram, MeasureUnit.Piece, MeasureUnit.Slice2]),
+        Ingredient.Create("Mimolette", [MeasureUnit.Gram, MeasureUnit.Piece, MeasureUnit.Slice2]),
         Ingredient.Create("Cheddar (kostka)", [MeasureUnit.Gram, MeasureUnit.Piece]),
         Ingredient.Create("Cheddar (tarty)", [MeasureUnit.Gram, MeasureUnit.Piece]),
         Ingredient.Create("Camembert", [MeasureUnit.Gram, MeasureUnit.Piece]),
@@ -247,6 +247,6 @@ internal static partial class InitialData
         Ingredient.Create("Stek z rostbefu", [MeasureUnit.Piece, MeasureUnit.Gram, MeasureUnit.Kilogram]),
         Ingredient.Create("Mięso mielone wołowe", [MeasureUnit.Piece, MeasureUnit.Gram, MeasureUnit.Kilogram]),
         Ingredient.Create("Łopatka wołowa", [MeasureUnit.Piece, MeasureUnit.Gram, MeasureUnit.Kilogram]),
-        Ingredient.Create("Szynka", [MeasureUnit.Gram]),
+        Ingredient.Create("Szynka", [MeasureUnit.Gram, MeasureUnit.Slice2]),
     ];
 }
