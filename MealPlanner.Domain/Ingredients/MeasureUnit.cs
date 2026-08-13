@@ -17,5 +17,7 @@ public enum MeasureUnit
     Package,
     Can,
     Bottle,
-    Pinch
+    Pinch,
+    Slice1,
+    Slice2
 }

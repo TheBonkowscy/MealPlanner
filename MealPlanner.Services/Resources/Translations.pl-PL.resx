@@ -45,9 +45,15 @@
         <value>szcz.</value>
     </data>
     <data name="Tablespoon" xml:space="preserve">
-        <value>ł. stoł.</value>
+        <value>łyż.</value>
     </data>
     <data name="Teaspoon" xml:space="preserve">
-        <value>łyżeczek</value>
+        <value>łyżecz.</value>
+    </data>
+    <data name="Slice1" xml:space="preserve">
+        <value>krom.</value>
+    </data>
+    <data name="Slice2" xml:space="preserve">
+        <value>plast.</value>
     </data>
 </root>

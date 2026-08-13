@@ -57,7 +57,10 @@
     <data name="Pinch" xml:space="preserve">
         <value>pinch(es)</value>
     </data>
-    <data name="X" xml:space="preserve">
-        <value />
+    <data name="Slice1" xml:space="preserve">
+        <value>slice(s)</value>
+    </data>
+    <data name="Slice2" xml:space="preserve">
+        <value>slice(s)</value>
     </data>
 </root>

@@ -159,6 +159,24 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to slice(s).
+        /// </summary>
+        public static string Slice1 {
+            get {
+                return ResourceManager.GetString("Slice1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to slice(s).
+        /// </summary>
+        public static string Slice2 {
+            get {
+                return ResourceManager.GetString("Slice2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to tbsp.
         /// </summary>
         public static string Tablespoon {
@@ -173,15 +191,6 @@ namespace MealPlanner.Services {
         public static string Teaspoon {
             get {
                 return ResourceManager.GetString("Teaspoon", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        public static string X {
-            get {
-                return ResourceManager.GetString("X", resourceCulture);
             }
         }
     }
