@@ -13,7 +13,8 @@ public interface ICreateRecipe
     Task<CreateRecipeResponse> Create(CreateRecipeRequest request, CancellationToken cancellationToken);
 }
 
-public class RecipeCreator(MealPlannerDbContext ctx) : ICreateRecipe
+public class RecipeCreator(MealPlannerDbContext ctx, 
+    MeasureUnitMapper measureUnitMapper) : ICreateRecipe
 {
     public async Task<CreateRecipeResponse> Create(CreateRecipeRequest request, CancellationToken cancellationToken)
     {
@@ -46,7 +47,7 @@ public class RecipeCreator(MealPlannerDbContext ctx) : ICreateRecipe
         var ingredientsToMap = usedIngredients.ToDictionary(x => x, 
             x => request.Ingredients.First(z => z.Id == x.Id));
 
-        var mappedUnits = request.Ingredients.Select(x => x.Unit).Distinct().ToDictionary(x => x, Enum.Parse<MeasureUnit>);
+        var mappedUnits = request.Ingredients.Select(x => x.Unit).Distinct().ToDictionary(x => x, measureUnitMapper.Map);
         
         
         return [.. ingredientsToMap.Select(x => AddIngredientAction.Create(x.Key, x.Value.Quantity, mappedUnits[x.Value.Unit]))];

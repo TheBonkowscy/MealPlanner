@@ -32,8 +32,9 @@ builder.Services.AddControllers();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-await ServiceRegistration.RegisterMenuServices(builder.Services);
+await builder.Services.RegisterMenuServices();
 
 var app = builder.Build();
 
