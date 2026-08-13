@@ -23,6 +23,9 @@ public static class ServiceRegistration
         /* Ingredients */
         services.AddTransient<IReadIngredient, IngredientReader>();
         
+        /* Shared */
+        services.AddTransient<MeasureUnitMapper>();
+        
         return Task.CompletedTask;
     }
 }

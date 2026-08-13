@@ -5,6 +5,7 @@ using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared;
+using Microsoft.Extensions.Localization;
 using Moq;
 using Moq.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ namespace MealPlanner.Services.Tests;
 
 public class RecipeCreatorTests
 {
+    private readonly Mock<IStringLocalizer<Translations>> _localizer = new();
     private readonly RecipeCreator _sut;
 
     private static readonly Ingredient PreExistingIngredient = Ingredient.Create("PreExistingIngredient", [MeasureUnit.Bottle]);
@@ -37,7 +39,7 @@ public class RecipeCreatorTests
         ctx.Setup(x => x.RecipeSteps).ReturnsDbSet(_recipeSteps);
         
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
-        _sut = new RecipeCreator(ctx.Object);
+        _sut = new RecipeCreator(ctx.Object, new MeasureUnitMapper(_localizer.Object));
     }
     
     [Fact]

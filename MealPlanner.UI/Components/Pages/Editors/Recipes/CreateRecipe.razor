@@ -2,6 +2,7 @@
 @using MealPlanner.UI.Services
 @using MealPlanner.UI.Models.Editors
 @using MealPlanner.Shared.Recipes.Requests
+@using MealPlanner.Shared.Shared
 @using System.Linq
 
 @implements IDisposable
@@ -61,7 +62,7 @@
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense" />
 
-                        <MudSelect T="UnitDto"
+                        <MudSelect T="MeasureUnitDto"
                                    Label="Jednostka"
                                    @bind-Value="context.SelectedUnit"
                                    ToStringFunc="@(u => u?.DisplayName)"
@@ -178,10 +179,7 @@
         [
             .. response.Ingredients.Select(i => new PredefinedProductDto(i.Id,
                 i.Name,
-                [
-                    .. i.Units.Select(u => new UnitDto(u.DisplayName,
-                        u.Value))
-                ]))
+                [.. i.ApplicableUnits]))
         ];
     }
 

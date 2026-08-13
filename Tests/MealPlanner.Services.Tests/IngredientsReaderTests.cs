@@ -2,8 +2,11 @@
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Ingredients;
+using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Ingredients;
+using MealPlanner.Shared.Shared;
 using MealPlanner.Tests.Shared;
+using Microsoft.Extensions.Localization;
 using Moq;
 using Moq.EntityFrameworkCore;
 
@@ -11,15 +14,17 @@ namespace MealPlanner.Services.Tests;
 
 public class IngredientsReaderTests
 {
+    private readonly Mock<IStringLocalizer<Translations>> _localiser;
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly IngredientReader _sut;
     private readonly List<Ingredient> _ingredients = [];
 
     public IngredientsReaderTests()
     {
+        _localiser = new Mock<IStringLocalizer<Translations>>();
         _ctx = new Mock<MealPlannerDbContext>();
         _ctx.Setup(x => x.Ingredients).ReturnsDbSet(_ingredients);
-        _sut = new IngredientReader(_ctx.Object);
+        _sut = new IngredientReader(_ctx.Object, new MeasureUnitMapper(_localiser.Object));
     }
 
     [Fact]
@@ -41,13 +46,13 @@ public class IngredientsReaderTests
         var flourResponse = result.Ingredients.First(x => x.Name == flour);
         var milkResponse = result.Ingredients.First(x => x.Name == milk);
         
-        flourResponse.Units.Should().BeEquivalentTo(ToResponse(ingredient1.ApplicableUnits));
-        milkResponse.Units.Should().BeEquivalentTo(ToResponse(ingredient2.ApplicableUnits));
+        flourResponse.ApplicableUnits.Should().BeEquivalentTo(ToResponse(ingredient1.ApplicableUnits));
+        milkResponse.ApplicableUnits.Should().BeEquivalentTo(ToResponse(ingredient2.ApplicableUnits));
     }
 
 
-    private static IEnumerable<IngredientMeasureUnitsResponse> ToResponse(IEnumerable<MeasureUnit> unitsToConvert) =>
+    private IEnumerable<MeasureUnitDto> ToResponse(IEnumerable<MeasureUnit> unitsToConvert) =>
     [
-        .. unitsToConvert.Select(x => new IngredientMeasureUnitsResponse(x.ToString(), x.ToString()))
+        .. unitsToConvert.Select(x => new MeasureUnitDto(_localiser.Object.GetString(x.ToString()), x.ToString()))
     ];
 }

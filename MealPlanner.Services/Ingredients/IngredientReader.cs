@@ -1,4 +1,6 @@
-﻿using MealPlanner.Persistence;
+﻿using MealPlanner.Domain.Ingredients;
+using MealPlanner.Persistence;
+using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Ingredients;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,19 +10,26 @@ public interface IReadIngredient
 {
     Task<GetIngredientsResponse> Get(CancellationToken cancellationToken);
 }
-public class IngredientReader(MealPlannerDbContext ctx) : IReadIngredient
+
+public class IngredientReader(MealPlannerDbContext ctx, MeasureUnitMapper measureUnitMapper) : IReadIngredient
 {
+    private record IngredientProjectionDto(int Id, string Name, IEnumerable<MeasureUnit> ApplicableUnits);
+    
     public async Task<GetIngredientsResponse> Get(CancellationToken cancellationToken)
     {
-        var result = await ctx.Ingredients.Select(x => 
-            new IngredientListItemResponse(
+        var ingredientsProjection = await ctx.Ingredients.Select(x => 
+            new IngredientProjectionDto(
                 x.Id,
                 x.Name,
-                x.ApplicableUnits.Select(z => new IngredientMeasureUnitsResponse(
-                    z.ToString(),
-                    z.ToString()))
+                x.ApplicableUnits
             )).ToListAsync(cancellationToken);
 
-        return new GetIngredientsResponse(result);
+        var mappedIngredients = ingredientsProjection.Select(x =>
+        {
+            var unitsToMap = x.ApplicableUnits.Select(measureUnitMapper.Map);
+            return new IngredientListItemResponse(x.Id, x.Name, unitsToMap);
+        });
+
+        return new GetIngredientsResponse(mappedIngredients);
     }
 }
