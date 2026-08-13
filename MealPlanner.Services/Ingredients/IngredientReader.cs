@@ -13,12 +13,12 @@ public interface IReadIngredient
 
 public class IngredientReader(MealPlannerDbContext ctx, MeasureUnitMapper measureUnitMapper) : IReadIngredient
 {
-    private record IngredientProjectionDTO(int Id, string Name, IEnumerable<MeasureUnit> ApplicableUnits);
+    private record IngredientProjectionDto(int Id, string Name, IEnumerable<MeasureUnit> ApplicableUnits);
     
     public async Task<GetIngredientsResponse> Get(CancellationToken cancellationToken)
     {
         var ingredientsProjection = await ctx.Ingredients.Select(x => 
-            new IngredientProjectionDTO(
+            new IngredientProjectionDto(
                 x.Id,
                 x.Name,
                 x.ApplicableUnits
