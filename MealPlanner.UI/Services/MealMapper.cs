@@ -9,8 +9,7 @@ public class MealMapper
         var meals = orderedMeals.Select(x => new MealDto
         {
             Name = x.Value,
-            Order = x.Key,
-            ZoneIdentifier = "DayMenuZone"
+            Order = x.Key
         }).OrderBy(x => x.Order).ToList();
         return meals;
     }

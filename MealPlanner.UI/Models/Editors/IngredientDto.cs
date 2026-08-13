@@ -2,9 +2,10 @@
 
 namespace MealPlanner.UI.Models.Editors;
 
-public class IngredientDto
+public class IngredientDto : IReorderable
 {
-    
+    public string ZoneIdentifier => "IngredientsZone";
+
     public int Id { get; set; }
     public string Name { get; set; }
     public UnitDto[] Units { get; set; }
@@ -15,5 +16,4 @@ public class IngredientDto
     
     public IReadOnlyList<UnitDto> AvailableUnits => SelectedProduct?.Units ?? [];
     
-    public string ZoneIdentifier { get; set; } = "IngredientsZone";
 }

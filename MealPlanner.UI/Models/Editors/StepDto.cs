@@ -1,8 +1,9 @@
 ﻿namespace MealPlanner.UI.Models.Editors;
 
-public class StepDto
+public class StepDto : IReorderable
 {
+    public string ZoneIdentifier => "StepsZone";
+
     public int Order { get; set; }
     public string Instructions { get; set; }
-    public string ZoneIdentifier { get; } = "StepsZone";
 }
