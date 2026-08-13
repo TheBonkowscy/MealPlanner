@@ -57,4 +57,7 @@
     <data name="Pinch" xml:space="preserve">
         <value>pinch(es)</value>
     </data>
+    <data name="X" xml:space="preserve">
+        <value />
+    </data>
 </root>

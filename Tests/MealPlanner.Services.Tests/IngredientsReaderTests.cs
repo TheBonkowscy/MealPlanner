@@ -14,14 +14,14 @@ namespace MealPlanner.Services.Tests;
 
 public class IngredientsReaderTests
 {
-    private readonly Mock<IStringLocalizer<MeasureUnitMapper>> _localiser;
+    private readonly Mock<IStringLocalizer<Translations>> _localiser;
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly IngredientReader _sut;
     private readonly List<Ingredient> _ingredients = [];
 
     public IngredientsReaderTests()
     {
-        _localiser = new Mock<IStringLocalizer<MeasureUnitMapper>>();
+        _localiser = new Mock<IStringLocalizer<Translations>>();
         _ctx = new Mock<MealPlannerDbContext>();
         _ctx.Setup(x => x.Ingredients).ReturnsDbSet(_ingredients);
         _sut = new IngredientReader(_ctx.Object, new MeasureUnitMapper(_localiser.Object));

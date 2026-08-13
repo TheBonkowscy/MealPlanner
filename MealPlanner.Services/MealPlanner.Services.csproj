@@ -13,9 +13,19 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Reference Include="Microsoft.Extensions.Localization.Abstractions">
+        <HintPath>..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\10.0.5\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\Translations.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
       <EmbeddedResource Update="Resources\Translations.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>Translations.Designer.cs</LastGenOutput>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
 
@@ -25,12 +35,6 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Translations.resx</DependentUpon>
       </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Microsoft.Extensions.Localization.Abstractions">
-        <HintPath>..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\10.0.5\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>

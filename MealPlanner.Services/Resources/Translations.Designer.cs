@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MealPlanner.Domain {
+namespace MealPlanner.Services {
     using System;
     
     

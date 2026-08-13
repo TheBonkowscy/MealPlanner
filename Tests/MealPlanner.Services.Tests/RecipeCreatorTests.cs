@@ -13,7 +13,7 @@ namespace MealPlanner.Services.Tests;
 
 public class RecipeCreatorTests
 {
-    private readonly Mock<IStringLocalizer<MeasureUnitMapper>> _localizer = new();
+    private readonly Mock<IStringLocalizer<Translations>> _localizer = new();
     private readonly RecipeCreator _sut;
 
     private static readonly Ingredient PreExistingIngredient = Ingredient.Create("PreExistingIngredient", [MeasureUnit.Bottle]);

@@ -13,7 +13,7 @@ public interface ICreateRecipe
     Task<CreateRecipeResponse> Create(CreateRecipeRequest request, CancellationToken cancellationToken);
 }
 
-public class RecipeCreator(MealPlannerDbContext ctx, 
+internal class RecipeCreator(MealPlannerDbContext ctx, 
     MeasureUnitMapper measureUnitMapper) : ICreateRecipe
 {
     public async Task<CreateRecipeResponse> Create(CreateRecipeRequest request, CancellationToken cancellationToken)

@@ -11,7 +11,7 @@ public interface IReadIngredient
     Task<GetIngredientsResponse> Get(CancellationToken cancellationToken);
 }
 
-public class IngredientReader(MealPlannerDbContext ctx, MeasureUnitMapper measureUnitMapper) : IReadIngredient
+internal class IngredientReader(MealPlannerDbContext ctx, MeasureUnitMapper measureUnitMapper) : IReadIngredient
 {
     private record IngredientProjectionDTO(int Id, string Name, IEnumerable<MeasureUnit> ApplicableUnits);
     
