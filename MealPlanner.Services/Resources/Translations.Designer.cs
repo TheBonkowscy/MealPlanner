@@ -21,7 +21,7 @@ namespace MealPlanner.Services {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Translations {
+    public class Translations {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -35,7 +35,7 @@ namespace MealPlanner.Services {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MealPlanner.Services.Resources.Translations", typeof(Translations).Assembly);
@@ -50,7 +50,7 @@ namespace MealPlanner.Services {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -62,7 +62,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to bottle(s).
         /// </summary>
-        internal static string Bottle {
+        public static string Bottle {
             get {
                 return ResourceManager.GetString("Bottle", resourceCulture);
             }
@@ -71,7 +71,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to can(s).
         /// </summary>
-        internal static string Can {
+        public static string Can {
             get {
                 return ResourceManager.GetString("Can", resourceCulture);
             }
@@ -80,7 +80,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to glass cup(s).
         /// </summary>
-        internal static string GlassCup {
+        public static string GlassCup {
             get {
                 return ResourceManager.GetString("GlassCup", resourceCulture);
             }
@@ -89,7 +89,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to g.
         /// </summary>
-        internal static string Gram {
+        public static string Gram {
             get {
                 return ResourceManager.GetString("Gram", resourceCulture);
             }
@@ -98,7 +98,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to kg.
         /// </summary>
-        internal static string Kilogram {
+        public static string Kilogram {
             get {
                 return ResourceManager.GetString("Kilogram", resourceCulture);
             }
@@ -107,7 +107,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to l.
         /// </summary>
-        internal static string Liter {
+        public static string Liter {
             get {
                 return ResourceManager.GetString("Liter", resourceCulture);
             }
@@ -116,7 +116,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to mg.
         /// </summary>
-        internal static string Milligram {
+        public static string Milligram {
             get {
                 return ResourceManager.GetString("Milligram", resourceCulture);
             }
@@ -125,7 +125,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to ml.
         /// </summary>
-        internal static string Milliliter {
+        public static string Milliliter {
             get {
                 return ResourceManager.GetString("Milliliter", resourceCulture);
             }
@@ -134,7 +134,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to package(s).
         /// </summary>
-        internal static string Package {
+        public static string Package {
             get {
                 return ResourceManager.GetString("Package", resourceCulture);
             }
@@ -143,7 +143,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to pc(s).
         /// </summary>
-        internal static string Piece {
+        public static string Piece {
             get {
                 return ResourceManager.GetString("Piece", resourceCulture);
             }
@@ -152,7 +152,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to pinch(es).
         /// </summary>
-        internal static string Pinch {
+        public static string Pinch {
             get {
                 return ResourceManager.GetString("Pinch", resourceCulture);
             }
@@ -161,7 +161,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to tbsp.
         /// </summary>
-        internal static string Tablespoon {
+        public static string Tablespoon {
             get {
                 return ResourceManager.GetString("Tablespoon", resourceCulture);
             }
@@ -170,9 +170,18 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to tsp.
         /// </summary>
-        internal static string Teaspoon {
+        public static string Teaspoon {
             get {
                 return ResourceManager.GetString("Teaspoon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string X {
+            get {
+                return ResourceManager.GetString("X", resourceCulture);
             }
         }
     }

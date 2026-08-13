@@ -20,7 +20,7 @@
 
     <ItemGroup>
       <EmbeddedResource Update="Resources\Translations.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
+        <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Translations.resx">
         <Generator>ResXFileCodeGenerator</Generator>

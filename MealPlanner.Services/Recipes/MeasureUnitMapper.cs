@@ -5,7 +5,7 @@ using Microsoft.Extensions.Localization;
 
 namespace MealPlanner.Services.Recipes;
 
-internal class MeasureUnitMapper(IStringLocalizer<Translations> localizer)
+public class MeasureUnitMapper(IStringLocalizer<Translations> localizer)
 {
     public MeasureUnitDto Map(MeasureUnit measureUnit)
     {
