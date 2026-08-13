@@ -7,6 +7,7 @@
 @implements IDisposable
 @inject NavigationManager Navigation
 @inject IFindIngredients IngredientsFinder
+@inject ICreateRecipes RecipeCreator
 @inject ISnackbar Snackbar
 @inject AppBarService AppBarService
 
@@ -222,7 +223,6 @@
         _ingredientsContainer?.Refresh();
     }
 
-    #region Logika Kroków
     private void AddStep()
     {
         _steps.Add(new StepDto
@@ -259,7 +259,6 @@
             _steps[i].Order = i;
         }
     }
-    #endregion
 
     private async Task SaveRecipeAsync()
     {
@@ -281,7 +280,6 @@
             return;
         }
 
-        // Mapowanie na końcowe IngredientDto z tablicą UnitDto[]
         var finalIngredients = _ingredients.Select(i => 
                 new AddIngredientRequest(i.Id, 
                     i.Quantity, 
@@ -291,13 +289,14 @@
             new AddStepRequest(s.Order, s.Instructions)
         ).ToList();
 
-        // Symulacja komunikacji z API
-        await Task.Delay(500, _cts.Token);
+        var request = new CreateRecipeRequest(_recipeName, finalIngredients, finalSteps);
+        var response = await RecipeCreator.CreateRecipe(request, _cts.Token);
+        
         var createdRecipeId = Random.Shared.Next(1, 1000);
 
         Snackbar.Add("Pomyślnie dodano nowy przepis!", Severity.Success);
 
-        // Navigation.NavigateTo($"/recipes/details/{createdRecipeId}");
+         Navigation.NavigateTo($"/recipes/details/{createdRecipeId}");
     }
 
     public void Dispose()
