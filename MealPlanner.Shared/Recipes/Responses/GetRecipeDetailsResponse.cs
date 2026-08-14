@@ -10,4 +10,4 @@ public record GetRecipeDetailsResponse(
     
     public record UsedIngredientDetailsResponse(int Id, string Name, decimal Quantity, MeasureUnitDto MeasureUnit);
 
-    public record StepDetailsResponse(int Id, int Order, string Description);
+    public record StepDetailsResponse(int Id, int Order, string Instructions);

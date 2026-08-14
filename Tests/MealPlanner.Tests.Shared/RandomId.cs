@@ -32,6 +32,17 @@ public static class RandomId
         }
     }
 
+    public static void Set(params UsedIngredient[] ingredients)
+    {
+        foreach(var ingredient in ingredients)
+        {
+            var idProp = typeof(UsedIngredient).GetProperty(nameof(UsedIngredient.IngredientId));
+            var underlyingIngredientProp = typeof(UsedIngredient).GetProperty(nameof(UsedIngredient.Ingredient));
+            var underlyingIngredient = (underlyingIngredientProp!.GetValue(ingredient)) as Ingredient ?? throw new InvalidOperationException("No property!");
+            idProp!.SetValue(ingredient, underlyingIngredient.Id);
+        }
+    }
+
     public static void Set(params RecipeStep[] recipeSteps)
     {
         foreach(var recipeStep in recipeSteps)

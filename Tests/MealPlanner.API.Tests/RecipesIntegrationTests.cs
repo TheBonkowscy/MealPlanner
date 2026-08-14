@@ -1,4 +1,5 @@
-﻿using AwesomeAssertions;
+﻿using System.Net;
+using AwesomeAssertions;
 using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
 using MealPlanner.Shared.Menus;
@@ -9,12 +10,8 @@ using Xunit;
 namespace MealPlanner.API.Tests;
 
 [Collection("IntegrationTests")]
-public class RecipesIntegrationTests : IntegrationTestBase
+public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
-    public RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) : base(factory)
-    {
-    }
-
     [Fact]
     public async Task Get_ReturnsAllMeals_WhenNoQueryProvided()
     {
@@ -63,6 +60,30 @@ public class RecipesIntegrationTests : IntegrationTestBase
         var response = await result.Content.ReadFromJsonAsync<GetRecipesResponse>();
         response.Should().NotBeNull();
         response!.Recipes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Get_ReturnsNotFound_WhenNoMealById()
+    {
+        // Act
+        var result = await Client.GetAsync($"{Constants.RecipesRoute}/{-200}");
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Get_ReturnsOk_WhenMealWasFound()
+    {
+        // Arrange 
+        var recipe = Recipe.Create("Pizza");
+        await AddMealToDatabase(recipe);
+        
+        // Act
+        var result = await Client.GetAsync($"{Constants.RecipesRoute}/{recipe.Id}");
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     private async Task AddMealToDatabase(Recipe recipe)
