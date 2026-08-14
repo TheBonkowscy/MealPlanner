@@ -16,9 +16,6 @@ var options = new DbContextOptionsBuilder<MealPlannerDbContext>()
 Console.WriteLine("Obtained connection string, creating context...");
 await using var db = new MealPlannerDbContext(options);
 
-Console.WriteLine("Creating new schema...");
-await db.Database.ExecuteSqlRawAsync("""CREATE SCHEMA IF NOT EXISTS "mealplanner";""");
-
 Console.WriteLine("Migrating database, please wait...");
 await db.Database.MigrateAsync();
 
