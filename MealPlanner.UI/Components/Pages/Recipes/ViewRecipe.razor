@@ -80,7 +80,7 @@
                 <MudExpansionPanels MultiExpansion="true" @ref="_expansionPanels" Class="mt-3">
                     @foreach (var step in _steps)
                     {
-                        <MudExpansionPanel IsExpanded="@step.IsExpanded" Class="my-2 rounded-lg elevation-1">
+                        <MudExpansionPanel @bind-Expanded="@step.IsExpanded" Class="my-2 rounded-lg elevation-1">
                             <TitleContent>
                                 <div class="d-flex align-center gap-3">
                                     <MudCheckBox T="bool" 
@@ -161,10 +161,11 @@
         
         _steps =
         [
-            .. response.Steps.Select(x => new StepViewItem
+            .. response.Steps.Select((x, index) => new StepViewItem
             {
                 Order = x.Order,
-                Instructions = x.Description
+                Instructions = x.Description,
+                IsExpanded = index == 0
             })
         ];
     }
@@ -179,14 +180,20 @@
         nextStep?.IsExpanded = true;
     }
 
-    private void ExpandAllSteps()
+    private async Task ExpandAllSteps()
     {
-        foreach (var step in _steps) step.IsExpanded = true;
+        if (_expansionPanels is not null)
+        {
+            await _expansionPanels.ExpandAllAsync();
+        }
     }
 
-    private void CollapseAllSteps()
+    private async Task CollapseAllSteps()
     {
-        foreach (var step in _steps) step.IsExpanded = false;
+        if (_expansionPanels is not null)
+        {
+            await _expansionPanels.CollapseAllAsync();
+        }
     }
 
     private void NavigateBack()
