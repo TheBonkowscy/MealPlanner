@@ -38,14 +38,8 @@ public class Recipe
 
     private Recipe(string name) : this(name, [])
     {
-        // TODO: remove when meal editor is updated to require at least one ingredient
-    }
-
-    public static Recipe Create(string name)
-    {
-        ValidateNameAndThrow(name);
-
-        return new Recipe(name);
+        // This is a helper for the factory method below.
+        // It allows you to create a recipe with no ingredients and add them later.
     }
     
     public static Recipe Create(string name, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)

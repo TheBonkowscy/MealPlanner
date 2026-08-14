@@ -5,6 +5,7 @@ using MealPlanner.Services.Menus;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared;
+using MealPlanner.Tests.Shared.Factories;
 using Moq;
 using Moq.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ namespace MealPlanner.Services.Tests;
 
 public class MenuCreatorTests
 {
-    private static readonly Recipe PreExistingRecipe = Recipe.Create("Fish and chips");
+    private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Fish and chips");
     private static readonly Dictionary<int, string> Meals = new()
     {
         { 1, PreExistingRecipe.Name }
@@ -80,7 +81,7 @@ public class MenuCreatorTests
     public async Task Create_ThrowsWhenMealDoesNotExist()
     {
         // Arrange
-        var newRecipe = Recipe.Create("Quesadilla");
+        var newRecipe = TestRecipes.Create("Quesadilla");
         var updatedMeals = new Dictionary<int, string>(Meals) { { 2, newRecipe.Name } };
         var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), updatedMeals);
         // Act

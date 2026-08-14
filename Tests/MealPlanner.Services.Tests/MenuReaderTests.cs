@@ -139,7 +139,7 @@ public class MenuReaderTests
     {
         // Arrange
         var menuWithMeals = CreateAndSaveMenu(Today);
-        menuWithMeals.AddMeal(Recipe.Create("Pizza"));
+        menuWithMeals.AddMeal(TestRecipes.Create("Pizza"));
         
         var menuWithoutMeals = CreateAndSaveMenu(Today.AddDays(1));
         
