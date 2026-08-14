@@ -8,6 +8,8 @@ public class Recipe
     public int Id { get; private set; }
     
     public string Name { get; private set; }
+    
+    public int Servings { get; set; }
 
     private List<UsedIngredient> _ingredients = [];
     
@@ -30,25 +32,27 @@ public class Recipe
         // For EF Core
     }
     
-    private Recipe(string name, List<UsedIngredient> ingredients)
+    private Recipe(string name, int servings, List<UsedIngredient> ingredients)
     {
         Name = name;
+        Servings = servings;
         Ingredients = ingredients;
     }
 
-    private Recipe(string name) : this(name, [])
+    private Recipe(string name, int servings) : this(name, servings, [])
     {
         // This is a helper for the factory method below.
         // It allows you to create a recipe with no ingredients and add them later.
     }
     
-    public static Recipe Create(string name, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
+    public static Recipe Create(string name, int servings, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
     {
         ValidateNameAndThrow(name);
+        ValidateServingsAndThrow(servings);
         ValidateIngredientsAndThrow(ingredientsToAdd);
         ValidateRecipeStepsAndThrow(recipeSteps);
         
-        var recipe = new Recipe(name);
+        var recipe = new Recipe(name, servings);
         var mappedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(recipe, ingredient)).ToList();
         mappedIngredients.ForEach(recipe._ingredients.Add);
         
@@ -62,6 +66,14 @@ public class Recipe
         if (string.IsNullOrWhiteSpace(meal))
         {
             throw new ArgumentNullException(null, "Please specify a name of the meal");
+        }
+    }
+
+    private static void ValidateServingsAndThrow(int servings)
+    {
+        if (servings < 1)
+        {
+            throw new ArgumentOutOfRangeException(null, "Recipe must yield at least one serving");
         }
     }
 

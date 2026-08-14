@@ -91,7 +91,7 @@ public class RecipeReaderTests
         var ingredient = Ingredient.Create("Bacon", [MeasureUnit.Kilogram]);
         var ingredients = AddIngredientAction.Create(ingredient, 1, MeasureUnit.Kilogram);
         var step = RecipeStep.Create(1, "Cook");
-        var meal = Recipe.Create("Burgers", [ingredients], [step]);
+        var meal = Recipe.Create("Burgers", 1, [ingredients], [step]);
         RandomId.Set(ingredient);
         RandomId.Set(step);
         RandomId.Set(meal);
@@ -105,8 +105,9 @@ public class RecipeReaderTests
         result.Should().NotBeNull();
         result.Id.Should().Be(meal.Id);
         result.Name.Should().Be(meal.Name);
-        result.Ingredients.Should().HaveCount(1);
+        result.Servings.Should().Be(meal.Servings);
         
+        result.Ingredients.Should().HaveCount(1);
         var bacon = result.Ingredients.First();
         bacon.Id.Should().Be(ingredient.Id);
         bacon.Name.Should().Be(ingredient.Name);

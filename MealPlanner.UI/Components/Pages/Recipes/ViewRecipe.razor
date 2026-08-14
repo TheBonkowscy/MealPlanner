@@ -15,7 +15,7 @@
                     @(_recipeName ?? "Wczytywanie...")
                 </MudText>
                 <MudChip T="string" Icon="@Icons.Material.Filled.Restaurant" Color="Color.Secondary" Size="Size.Small">
-                    Składniki: @(_ingredients?.Count ?? 0) | Kroki: @(_steps?.Count ?? 0)
+                    Składniki: @(_ingredients?.Count ?? 0) | Kroki: @(_steps?.Count ?? 0) | Porcje: @(_servings ?? 0)
                 </MudChip>
             </div>
             <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" 
@@ -131,6 +131,7 @@
 
     private MudExpansionPanels? _expansionPanels;
     private string? _recipeName;
+    private int? _servings;
     private List<IngredientViewItem> _ingredients = [];
     private List<StepViewItem> _steps = [];
     
@@ -148,6 +149,7 @@
         if (response is null) return;
         
         _recipeName = response.Name;
+        _servings = response.Servings;
         _ingredients =
         [
             .. response.Ingredients
@@ -166,7 +168,7 @@
                 Order = x.Order,
                 Instructions = x.Instructions,
                 IsExpanded = index == 0
-            })
+            }).OrderBy(x => x.Order)
         ];
     }
 

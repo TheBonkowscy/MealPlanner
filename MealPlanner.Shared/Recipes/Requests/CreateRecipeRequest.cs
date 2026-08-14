@@ -2,6 +2,7 @@
 
 public record CreateRecipeRequest(
     string Name,
+    int Servings,
     List<AddIngredientRequest> Ingredients,
     List<AddStepRequest> Steps);
 

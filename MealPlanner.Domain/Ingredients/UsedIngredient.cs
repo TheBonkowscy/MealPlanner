@@ -14,8 +14,6 @@ public class UsedIngredient
 
     public decimal Quantity { get; private set; }
     
-    public int UnitId { get; private set; }
-    
     public MeasureUnit Unit { get; private set; }
 
     private UsedIngredient()

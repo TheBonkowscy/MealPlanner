@@ -22,7 +22,7 @@ internal static class RecipeSeeder
         await context
             .Set<Recipe>()
             .Where(x => allNames.Contains(x.Name.ToLower()))
-            .ToDictionaryAsync(x => x.Name, x => x, cancellationToken);
+            .ToDictionaryAsync(x => x.Name.ToLower(), x => x, cancellationToken);
 
     private static void UpdateOrAddRecipe(DbContext context, List<string> allNames, Recipe[] seedData, Dictionary<string, Recipe> existingRecipes) =>
         allNames.ForEach(name =>
@@ -31,13 +31,10 @@ internal static class RecipeSeeder
             var existingRecipe = existingRecipes.GetValueOrDefault(name);
             if (existingRecipe != null)
             {
-                existingRecipe.UpdateIngredients([.. recipe.Ingredients]);
-                existingRecipe.UpdateSteps([.. recipe.Steps]);
+                context.Set<Recipe>().Remove(existingRecipe);
             }
-            else
-            {
-                context.Set<Recipe>().Add(recipe);
-            }
+            
+            context.Set<Recipe>().Add(recipe);
         });
 
     internal static void Seed(DbContext context)

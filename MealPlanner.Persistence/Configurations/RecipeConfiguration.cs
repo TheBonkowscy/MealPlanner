@@ -12,5 +12,11 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
         
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.Servings).IsRequired();
+        
+        builder.HasMany(x => x.Ingredients).WithOne(x => x.Recipe).HasForeignKey(x => x.RecipeId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(x => x.Steps).WithOne().HasForeignKey("RecipeId")
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
