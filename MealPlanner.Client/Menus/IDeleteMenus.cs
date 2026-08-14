@@ -1,4 +1,4 @@
-﻿namespace MealPlanner.Client;
+﻿namespace MealPlanner.Client.Menus;
 
 public interface IDeleteMenus
 {

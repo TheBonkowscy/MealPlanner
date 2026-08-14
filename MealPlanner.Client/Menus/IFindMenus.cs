@@ -1,7 +1,6 @@
-﻿using MealPlanner.Shared.Menus.Requests;
-using MealPlanner.Shared.Menus.Responses;
+﻿using MealPlanner.Shared.Menus.Responses;
 
-namespace MealPlanner.Client;
+namespace MealPlanner.Client.Menus;
 
 public interface IFindMenus
 {
