@@ -8,7 +8,7 @@ using MealPlanner.Shared.Recipes.Responses;
 namespace MealPlanner.Client.Recipes;
 
 internal class RecipeClient(HttpClient httpClient) : 
-    IFindRecipes, ICreateRecipes,
+    IFindRecipes, ICreateRecipes, IDeleteRecipes,
     IFindIngredients
 {
     public async Task<GetRecipesResponse> Get(string? query, CancellationToken cancellationToken)
@@ -64,5 +64,12 @@ internal class RecipeClient(HttpClient httpClient) :
         }
 
         throw new Exception("Unable to create recipe");   // TODO: concrete types?
+    }
+
+    public async Task<bool> Delete(int id, CancellationToken cancellationToken)
+    {
+        var endpoint = Constants.MenusRoute.AppendPathSegment(id);
+        var result = await httpClient.DeleteAsync(endpoint, cancellationToken);
+        return result.IsSuccessStatusCode;
     }
 }

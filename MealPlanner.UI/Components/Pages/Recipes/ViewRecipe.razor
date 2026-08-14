@@ -1,11 +1,16 @@
 ﻿@page "/recipes/{Id:int}"
 @using MealPlanner.Client.Recipes
+@using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 
 @implements IDisposable
 @inject NavigationManager Navigation
 @inject AppBarService AppBarService
+@inject IMenuStateService MenuStateService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 @inject IFindRecipes RecipeFinder 
+@inject IDeleteRecipes RecipesDeleter
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
     <MudPaper Class="pa-6 rounded-lg" Elevation="2">
@@ -131,6 +136,7 @@
 
     private MudExpansionPanels? _expansionPanels;
     private string? _recipeName;
+    private int? _recipeId;
     private int? _servings;
     private List<IngredientViewItem> _ingredients = [];
     private List<StepViewItem> _steps = [];
@@ -139,8 +145,42 @@
 
     protected override async Task OnInitializedAsync()
     {
-        AppBarService.SetTitle("Podgląd Przepisu");
         await LoadRecipeAsync();
+        
+        AppBarService.SetTitle("Podgląd Przepisu");
+
+        List<AppBarAction> actions = [];
+        
+        if (_recipeId is not null)
+        {
+            actions.AddRange(
+                // TODO: edit action
+                new AppBarAction
+                {
+                    Icon = Icons.Material.Filled.Delete,
+                    Tooltip = "Usuń menu",
+                    Color = Color.Error,
+                    OnClick = EventCallback.Factory.Create(this, ConfirmAndDeleteAsync)
+                }
+            );
+        }
+        
+        AppBarService.SetActions([.. actions]);
+        MenuStateService.NotifyMenuChanged();
+    }
+
+    private async Task ConfirmAndDeleteAsync()
+    {
+        var hasRecipe = _recipeId.HasValue && !string.IsNullOrWhiteSpace(_recipeName);
+        if (hasRecipe) 
+            await DialogService.ConfirmAndDeleteRecipeAsync(
+                _recipeId!.Value,
+                _recipeName!,
+                (id, token) => RecipesDeleter.Delete(id, token),
+                Snackbar,
+                Navigation,
+                _cts.Token
+            );
     }
 
     private async Task LoadRecipeAsync()
@@ -149,6 +189,7 @@
         if (response is null) return;
         
         _recipeName = response.Name;
+        _recipeId = response.Id;
         _servings = response.Servings;
         _ingredients =
         [
