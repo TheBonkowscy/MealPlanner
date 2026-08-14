@@ -8,6 +8,8 @@ public class Recipe
     public int Id { get; private set; }
     
     public string Name { get; private set; }
+    
+    public int Servings { get; set; }
 
     private List<UsedIngredient> _ingredients = [];
     
@@ -42,9 +44,10 @@ public class Recipe
         // It allows you to create a recipe with no ingredients and add them later.
     }
     
-    public static Recipe Create(string name, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
+    public static Recipe Create(string name, int servings, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
     {
         ValidateNameAndThrow(name);
+        ValidateServingsAndThrow(servings);
         ValidateIngredientsAndThrow(ingredientsToAdd);
         ValidateRecipeStepsAndThrow(recipeSteps);
         
@@ -62,6 +65,14 @@ public class Recipe
         if (string.IsNullOrWhiteSpace(meal))
         {
             throw new ArgumentNullException(null, "Please specify a name of the meal");
+        }
+    }
+
+    private static void ValidateServingsAndThrow(int servings)
+    {
+        if (servings < 1)
+        {
+            throw new ArgumentOutOfRangeException(null, "Recipe must yield at least one serving");
         }
     }
 
