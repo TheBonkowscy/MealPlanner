@@ -1,0 +1,225 @@
+﻿@page "/recipes/{Id:int}"
+@using MealPlanner.Client.Recipes
+@using MealPlanner.UI.Services
+
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject AppBarService AppBarService
+@inject IFindRecipes RecipeFinder 
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+    <MudPaper Class="pa-6 rounded-lg" Elevation="2">
+        <div class="d-flex align-center justify-space-between mb-4">
+            <div>
+                <MudText Typo="Typo.h4" GutterBottom="true" Color="Color.Primary">
+                    @(_recipeName ?? "Wczytywanie...")
+                </MudText>
+                <MudChip T="string" Icon="@Icons.Material.Filled.Restaurant" Color="Color.Secondary" Size="Size.Small">
+                    Składniki: @(_ingredients?.Count ?? 0) | Kroki: @(_steps?.Count ?? 0)
+                </MudChip>
+            </div>
+            <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" 
+                       Variant="Variant.Outlined" 
+                       Color="Color.Default"
+                       OnClick="NavigateBack">
+                Powrót
+            </MudButton>
+        </div>
+
+        <MudDivider Class="my-4" />
+
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <MudPaper Class="pa-4 mud-background-gray rounded-lg" Elevation="0">
+                    <MudText Typo="Typo.h6" Class="mb-3 d-flex align-center gap-2">
+                        <MudIcon Icon="@Icons.Material.Filled.ShoppingBag" Color="Color.Primary" />
+                        Składniki
+                    </MudText>
+                    
+                    <MudList T="string" Dense="true">
+                        @foreach (var ingredient in _ingredients)
+                        {
+                            <MudListItem>
+                                <MudCheckBox T="bool" 
+                                             @bind-Value="ingredient.IsDone" 
+                                             Color="Color.Success" 
+                                             Dense="true">
+                                    <span class="@(ingredient.IsDone ? "text-decoration-line-through text-muted" : "")">
+                                        <b>@ingredient.Quantity @ingredient.UnitName</b> – @ingredient.ProductName
+                                    </span>
+                                </MudCheckBox>
+                            </MudListItem>
+                        }
+                    </MudList>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" md="8">
+                <div class="d-flex align-center justify-space-between mb-2">
+                    <MudText Typo="Typo.h6" Class="d-flex align-center gap-2">
+                        <MudIcon Icon="@Icons.Material.Filled.FormatListNumbered" Color="Color.Primary" />
+                        Sposób przygotowania
+                    </MudText>
+                    
+                    <MudStack Row="true" Spacing="1">
+                        <MudButton Size="Size.Small" 
+                                   Variant="Variant.Text" 
+                                   Color="Color.Primary" 
+                                   OnClick="ExpandAllSteps">
+                            Rozwiń wszystkie
+                        </MudButton>
+                        <MudButton Size="Size.Small" 
+                                   Variant="Variant.Text" 
+                                   Color="Color.Secondary" 
+                                   OnClick="CollapseAllSteps">
+                            Zwiń wszystkie
+                        </MudButton>
+                    </MudStack>
+                </div>
+
+                <MudExpansionPanels MultiExpansion="true" @ref="_expansionPanels" Class="mt-3">
+                    @foreach (var step in _steps)
+                    {
+                        <MudExpansionPanel @bind-Expanded="@step.IsExpanded" Class="my-2 rounded-lg elevation-1">
+                            <TitleContent>
+                                <div class="d-flex align-center gap-3">
+                                    <MudCheckBox T="bool" 
+                                                 Value="@step.IsCompleted" 
+                                                 ValueChanged="@((bool val) => ToggleStepCompletion(step, val))"
+                                                 Color="Color.Success" 
+                                                 StopClickPropagation="true" />
+                                    
+                                    <MudChip T="string" 
+                                             Color="@(step.IsCompleted ? Color.Success : Color.Primary)" 
+                                             Size="Size.Small" 
+                                             Variant="@(step.IsCompleted ? Variant.Filled : Variant.Outlined)">
+                                        Krok @step.Order
+                                    </MudChip>
+                                    
+                                    <MudText Class="@(step.IsCompleted ? "text-decoration-line-through text-muted" : "fw-bold")">
+                                        @(step.Instructions.Length > 50 ? step.Instructions[..50] + "..." : step.Instructions)
+                                    </MudText>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudText Typo="Typo.body1" Class="pa-2 style-instruction-text">
+                                    @step.Instructions
+                                </MudText>
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    }
+                </MudExpansionPanels>
+            </MudItem>
+        </MudGrid>
+
+    </MudPaper>
+</MudContainer>
+
+<style>
+    .style-instruction-text {
+        white-space: pre-line;
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+    .text-muted {
+        opacity: 0.6;
+    }
+</style>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private MudExpansionPanels? _expansionPanels;
+    private string? _recipeName;
+    private List<IngredientViewItem> _ingredients = [];
+    private List<StepViewItem> _steps = [];
+    
+    private readonly CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppBarService.SetTitle("Podgląd Przepisu");
+        await LoadRecipeAsync();
+    }
+
+    private async Task LoadRecipeAsync()
+    {
+        var response = await RecipeFinder.Get(Id, _cts.Token);
+        if (response is null) return;
+        
+        _recipeName = response.Name;
+        _ingredients =
+        [
+            .. response.Ingredients
+                .Select(x => new IngredientViewItem
+                {
+                    ProductName = x.Name,
+                    Quantity = x.Quantity,
+                    UnitName = x.MeasureUnit.DisplayName
+                })
+        ];
+        
+        _steps =
+        [
+            .. response.Steps.Select((x, index) => new StepViewItem
+            {
+                Order = x.Order,
+                Instructions = x.Instructions,
+                IsExpanded = index == 0
+            })
+        ];
+    }
+
+    private void ToggleStepCompletion(StepViewItem step, bool isCompleted)
+    {
+        step.IsCompleted = isCompleted;
+        if (!isCompleted) return;
+        
+        step.IsExpanded = false;
+        var nextStep = _steps.FirstOrDefault(s => s.Order == step.Order + 1);
+        nextStep?.IsExpanded = true;
+    }
+
+    private async Task ExpandAllSteps()
+    {
+        if (_expansionPanels is not null)
+        {
+            await _expansionPanels.ExpandAllAsync();
+        }
+    }
+
+    private async Task CollapseAllSteps()
+    {
+        if (_expansionPanels is not null)
+        {
+            await _expansionPanels.CollapseAllAsync();
+        }
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/editors/recipes/create");
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    private class IngredientViewItem
+    {
+        public string ProductName { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public string UnitName { get; set; } = string.Empty;
+        public bool IsDone { get; set; }
+    }
+
+    private class StepViewItem
+    {
+        public int Order { get; set; }
+        public string Instructions { get; set; } = string.Empty;
+        public bool IsExpanded { get; set; }
+        public bool IsCompleted { get; set; }
+    }
+}

@@ -1,7 +1,7 @@
 ﻿using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;
 
-namespace MealPlanner.Client;
+namespace MealPlanner.Client.Recipes;
 
 public interface ICreateRecipes
 {

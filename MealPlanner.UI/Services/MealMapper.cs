@@ -1,15 +1,17 @@
-﻿using MealPlanner.UI.Models;
+﻿using MealPlanner.Shared.Recipes.Responses;
+using MealPlanner.UI.Models;
 
 namespace MealPlanner.UI.Services;
 
 public class MealMapper
 {
-    public List<MealDto> MapMeals(Dictionary<int, string> orderedMeals)
+    public List<MealDto> MapMeals(IEnumerable<OrderedRecipeListItemResponse> orderedMeals)
     {
         var meals = orderedMeals.Select(x => new MealDto
         {
-            Name = x.Value,
-            Order = x.Key
+            Id = x.Id,
+            Name = x.Name,
+            Order = x.Order
         }).OrderBy(x => x.Order).ToList();
         return meals;
     }

@@ -1,4 +1,6 @@
 ﻿using MealPlanner.Client.Configuration;
+using MealPlanner.Client.Menus;
+using MealPlanner.Client.Recipes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -11,15 +13,15 @@ public static class ServiceRegistration
         public IServiceCollection AddMealPlannerClient()
         {
             
-            services.AddHttpClient<IFindMenus, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<ICreateMenus, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<IUpdateMenus, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<IDeleteMenus, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IFindMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<ICreateMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IUpdateMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IDeleteMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient());
             
-            services.AddHttpClient<IFindRecipes, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<ICreateRecipes, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IFindRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<ICreateRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
             
-            services.AddHttpClient<IFindIngredients, MealPlannerClient>(nameof(MealPlannerClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IFindIngredients, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
             return services;
         }    
         

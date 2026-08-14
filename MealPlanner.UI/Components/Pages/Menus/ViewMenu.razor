@@ -1,4 +1,5 @@
 ﻿@page "/menus/day/{Date:datetime}"
+@using MealPlanner.Client.Menus
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @inherits LayoutComponentBase
@@ -34,7 +35,7 @@ else
 
         @foreach (var meal in _meals)
         {
-            <MudListItem T="string" Value="meal.Name">
+            <MudListItem T="string" Value="meal.Name" Href="@(RoutingConstants.Recipes.DetailsFor(meal.Id))">
                 @meal.Name
             </MudListItem>
         }

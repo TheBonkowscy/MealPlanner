@@ -209,7 +209,8 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
 
         getResult.Should().NotBeNull();
         getResult.Meals.Should().HaveCount(1);
-        getResult.Meals.First().Value.Should().Be(updatedMeal.Name);
+        var firstMeal = getResult.Meals.First();
+        firstMeal.Name.Should().Be(updatedMeal.Name);
     }
 
     [Fact]

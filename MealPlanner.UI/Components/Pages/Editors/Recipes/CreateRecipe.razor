@@ -3,6 +3,7 @@
 @using MealPlanner.UI.Models.Editors
 @using MealPlanner.Shared.Recipes.Requests
 @using MealPlanner.Shared.Shared
+@using MealPlanner.Client.Recipes
 @using System.Linq
 
 @implements IDisposable
@@ -284,7 +285,7 @@
 
         Snackbar.Add("Pomyślnie dodano nowy przepis!", Severity.Success);
 
-         Navigation.NavigateTo(RoutingConstants.Editors.Recipes.DetailsFor(response.Id));
+         Navigation.NavigateTo(RoutingConstants.Recipes.DetailsFor(response.Id));
     }
 
     public void Dispose()

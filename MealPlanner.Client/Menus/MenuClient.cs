@@ -1,18 +1,12 @@
 ﻿using System.Net.Http.Json;
 using Flurl;
-using MealPlanner.Shared.Ingredients;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
-using MealPlanner.Shared.Recipes;
-using MealPlanner.Shared.Recipes.Requests;
-using MealPlanner.Shared.Recipes.Responses;
 
-namespace MealPlanner.Client;
+namespace MealPlanner.Client.Menus;
 
-internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IUpdateMenus, IDeleteMenus, 
-    IFindRecipes, ICreateRecipes,
-    IFindIngredients
+internal class MenuClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IUpdateMenus, IDeleteMenus
 {
     public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
@@ -21,7 +15,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
 
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadFromJsonAsync<CreateMenuResponse>();
+            return await response.Content.ReadFromJsonAsync<CreateMenuResponse>(cancellationToken);
         }
 
         throw new Exception("Unable to create menu");   // TODO: concrete types?
@@ -73,28 +67,10 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
         var result = await httpClient.GetAsync(endpoint, cancellationToken);
         if (result.IsSuccessStatusCode)
         {
-            return await result.Content.ReadFromJsonAsync<GetExistingMenusResponse>();
+            return await result.Content.ReadFromJsonAsync<GetExistingMenusResponse>(cancellationToken);
         }
 
         return GetExistingMenusResponse.Empty;
-    }
-
-    // TODO: this should probably live in a separate client
-    public async Task<GetRecipesResponse> Get(string? query, CancellationToken cancellationToken)
-    {
-        var endpoint = Constants.RecipesRoute;
-        if (!string.IsNullOrWhiteSpace(query))
-        {
-            endpoint = endpoint.AppendQueryParam("q", query);
-        }
-
-        var result = await httpClient.GetAsync(endpoint, cancellationToken);
-        if (result.IsSuccessStatusCode)
-        {
-            return await result.Content.ReadFromJsonAsync<GetRecipesResponse?>();
-        }
-
-        return GetRecipesResponse.Empty;
     }
 
     public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
@@ -104,7 +80,7 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
 
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadFromJsonAsync<UpdateMenuResponse>();
+            return await response.Content.ReadFromJsonAsync<UpdateMenuResponse>(cancellationToken);
         }
 
         throw new Exception("Unable to update menu");   // TODO: concrete types?
@@ -120,31 +96,5 @@ internal class MealPlannerClient(HttpClient httpClient) : IFindMenus, ICreateMen
     private static Url AppendDateToBaseUri(string toString)
     {
         return Constants.MenusRoute.AppendPathSegment(toString);
-    }
-
-    public async Task<GetIngredientsResponse> Get(CancellationToken cancellationToken = default)
-    {
-        const string endpoint = Constants.IngredientsRoute;
-        
-        var result = await httpClient.GetAsync(endpoint, cancellationToken);
-        if (result.IsSuccessStatusCode)
-        {
-            return await result.Content.ReadFromJsonAsync<GetIngredientsResponse>();
-        }
-
-        return GetIngredientsResponse.Empty;
-    }
-
-    public async Task<CreateRecipeResponse> CreateRecipe(CreateRecipeRequest createRecipeRequest, CancellationToken cancellationToken)
-    {
-        var response = await httpClient.PostAsJsonAsync(Constants.RecipesRoute, createRecipeRequest, options: null,
-            cancellationToken);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<CreateRecipeResponse>();
-        }
-
-        throw new Exception("Unable to create recipe");   // TODO: concrete types?
     }
 }
