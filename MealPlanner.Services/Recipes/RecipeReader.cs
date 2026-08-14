@@ -36,7 +36,7 @@ public class RecipeReader(MealPlannerDbContext ctx, MeasureUnitMapper measureUni
         var mappedIngredients = recipe.Ingredients.Select(x =>
             new UsedIngredientDetailsResponse(x.IngredientId, x.Ingredient.Name, x.Quantity, measureUnitMapper.Map(x.Unit))).ToList();
         var mappedSteps = recipe.Steps.Select(x => new StepDetailsResponse(x.Id, x.Order, x.Instructions)).ToList();
-        return new GetRecipeDetailsResponse(recipe.Id, recipe.Name, 
+        return new GetRecipeDetailsResponse(recipe.Id, recipe.Name, recipe.Servings,
             mappedIngredients, 
             mappedSteps);
     }

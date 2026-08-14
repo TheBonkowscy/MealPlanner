@@ -5,6 +5,7 @@ namespace MealPlanner.Shared.Recipes.Responses;
 public record GetRecipeDetailsResponse(
     int Id,
     string Name,
+    int Servings,
     IEnumerable<UsedIngredientDetailsResponse> Ingredients,
     IEnumerable<StepDetailsResponse> Steps);
     

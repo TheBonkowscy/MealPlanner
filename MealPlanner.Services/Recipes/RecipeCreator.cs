@@ -28,7 +28,7 @@ public class RecipeCreator(MealPlannerDbContext ctx,
         var mappedSteps = request.Steps.Select(x => RecipeStep.Create(x.Order, x.Instructions))
             .OrderBy(x => x.Order).ToList();
         
-        var newRecipe = Recipe.Create(request.Name, mappedIngredients, mappedSteps);
+        var newRecipe = Recipe.Create(request.Name, request.Servings, mappedIngredients, mappedSteps);
         ctx.Recipes.Add(newRecipe);
         await ctx.SaveChangesAsync(cancellationToken);
         
