@@ -1,6 +1,7 @@
 using MealPlanner.Domain;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
+using MealPlanner.Tests.Shared.Factories;
 using Moq;
 using Moq.EntityFrameworkCore;
 
@@ -10,7 +11,7 @@ public class MenuDeleterTests
 {
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
 
-    private static readonly Recipe PreExistingRecipe = Recipe.Create("Test Meal");
+    private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Test Meal");
     private static readonly Menu PreExistingMenu = Menu.Create(Today, [PreExistingRecipe]);
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly MenuDeleter _sut;

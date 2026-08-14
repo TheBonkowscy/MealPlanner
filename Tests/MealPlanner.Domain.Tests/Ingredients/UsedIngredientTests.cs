@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
+using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests.Ingredients;
 
@@ -13,7 +14,7 @@ public class UsedIngredientTests
     public void Create_FromAction_Succeeds()
     {
         // Arrange
-        var recipe = Recipe.Create("Test Recipe");
+        var recipe = TestRecipes.Create("Test Recipe");
         var action = AddIngredientAction.Create(Ingredient, 0.75m, MeasureUnit.GlassCup);
         
         // Act

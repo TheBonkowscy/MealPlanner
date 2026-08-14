@@ -5,6 +5,7 @@ using MealPlanner.Services.Menus;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared;
+using MealPlanner.Tests.Shared.Factories;
 using Moq;
 using Moq.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ namespace MealPlanner.Services.Tests;
 
 public class MenuUpdaterTests
 {
-    private static readonly Recipe PreExistingRecipe = Recipe.Create("Fish and chips");
+    private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Fish and chips");
 
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly Mock<IMapRecipe> _mealsMapper;

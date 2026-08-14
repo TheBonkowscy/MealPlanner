@@ -5,6 +5,7 @@ using MealPlanner.Domain;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Recipes;
 using MealPlanner.Shared.Recipes.Responses;
+using MealPlanner.Tests.Shared.Factories;
 using Xunit;
 
 namespace MealPlanner.API.Tests;
@@ -16,7 +17,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
     public async Task Get_ReturnsAllMeals_WhenNoQueryProvided()
     {
         // Arrange
-        await AddMealToDatabase(Recipe.Create("Burger"));
+        await AddMealToDatabase(TestRecipes.Create("Burger"));
 
         // Act
         var result = await Client.GetAsync(Constants.RecipesRoute);
@@ -33,7 +34,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
     {
         // Arrange
         var uniqueMealName = "Unique Sandwich";
-        await AddMealToDatabase(Recipe.Create(uniqueMealName));
+        await AddMealToDatabase(TestRecipes.Create(uniqueMealName));
 
         // Act
         var result = await Client.GetAsync($"{Constants.RecipesRoute}?q=sandw");
@@ -50,7 +51,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
     public async Task Get_ReturnsEmptyList_WhenNoMatchesFound()
     {
         // Arrange
-        await AddMealToDatabase(Recipe.Create("Pizza"));
+        await AddMealToDatabase(TestRecipes.Create("Pizza"));
 
         // Act
         var result = await Client.GetAsync($"{Constants.RecipesRoute}?q=salad");
@@ -76,7 +77,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
     public async Task Get_ReturnsOk_WhenMealWasFound()
     {
         // Arrange 
-        var recipe = Recipe.Create("Pizza");
+        var recipe = TestRecipes.Create("Pizza");
         await AddMealToDatabase(recipe);
         
         // Act

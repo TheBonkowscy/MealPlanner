@@ -6,8 +6,8 @@ namespace MealPlanner.Domain.Tests;
 public class MenuTests
 {
     private static readonly DateOnly SharedDate = DateOnly.FromDateTime(DateTime.UtcNow);
-    private static readonly Recipe SharedFirstRecipe = Recipe.Create("Fish and chips");
-    private static readonly Recipe SharedSecondRecipe = Recipe.Create("Pierogi");
+    private static readonly Recipe SharedFirstRecipe = TestRecipes.Create("Fish and chips");
+    private static readonly Recipe SharedSecondRecipe = TestRecipes.Create("Pierogi");
     private static readonly string InvalidDateExceptionMessage = $"Invalid date specified. The date can not be before {Menu.MinDateInThePast} and must be in the near future.";
 
     [Theory]
@@ -15,7 +15,7 @@ public class MenuTests
     public void Create_ThrowsForInvalidDate(DateOnly invalidDate)
     {
         // Act
-        Action<DateOnly> createNewMenu = date => TestMenu.Create(date);
+        Action<DateOnly> createNewMenu = date => Menu.Create(date, [SharedFirstRecipe, SharedSecondRecipe]);
         
         // Assert
         createNewMenu.Invoking(x => x.Invoke(invalidDate))
@@ -28,7 +28,7 @@ public class MenuTests
     public void Create_CreatesSuccessfully(DateOnly validDate)
     {
         // Act
-        var result = TestMenu.Create(validDate);
+        var result = Menu.Create(validDate, [SharedFirstRecipe, SharedSecondRecipe]);
         
         // Assert
         result.Date.Should().Be(validDate);
@@ -38,7 +38,7 @@ public class MenuTests
     public void AddMeal_WithoutOrder_SuccessfullyAddsMeal()
     {
         // Arrange
-        var menu = TestMenu.Create(SharedDate, [SharedFirstRecipe]);
+        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
         
         // Act
         menu.AddMeal(SharedSecondRecipe);
@@ -53,7 +53,7 @@ public class MenuTests
     public void AddMeal_WithoutOrder_KeepsOrder()
     {
         // Arrange
-        var menu = TestMenu.Create(SharedDate, [SharedFirstRecipe]);
+        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
         
         // Act
         menu.AddMeal(SharedSecondRecipe);
@@ -68,7 +68,7 @@ public class MenuTests
     public void AddMeal_WithMealAlreadyAdded_ThrowsException()
     {
         // Arrange
-        var menu = TestMenu.Create(SharedDate, [SharedFirstRecipe]);
+        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
         
         // Act
         Action<Recipe> addMealToMenu = menu.AddMeal;
@@ -83,7 +83,7 @@ public class MenuTests
     public void AddMeal_WithOrder_SuccessfullyAddsMeal()
     {
         // Arrange
-        var menu = TestMenu.Create(SharedDate, [SharedFirstRecipe]);
+        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
         const int order = 1;
         
         // Act
@@ -98,7 +98,7 @@ public class MenuTests
     public void AddMeal_WithOrder_WhenOrderAlreadyTaken_ThrowsException()
     {
         // Arrange
-        var menu = TestMenu.Create(SharedDate, [SharedFirstRecipe]);
+        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
         const int mealOrder = 0;
         
         // Act
@@ -114,7 +114,7 @@ public class MenuTests
     public void AddMeal_WithOrder_WithMealAlreadyAdded_ThrowsException()
     {
         // Arrange
-        var menu = TestMenu.Create(SharedDate, [SharedFirstRecipe]);
+        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
         
         // Act
         Action<int, Recipe> addMealToMenu = menu.AddMeal;
@@ -129,7 +129,7 @@ public class MenuTests
     public void AddMeal_WithOrder_ThrowsExceptionForNegativeOrder()
     {
         // Arrange
-        var menu = TestMenu.Create(SharedDate);
+        var menu = Menu.Create(SharedDate, [SharedSecondRecipe]);
         
         // Act
         Action<int, Recipe> addMealToMenu = menu.AddMeal;

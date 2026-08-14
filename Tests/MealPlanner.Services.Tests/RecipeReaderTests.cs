@@ -5,6 +5,7 @@ using MealPlanner.Domain.Ingredients.Actions;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Tests.Shared;
+using MealPlanner.Tests.Shared.Factories;
 using Microsoft.Extensions.Localization;
 using Moq;
 using Moq.EntityFrameworkCore;
@@ -31,11 +32,11 @@ public class RecipeReaderTests
     public async Task GetByQuery_NoQuery_ReturnsAllMeals()
     {
         // Arrange
-        var meal1 = Recipe.Create("Pasta");
+        var meal1 = TestRecipes.Create("Pasta");
         RandomId.Set(meal1);
         _recipes.Add(meal1);
         
-        var meal2 = Recipe.Create("Pizza");
+        var meal2 = TestRecipes.Create("Pizza");
         RandomId.Set(meal2);
         _recipes.Add(meal2);
 
@@ -54,11 +55,11 @@ public class RecipeReaderTests
     public async Task GetByQuery_CaseInsensitiveQuery_ReturnsFilteredMeals(string query)
     {
         // Arrange
-        var meal1 = Recipe.Create("Pasta");
+        var meal1 = TestRecipes.Create("Pasta");
         RandomId.Set(meal1);
         _recipes.Add(meal1);
         
-        var meal2 = Recipe.Create("Pizza");
+        var meal2 = TestRecipes.Create("Pizza");
         RandomId.Set(meal2);
         _recipes.Add(meal2);
 

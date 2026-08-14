@@ -15,7 +15,7 @@ public class RecipeTests
     public void Create_WithoutName_ThrowsException()
     {   
         // Act
-        Action<string> createMeal = (name) => Recipe.Create(name);
+        Action<string> createMeal = (name) => Recipe.Create(name, [SharedIngredient], SharedSteps);
         
         // Assert
         createMeal.Invoking(x => x.Invoke(""))
@@ -27,7 +27,7 @@ public class RecipeTests
     public void Create_WithName_Succeeds()
     {
         // Act
-        var meal = Recipe.Create(Name);
+        var meal = Recipe.Create(Name, [SharedIngredient], SharedSteps);
         
         // Assert
         meal.Should().NotBeNull();
