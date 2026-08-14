@@ -12,7 +12,6 @@ public class RecipesController(IReadRecipe recipeReader,
 {
     [HttpGet]
     [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IResult> GetByQuery([FromQuery(Name = "q")] string? query,
         CancellationToken cancellationToken)
     {
@@ -25,4 +24,14 @@ public class RecipesController(IReadRecipe recipeReader,
     [HttpPost]
     public async Task<CreateRecipeResponse> Create([FromBody] CreateRecipeRequest createRecipeRequest, CancellationToken cancellationToken) =>
         await recipeCreator.Create(createRecipeRequest, cancellationToken);
+    
+    
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IResult> Get([FromRoute(Name = "id")] int id, CancellationToken cancellationToken)
+    {
+        var recipe = await recipeReader.Get(id, cancellationToken);
+        return recipe is null ? Results.NotFound() : Results.Ok(recipe);
+    }
 }
