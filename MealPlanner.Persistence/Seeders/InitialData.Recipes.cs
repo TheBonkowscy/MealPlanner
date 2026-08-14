@@ -37,7 +37,7 @@ internal static partial class InitialData
             RecipeStep.Create(4, "Zmontuj pizzę."),
             RecipeStep.Create(5, "Piecz 5 minut w 300 stopniach lub do całkowitego zwęglenia pokarmu."),
         ];
-        var pizza1 = Recipe.Create("Pizza z boczkiem, czerwoną cebulą i jalapeno", [addBacon, addOnion, addJalapeno], pizza1Steps);
+        var pizza1 = Recipe.Create("Pizza z boczkiem, czerwoną cebulą i jalapeno", 3, [addBacon, addOnion, addJalapeno], pizza1Steps);
         
         List<RecipeStep> pizza2Steps =
         [
@@ -48,7 +48,7 @@ internal static partial class InitialData
             RecipeStep.Create(5, "Zmontuj pizzę."),
             RecipeStep.Create(6, "Piecz 5 minut w 300 stopniach lub do całkowitego zwęglenia pokarmu."),
         ];
-        var pizza2 = Recipe.Create("Pizza z boczkiem, czosnkiem i oliwkami", [addBacon, addGarlic, addOlives], pizza2Steps);
+        var pizza2 = Recipe.Create("Pizza z boczkiem, czosnkiem i oliwkami", 3, [addBacon, addGarlic, addOlives], pizza2Steps);
         
         List<RecipeStep> pizza3Steps =
         [
@@ -60,7 +60,7 @@ internal static partial class InitialData
             RecipeStep.Create(6, "Piecz 5 minut w 300 stopniach lub do całkowitego zwęglenia pokarmu."),
             RecipeStep.Create(7, "Podawać z oliwą z oliwek."),
         ];
-        var pizza3 = Recipe.Create("Pizza z kurczakiem, pieczarkami i cebulą", [addChicken, addMushrooms, addOnion], pizza3Steps);
+        var pizza3 = Recipe.Create("Pizza z kurczakiem, pieczarkami i cebulą", 3, [addChicken, addMushrooms, addOnion], pizza3Steps);
         
         return [pizza1, pizza2, pizza3];
     }

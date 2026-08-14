@@ -12,5 +12,6 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
         
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.Servings).IsRequired();
     }
 }
