@@ -22,6 +22,13 @@
                   Class="mb-6"
                   Required="true"
                   RequiredError="Nazwa jest wymagana" />
+    <MudNumericField @bind-Value="_servings"
+                  Label="Liczba porcji"
+                  Variant="Variant.Outlined"
+                  Class="mb-6"
+                  Required="true"
+                  Min="1"
+                  RequiredError="Liczba porcji jest wymagana" />
 
     <MudText Typo="Typo.h6" Class="mb-2">Składniki</MudText>
     
@@ -157,6 +164,7 @@
 
 @code {
     private string _recipeName = string.Empty;
+    private int _servings = 1;
     
     private MudDropContainer<IngredientDto>? _ingredientsContainer;
     private readonly List<IngredientDto> _ingredients = [];
@@ -280,7 +288,7 @@
             new AddStepRequest(s.Order + 1, s.Instructions)
         ).ToList();
 
-        var request = new CreateRecipeRequest(_recipeName, finalIngredients, finalSteps);
+        var request = new CreateRecipeRequest(_recipeName, _servings, finalIngredients, finalSteps);
         var response = await RecipeCreator.CreateRecipe(request, _cts.Token);
 
         Snackbar.Add("Pomyślnie dodano nowy przepis!", Severity.Success);
