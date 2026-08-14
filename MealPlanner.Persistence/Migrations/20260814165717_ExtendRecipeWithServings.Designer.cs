@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MealPlanner.Persistence.Migrations
 {
     [DbContext(typeof(MealPlannerDbContext))]
-    [Migration("20260814162032_ExtendRecipeWithServings")]
+    [Migration("20260814165717_ExtendRecipeWithServings")]
     partial class ExtendRecipeWithServings
     {
         /// <inheritdoc />
@@ -55,17 +55,13 @@ namespace MealPlanner.Persistence.Migrations
                     b.Property<int>("IngredientId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UnitId")
-                        .HasColumnType("integer");
+                    b.Property<string>("Unit")
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Quantity")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("RecipeId", "IngredientId", "UnitId");
+                    b.HasKey("RecipeId", "IngredientId", "Unit");
 
                     b.HasIndex("IngredientId");
 
@@ -196,7 +192,8 @@ namespace MealPlanner.Persistence.Migrations
                 {
                     b.HasOne("MealPlanner.Domain.Recipe", null)
                         .WithMany("Steps")
-                        .HasForeignKey("RecipeId");
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("MealPlanner.Domain.Menu", b =>

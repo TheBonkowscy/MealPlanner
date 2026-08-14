@@ -32,13 +32,14 @@ public class Recipe
         // For EF Core
     }
     
-    private Recipe(string name, List<UsedIngredient> ingredients)
+    private Recipe(string name, int servings, List<UsedIngredient> ingredients)
     {
         Name = name;
+        Servings = servings;
         Ingredients = ingredients;
     }
 
-    private Recipe(string name) : this(name, [])
+    private Recipe(string name, int servings) : this(name, servings, [])
     {
         // This is a helper for the factory method below.
         // It allows you to create a recipe with no ingredients and add them later.
@@ -51,7 +52,7 @@ public class Recipe
         ValidateIngredientsAndThrow(ingredientsToAdd);
         ValidateRecipeStepsAndThrow(recipeSteps);
         
-        var recipe = new Recipe(name);
+        var recipe = new Recipe(name, servings);
         var mappedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(recipe, ingredient)).ToList();
         mappedIngredients.ForEach(recipe._ingredients.Add);
         
