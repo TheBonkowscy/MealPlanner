@@ -36,4 +36,29 @@ public static class DialogServiceExtensions
             navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(date));
         }
     }
+    public static async Task ConfirmAndDeleteRecipeAsync(
+        this IDialogService dialogService,
+        int recipeId,
+        string recipeName,
+        Func<int, CancellationToken, Task> deleteAction,
+        ISnackbar snackbar,
+        NavigationManager navigation,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await dialogService.ShowMessageBoxAsync(
+            title: "Potwierdzenie usunięcia",
+            message: $"Czy na pewno chcesz usunąć przepis '{recipeName}'?",
+            yesText: "Usuń",
+            cancelText: "Anuluj",
+            options: new DialogOptions { CloseOnEscapeKey = true }
+        );
+
+        if (result == true)
+        {
+            await deleteAction(recipeId, cancellationToken);
+            
+            snackbar.Add("Przepis został pomyślnie usunięty.", Severity.Success);
+            navigation.NavigateTo(RoutingConstants.Editors.Recipe.Create);
+        }
+    }
 }

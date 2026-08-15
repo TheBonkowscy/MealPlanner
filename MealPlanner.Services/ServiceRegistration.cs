@@ -19,6 +19,7 @@ public static class ServiceRegistration
         services.AddTransient<IReadRecipe, RecipeReader>();
         services.AddTransient<ICreateRecipe, RecipeCreator>();
         services.AddTransient<IMapRecipe, RecipeMapper>();
+        services.AddTransient<IDeleteRecipe, RecipeDeleter>();
         
         /* Ingredients */
         services.AddTransient<IReadIngredient, IngredientReader>();
