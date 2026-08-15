@@ -20,6 +20,7 @@ public static class ServiceRegistration
             
             services.AddHttpClient<IFindRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
             services.AddHttpClient<ICreateRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IDeleteRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
             
             services.AddHttpClient<IFindIngredients, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
             return services;

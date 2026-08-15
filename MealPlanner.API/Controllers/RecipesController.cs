@@ -8,7 +8,8 @@ namespace MealPlanner.API.Controllers;
 [ApiController]
 [Route(Shared.Menus.Constants.RecipesRoute)]
 public class RecipesController(IReadRecipe recipeReader,
-    ICreateRecipe recipeCreator) : ControllerBase
+    ICreateRecipe recipeCreator,
+    IDeleteRecipe recipeDeleter) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]
@@ -25,7 +26,6 @@ public class RecipesController(IReadRecipe recipeReader,
     public async Task<CreateRecipeResponse> Create([FromBody] CreateRecipeRequest createRecipeRequest, CancellationToken cancellationToken) =>
         await recipeCreator.Create(createRecipeRequest, cancellationToken);
     
-    
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -33,5 +33,13 @@ public class RecipesController(IReadRecipe recipeReader,
     {
         var recipe = await recipeReader.Get(id, cancellationToken);
         return recipe is null ? Results.NotFound() : Results.Ok(recipe);
+    }
+    
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [HttpDelete("{id:int}")]
+    public async Task<IResult> Delete([FromRoute(Name = "id")] int id, CancellationToken cancellationToken)
+    {
+        await recipeDeleter.Delete(id, cancellationToken);
+        return Results.NoContent();
     }
 }

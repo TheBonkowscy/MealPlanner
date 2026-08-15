@@ -67,9 +67,7 @@ public class MenusController(
         CancellationToken cancellationToken) =>
         await menusUpdater.Update(updateMenuRequest, cancellationToken);
     
-    [ProducesResponseType(typeof(CreateMenuResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [HttpDelete("{day:datetime}")]
     public async Task<IResult> Delete([FromRoute(Name = "day")] DateTime day, CancellationToken cancellationToken)
     {

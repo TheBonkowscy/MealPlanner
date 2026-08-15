@@ -68,7 +68,7 @@ internal class RecipeClient(HttpClient httpClient) :
 
     public async Task<bool> Delete(int id, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.MenusRoute.AppendPathSegment(id);
+        var endpoint = Constants.RecipesRoute.AppendPathSegment(id);
         var result = await httpClient.DeleteAsync(endpoint, cancellationToken);
         return result.IsSuccessStatusCode;
     }
