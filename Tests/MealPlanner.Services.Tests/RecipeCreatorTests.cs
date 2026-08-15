@@ -5,6 +5,7 @@ using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared;
+using MealPlanner.Tests.Shared.Factories;
 using Microsoft.Extensions.Localization;
 using Moq;
 using Moq.EntityFrameworkCore;
@@ -16,7 +17,7 @@ public class RecipeCreatorTests
     private readonly Mock<IStringLocalizer<Translations>> _localizer = new();
     private readonly RecipeCreator _sut;
 
-    private static readonly Ingredient PreExistingIngredient = Ingredient.Create("PreExistingIngredient", [MeasureUnit.Bottle]);
+    private static readonly Ingredient PreExistingIngredient = TestIngredients.Create("PreExistingIngredient");
     private readonly List<Ingredient> _ingredients = [PreExistingIngredient];
     private readonly List<RecipeStep> _recipeSteps = [];
     private readonly List<Recipe> _recipes = [];
@@ -71,7 +72,35 @@ public class RecipeCreatorTests
         await result.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("One or more ingredients not found");
     }
-    // 3. success
+    
+    [Fact]
+    public async Task Create_CreatesRecipe_KeepsSameIngredientWithDifferentUnits_SumsQuantityForSameUnit()
+    {
+        // Arrange
+        var request = NewRequest();
+        var ingredientByBottles = request.Ingredients.First(x => x.Id == PreExistingIngredient.Id);
+        var ingredientByLitres = new AddIngredientRequest(PreExistingIngredient.Id, 1, nameof(MeasureUnit.Liter));
+        request.Ingredients.Add(ingredientByLitres);
+        request.Ingredients.Add(ingredientByBottles);
+        
+        // Act
+        var result = await _sut.Create(request, CancellationToken.None);
+        
+        // Assert
+        var createdRecipe = _recipes.FirstOrDefault(x => x.Id == result.Id);
+        createdRecipe.Should().NotBeNull();
+        createdRecipe.Ingredients.Should().HaveCount(2);
+
+        var byBottles = createdRecipe.Ingredients.FirstOrDefault(x => x.Unit == MeasureUnit.Bottle);
+        byBottles.Should().NotBeNull();
+        byBottles.Quantity.Should().Be(ingredientByBottles.Quantity * 2);
+        byBottles.Unit.ToString().Should().Be(ingredientByBottles.Unit);
+
+        var byLitres = createdRecipe.Ingredients.FirstOrDefault(x => x.Unit == MeasureUnit.Liter);
+        byLitres.Should().NotBeNull();
+        byLitres.Quantity.Should().Be(ingredientByLitres.Quantity);
+        byLitres.Unit.ToString().Should().Be(ingredientByLitres.Unit);
+    }
     
     [Fact]
     public async Task Create_Succeeds()
