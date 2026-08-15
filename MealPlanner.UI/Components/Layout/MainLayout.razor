@@ -1,8 +1,10 @@
 ﻿@inherits LayoutComponentBase
+@using MealPlanner.Client.Menus
 @using MealPlanner.UI.Services
 @implements IDisposable
 @inject AppBarService AppBarService
 @inject NavigationManager Navigation
+@inject IFindMenus MenuFinder
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -48,6 +50,7 @@
 </MudLayout>
 
 @code {
+    private CancellationTokenSource _cts = new();
     private string _title = "Meal Planner";
     private bool _drawerOpen = true;
 
@@ -59,13 +62,17 @@
     public void Dispose()
     {
         AppBarService.OnChange -= StateHasChanged;
+        _cts.Cancel();
+        _cts.Dispose();
     }
 
     private void DrawerToggle() => _drawerOpen = !_drawerOpen;
 
-    private void GoToToday()
+    private async Task GoToToday()
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
-        Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(today));
+        
+        var exists = await MenuFinder.GetToday(_cts.Token);
+        Navigation.NavigateTo(exists is not null ? RoutingConstants.Menus.DetailsForDate(today) : RoutingConstants.Menus.CreateForDate(today));
     }
 }
