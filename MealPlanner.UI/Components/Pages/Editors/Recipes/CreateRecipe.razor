@@ -62,7 +62,7 @@
                                          Variant="Variant.Outlined"
                                          DebounceInterval="200"
                                          MinCharacters="0" />
-                        
+
                         <MudNumericField @bind-Value="context.Quantity"
                                          Label="Ilość"
                                          Min="0.01m"
@@ -72,13 +72,14 @@
 
                         <MudSelect T="MeasureUnitDto"
                                    Label="Jednostka"
-                                   @bind-Value="context.SelectedUnit"
+                                   Value="@context.SelectedUnit"
+                                   ValueChanged="@(unit => OnUnitChanged(context, unit))"
                                    ToStringFunc="@(u => u?.DisplayName)"
-                                   Disabled="@(!context.AvailableUnits.Any())"
+                                   Disabled="@(!GetAvailableUnits(context).Any())"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Dense="true">
-                            @foreach (var unit in context.AvailableUnits)
+                            @foreach (var unit in GetAvailableUnits(context))
                             {
                                 <MudSelectItem Value="@unit">@unit.DisplayName</MudSelectItem>
                             }
@@ -197,12 +198,37 @@
         _ingredients.Add(new IngredientDto());
         _ingredientsContainer?.Refresh();
     }
+    
+    private IEnumerable<MeasureUnitDto> GetAvailableUnits(IngredientDto currentItem)
+    {
+        if (currentItem.SelectedProduct == null)
+            return [];
 
-    private static void OnProductChanged(IngredientDto item, PredefinedProductDto? product)
+        var usedUnitValuesInOtherRows = _ingredients
+            .Where(i => i != currentItem && i.SelectedProduct?.Id == currentItem.SelectedProduct.Id)
+            .Select(i => i.SelectedUnit?.UnderlyingValue)
+            .Where(val => val != null)
+            .ToHashSet();
+
+        return currentItem.AvailableUnits
+            .Where(u => !usedUnitValuesInOtherRows.Contains(u.UnderlyingValue));
+    }
+
+    private void OnProductChanged(IngredientDto item, PredefinedProductDto? product)
     {
         item.SelectedProduct = product;
         item.Id = product?.Id ?? 0;
-        item.SelectedUnit = product?.Units.FirstOrDefault();
+    
+        item.SelectedUnit = GetAvailableUnits(item).FirstOrDefault();
+    
+        _ingredientsContainer?.Refresh();
+    }
+    
+    private void OnUnitChanged(IngredientDto item, MeasureUnitDto? unit)
+    {
+        item.SelectedUnit = unit;
+    
+        _ingredientsContainer?.Refresh();
     }
 
     private void RemoveIngredient(IngredientDto item)
