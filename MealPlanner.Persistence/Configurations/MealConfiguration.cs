@@ -14,5 +14,6 @@ public class MealConfiguration : IEntityTypeConfiguration<Meal>
         builder.HasKey(x => new { x.MenuId, x.RecipeId });
         
         builder.Property(x => x.Order).IsRequired();
+        builder.Property(x => x.Servings).IsRequired();
     }
 }

@@ -3,6 +3,7 @@ using System;
 using MealPlanner.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MealPlanner.Persistence.Migrations
 {
     [DbContext(typeof(MealPlannerDbContext))]
-    partial class MealPlannerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260816194041_ExtendMealsWithServings")]
+    partial class ExtendMealsWithServings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
