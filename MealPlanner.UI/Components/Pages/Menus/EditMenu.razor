@@ -37,6 +37,12 @@
                         <div class="d-flex align-center">
                             <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="mr-3 cursor-grab" />
                             <MudText Typo="Typo.body1">@context.Name</MudText>
+                            <MudNumericField @bind-Value="context.Servings"
+                                             Label="Liczba posiłków"
+                                             Min="1"
+                                             Step="1"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense" />
                         </div>
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" 
                                        Color="Color.Error" 
@@ -180,9 +186,7 @@
             return;
         }
 
-        var orderedMeals = _meals.ToDictionary(x => x.Order, x => x.Name);
-        
-
+        var orderedMeals = _meals.Select(x => new AddMealRequest(x.Id, x.Order, x.Servings)).ToList();
         var request = new UpdateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
         var response = await MenusUpdater.Update(request, _cts.Token);
         Snackbar.Add("Pomyślnie edytowano menu!", Severity.Success);
