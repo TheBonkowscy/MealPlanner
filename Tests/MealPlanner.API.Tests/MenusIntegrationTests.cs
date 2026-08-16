@@ -2,6 +2,7 @@ using System.Net;
 using AwesomeAssertions;
 using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
+using MealPlanner.Domain.Menus;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;

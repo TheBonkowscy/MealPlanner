@@ -1,4 +1,5 @@
 using MealPlanner.Domain;
+using MealPlanner.Domain.Menus;
 using MealPlanner.Persistence;
 using MealPlanner.Shared.Menus.Responses;
 using MealPlanner.Shared.Recipes.Responses;

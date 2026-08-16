@@ -1,4 +1,6 @@
 using AwesomeAssertions;
+using MealPlanner.Domain.Menus;
+using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests;
@@ -14,8 +16,11 @@ public class MenuTests
     [MemberData(nameof(InvalidDatesSource))]
     public void Create_ThrowsForInvalidDate(DateOnly invalidDate)
     {
+        // Arrange
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1), AddMealAction.Create(SharedSecondRecipe, 2, 1)];
+            
         // Act
-        Action<DateOnly> createNewMenu = date => Menu.Create(date, [SharedFirstRecipe, SharedSecondRecipe]);
+        Action<DateOnly> createNewMenu = date => Menu.Create(date, mealsToAdd);
         
         // Assert
         createNewMenu.Invoking(x => x.Invoke(invalidDate))
@@ -27,117 +32,79 @@ public class MenuTests
     [MemberData(nameof(ValidDatesSource))]
     public void Create_CreatesSuccessfully(DateOnly validDate)
     {
+        // Arrange
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1), AddMealAction.Create(SharedSecondRecipe, 2, 1)];
+        
         // Act
-        var result = Menu.Create(validDate, [SharedFirstRecipe, SharedSecondRecipe]);
+        var result = Menu.Create(validDate, mealsToAdd);
         
         // Assert
         result.Date.Should().Be(validDate);
     }
 
     [Fact]
-    public void AddMeal_WithoutOrder_SuccessfullyAddsMeal()
+    public void AddMeal_SuccessfullyAddsMeal_KeepsOrder()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1)];
+        var menu = Menu.Create(SharedDate, mealsToAdd);
         
         // Act
-        menu.AddMeal(SharedSecondRecipe);
+        menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, 2, 1));
         
         // Assert
         menu.Meals.Should().HaveCount(2);
-        menu.GetRecipe(0).Should().Be(SharedFirstRecipe);
-        menu.GetRecipe(1).Should().Be(SharedSecondRecipe);
+        menu.GetRecipe(1).Should().Be(SharedFirstRecipe);
+        menu.GetRecipe(2).Should().Be(SharedSecondRecipe);
     }
 
     [Fact]
-    public void AddMeal_WithoutOrder_KeepsOrder()
+    public void AddMeal_Throws_WhenOrderAlreadyTaken()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
+        const int order = 1;
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, order, 1), ];
+        var menu = Menu.Create(SharedDate, mealsToAdd);
         
         // Act
-        menu.AddMeal(SharedSecondRecipe);
+        var addMeal = () => menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, order, 1));
         
         // Assert
-        menu.Meals.Should().HaveCount(2);
-        menu.GetRecipe(0).Should().Be(SharedFirstRecipe);
-        menu.GetRecipe(1).Should().Be(SharedSecondRecipe);
+        addMeal.Should().Throw<InvalidOperationException>()
+            .WithMessage($"There is already a meal added as #{order + 1} in the day");
     }
 
     [Fact]
     public void AddMeal_WithMealAlreadyAdded_ThrowsException()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
+        var firstMeal = AddMealAction.Create(SharedFirstRecipe, 1, 1);
+        List<AddMealAction> mealsToAdd = [firstMeal, AddMealAction.Create(SharedSecondRecipe, 2, 1)];
+        var menu = Menu.Create(SharedDate, mealsToAdd);
+        var thirdMeal = AddMealAction.Create(SharedFirstRecipe, 3, 1);
         
         // Act
-        Action<Recipe> addMealToMenu = menu.AddMeal;
+        var addMealToMenu = menu.AddMeal;
         
         // Assert
-        addMealToMenu.Invoking(x => x.Invoke(SharedFirstRecipe))
+        addMealToMenu.Invoking(x => x.Invoke(thirdMeal))
             .Should().Throw<InvalidOperationException>()
-            .WithMessage($"Meal '{SharedFirstRecipe}' is already present in the menu for {menu.Date}.");
+            .WithMessage($"Meal '{SharedFirstRecipe.Name}' is already present in the menu for {menu.Date}.");
     }
 
     [Fact]
-    public void AddMeal_WithOrder_SuccessfullyAddsMeal()
+    public void AddMeal_Throws_WhenOrderIsOutOfBounds()
     {
         // Arrange
-        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
-        const int order = 1;
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1), ];
+        var menu = Menu.Create(SharedDate, mealsToAdd);
         
         // Act
-        menu.AddMeal(order, SharedSecondRecipe);
+        var addMeal = () => menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, 999, 1));
         
         // Assert
-        menu.Meals.Should().HaveCount(2);
-        menu.GetRecipe(order)!.Name.Should().Be(SharedSecondRecipe.Name);
-    }
-
-    [Fact]
-    public void AddMeal_WithOrder_WhenOrderAlreadyTaken_ThrowsException()
-    {
-        // Arrange
-        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
-        const int mealOrder = 0;
-        
-        // Act
-        Action<int, Recipe> addMealToMenu = menu.AddMeal;
-        
-        // Assert
-        addMealToMenu.Invoking(x => x.Invoke(mealOrder, SharedSecondRecipe))
-            .Should().Throw<InvalidOperationException>()
-            .WithMessage($"There is already a meal added as #{mealOrder + 1} in the day");
-    }
-
-    [Fact]
-    public void AddMeal_WithOrder_WithMealAlreadyAdded_ThrowsException()
-    {
-        // Arrange
-        var menu = Menu.Create(SharedDate, [SharedFirstRecipe]);
-        
-        // Act
-        Action<int, Recipe> addMealToMenu = menu.AddMeal;
-        
-        // Assert
-        addMealToMenu.Invoking(x => x.Invoke(1, SharedFirstRecipe))
-            .Should().Throw<InvalidOperationException>()
-            .WithMessage($"Meal '{SharedFirstRecipe}' is already present in the menu for {menu.Date}.");
-    }
-
-    [Fact]
-    public void AddMeal_WithOrder_ThrowsExceptionForNegativeOrder()
-    {
-        // Arrange
-        var menu = Menu.Create(SharedDate, [SharedSecondRecipe]);
-        
-        // Act
-        Action<int, Recipe> addMealToMenu = menu.AddMeal;
-        
-        // Assert
-        addMealToMenu.Invoking(x => x.Invoke(-1, SharedFirstRecipe))
-            .Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessage("Order must be a positive number.");
+        addMeal.Should().Throw<ArgumentOutOfRangeException>()
+            .WithMessage("Order must not exceed the number of already added meals.");
     }
 
     public static TheoryData<DateOnly> InvalidDatesSource

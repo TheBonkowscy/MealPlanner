@@ -1,8 +1,11 @@
-namespace MealPlanner.Domain;
+using MealPlanner.Domain.Menus.Actions;
+
+namespace MealPlanner.Domain.Menus;
 
 public class Menu
 {
     public static readonly DateOnly MinDateInThePast = new(2019, 9, 28);
+    public static readonly int MinOrder = 1;
 
     private List<Meal> _meals = [];
 
@@ -29,21 +32,19 @@ public class Menu
         Meals = meals;
     }
     
-    public void AddMeal(Recipe recipe) => TryAddMeal(_meals.Count, recipe);
+    public void AddMeal(AddMealAction action) => TryAddMeal(action.Order, action.Recipe, action.Servings);
 
-    public void AddMeal(int order, Recipe recipe) => TryAddMeal(order, recipe);
-
-    private void TryAddMeal(int order, Recipe recipe)
+    private void TryAddMeal(int order, Recipe recipe, int servings)
     {
         ValidateOrderAndThrow(order);
         ValidateRecipeAndThrow(recipe);
-        var item = Meal.Create(this, recipe, order);
+        var item = Meal.Create(this, recipe, order, servings);
         _meals.Add(item);
     }
 
     private void ValidateOrderAndThrow(int order)
     {
-        if (order > _meals.Count)
+        if (order > _meals.Count +1 && _meals.Count != 0)
         {
             throw new ArgumentOutOfRangeException(null, "Order must not exceed the number of already added meals.");
         }
@@ -61,17 +62,17 @@ public class Menu
     {
         if (HasRecipe(recipe))
         {
-            throw new InvalidOperationException($"Meal '{recipe}' is already present in the menu for {Date}.");
+            throw new InvalidOperationException($"Meal '{recipe.Name}' is already present in the menu for {Date}.");
         }
     }
 
     private bool HasRecipe(Recipe recipe) => _meals.Any(x => x.Recipe.Equals(recipe));
     
-    public static Menu Create(DateOnly date, List<Recipe> recipes)
+    public static Menu Create(DateOnly date, List<AddMealAction> mealsToAdd)
     {
         ValidateDateAndThrow(date);
         var menu = new Menu(date);
-        recipes.ForEach(menu.AddMeal);
+        mealsToAdd.ForEach(menu.AddMeal);
         return menu;
     }
 
@@ -90,10 +91,5 @@ public class Menu
     public void RemoveAllItems()
     {
         _meals.Clear();
-    }
-
-    public void AddRecipes(List<Recipe> recipes)
-    {
-        recipes.ForEach(AddMeal);
     }
 }
