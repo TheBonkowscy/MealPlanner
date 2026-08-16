@@ -11,7 +11,8 @@ public class MealMapper
         {
             Id = x.Id,
             Name = x.Name,
-            Order = x.Order
+            Order = x.Order,
+            Servings = x.Servings
         }).OrderBy(x => x.Order).ToList();
         return meals;
     }

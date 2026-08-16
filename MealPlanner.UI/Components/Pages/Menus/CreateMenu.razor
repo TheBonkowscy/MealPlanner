@@ -1,6 +1,7 @@
 ﻿@page "/menus/create/{Date:datetime}"
 @using MealPlanner.Client.Menus
 @using MealPlanner.Client.Recipes
+@using MealPlanner.Domain
 @using MealPlanner.Shared.Menus.Requests
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
@@ -53,7 +54,7 @@
 
     <MudPaper Class="pa-4 mt-4 mud-theme-light" Elevation="1">
         <MudText Typo="Typo.subtitle2" Class="mb-2">Dodaj nowy posiłek do menu:</MudText>
-        <MudAutocomplete T="string"
+        <MudAutocomplete T="RecipeByIdDto"
                          Label="Szukaj potrawy..."
                          Value="_selectedMeal"
                          ValueChanged="OnMealSelected"
@@ -79,7 +80,7 @@
 
     private MudDropContainer<MealDto>? _container;
     private readonly List<MealDto> _meals = [];
-    private string? _selectedMeal;
+    private RecipeByIdDto? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
 
     protected override async Task OnParametersSetAsync()
@@ -114,23 +115,22 @@
         _container?.Refresh();
     }
 
-    private async Task<IEnumerable<string>> SearchRecipesAsync(string value, CancellationToken token)
+    private async Task<IEnumerable<RecipeByIdDto>> SearchRecipesAsync(string value, CancellationToken token)
     {
-        if (string.IsNullOrWhiteSpace(value)) return Array.Empty<string>();
+        if (string.IsNullOrWhiteSpace(value)) return [];
         return await FetchRecipesFromApiAsync(value, token);
     }
 
-    private void OnMealSelected(string selectedMeal)
+    private void OnMealSelected(RecipeByIdDto selectedMeal)
     {
-        if (string.IsNullOrWhiteSpace(selectedMeal)) return;
-
         _meals.Add(new MealDto
         {
-            Name = selectedMeal,
+            Id = selectedMeal.Id, 
+            Name = selectedMeal.Name,
             Order = _meals.Count
         });
 
-        _selectedMeal = string.Empty;
+        _selectedMeal = null;
         _container?.Refresh();
     }
 
@@ -152,7 +152,7 @@
             return;
         }
 
-        var meals = _meals.Select(x => new AddMealRequest(x.Id, x.Order, x.Servings)).ToList();
+        var meals = _meals.Select(x => new AddMealRequest(x.Id, x.Order + 1, x.Servings)).ToList();
 
         var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), meals);
         var response = await CreateMenus.CreateMenu(request, _cts.Token);
@@ -164,11 +164,16 @@
 
     #region API Calls
 
-    private async Task<IEnumerable<string>> FetchRecipesFromApiAsync(string? query, CancellationToken token)
+    private record RecipeByIdDto(int Id, string Name)
+    {
+        public override string ToString() => Name;
+    }
+    
+    private async Task<IEnumerable<RecipeByIdDto>> FetchRecipesFromApiAsync(string? query, CancellationToken token)
     {
         var results = await FindRecipes.Get(query, token);
 
-        return results.Recipes.Select(x => x.Name);
+        return results.Recipes.Select(x => new RecipeByIdDto(x.Id, x.Name));
     }
     #endregion
 
@@ -176,5 +181,6 @@
     {
         _cts.Cancel();
         _cts.Dispose();
+        AppBarService.ClearActions();
     }
 }
