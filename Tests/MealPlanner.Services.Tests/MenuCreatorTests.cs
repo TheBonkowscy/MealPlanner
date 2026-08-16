@@ -3,7 +3,6 @@ using MealPlanner.Domain;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
-using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
@@ -15,10 +14,7 @@ namespace MealPlanner.Services.Tests;
 public class MenuCreatorTests
 {
     private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Fish and chips");
-    private static readonly Dictionary<int, string> Meals = new()
-    {
-        { 1, PreExistingRecipe.Name }
-    };
+    private static readonly List<AddMealRequest> Meals = [new AddMealRequest(PreExistingRecipe.Id, 1, 1)];
 
     private readonly MenuCreator _sut;
 
@@ -46,8 +42,8 @@ public class MenuCreatorTests
         ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
         
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
-        IMapRecipe recipeMapper = new RecipeMapper(ctx.Object);
-        _sut = new MenuCreator(ctx.Object, recipeMapper);
+        IMapMeals mealsMapper = new MealsMapper(ctx.Object);
+        _sut = new MenuCreator(ctx.Object, mealsMapper);
     }
     
     [Fact]
@@ -67,7 +63,7 @@ public class MenuCreatorTests
     public async Task Create_ThrowsWhenMealsAreEmpty()
     {
         // Arrange
-        var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), new Dictionary<int, string>());
+        var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), []);
         
         // Act
         var result = () => _sut.Create(request, CancellationToken.None);
@@ -82,18 +78,14 @@ public class MenuCreatorTests
     public async Task Create_ThrowsWhenMealDoesNotExist()
     {
         // Arrange
-        var newRecipe = TestRecipes.Create("Quesadilla");
-        var updatedMeals = new Dictionary<int, string>(Meals) { { 2, newRecipe.Name } };
-        var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), updatedMeals);
+        var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), [new AddMealRequest(999, 2, 1)]);
+        
         // Act
         var result = () => _sut.Create(request, CancellationToken.None);
         
         // Assert
         await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"Recipe for {newRecipe.Name} does not exist");
-        
-        // Cleanup
-        _recipes.Remove(newRecipe);
+            .WithMessage("One or more recipes was not found");
     }
 
     [Fact]
@@ -103,7 +95,8 @@ public class MenuCreatorTests
         var tomorrow =  DateOnly.FromDateTime(DateTime.Today.AddDays(1));
         var request = new CreateMenuRequest(tomorrow, Meals);
         await _sut.Create(request, CancellationToken.None);
-        var mealsForConflictingRequest = new Dictionary<int, string>() { { 0, "Pierogi" } };
+        var recipeForConflictingRequest = TestRecipes.Create("Pierogi");
+        List<AddMealRequest> mealsForConflictingRequest = [new(recipeForConflictingRequest.Id, 2, 1)];
         var conflictingRequest = new CreateMenuRequest(tomorrow, mealsForConflictingRequest);
 
         // Act

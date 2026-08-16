@@ -52,7 +52,7 @@ public class Menu
         var mealAtIndex = GetRecipe(order);
         if (mealAtIndex is not null)
         {
-            throw new InvalidOperationException($"There is already a meal added as #{order + 1} in the day");
+            throw new InvalidOperationException($"There is already a meal added as #{order} in the day");
         }
     }
     

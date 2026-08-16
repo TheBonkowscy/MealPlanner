@@ -71,7 +71,7 @@ public class MenuTests
         
         // Assert
         addMeal.Should().Throw<InvalidOperationException>()
-            .WithMessage($"There is already a meal added as #{order + 1} in the day");
+            .WithMessage($"There is already a meal added as #{order} in the day");
     }
 
     [Fact]

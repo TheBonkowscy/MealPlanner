@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Domain.Menus;
+using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
 using MealPlanner.Tests.Shared;
@@ -140,7 +141,7 @@ public class MenuReaderTests
     {
         // Arrange
         var menuWithMeals = CreateAndSaveMenu(Today);
-        menuWithMeals.AddMeal(TestRecipes.Create("Pizza"));
+        menuWithMeals.AddMeal(AddMealAction.Create(TestRecipes.Create("Pizza"), 2, 1));
         
         var menuWithoutMeals = CreateAndSaveMenu(Today.AddDays(1));
         
