@@ -11,7 +11,7 @@ public class MenuDeleterTests
 {
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
 
-    private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Test Meal");
+    private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Test Recipe");
     private static readonly Menu PreExistingMenu = Menu.Create(Today, [PreExistingRecipe]);
     private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly MenuDeleter _sut;

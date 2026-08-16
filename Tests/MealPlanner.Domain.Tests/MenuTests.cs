@@ -45,8 +45,8 @@ public class MenuTests
         
         // Assert
         menu.Meals.Should().HaveCount(2);
-        menu.GetMeal(0).Should().Be(SharedFirstRecipe);
-        menu.GetMeal(1).Should().Be(SharedSecondRecipe);
+        menu.GetRecipe(0).Should().Be(SharedFirstRecipe);
+        menu.GetRecipe(1).Should().Be(SharedSecondRecipe);
     }
 
     [Fact]
@@ -60,8 +60,8 @@ public class MenuTests
         
         // Assert
         menu.Meals.Should().HaveCount(2);
-        menu.GetMeal(0).Should().Be(SharedFirstRecipe);
-        menu.GetMeal(1).Should().Be(SharedSecondRecipe);
+        menu.GetRecipe(0).Should().Be(SharedFirstRecipe);
+        menu.GetRecipe(1).Should().Be(SharedSecondRecipe);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class MenuTests
         
         // Assert
         menu.Meals.Should().HaveCount(2);
-        menu.GetMeal(order)!.Name.Should().Be(SharedSecondRecipe.Name);
+        menu.GetRecipe(order)!.Name.Should().Be(SharedSecondRecipe.Name);
     }
 
     [Fact]

@@ -48,14 +48,14 @@ public class Menu
             throw new ArgumentOutOfRangeException(null, "Order must not exceed the number of already added meals.");
         }
 
-        var mealAtIndex = GetMeal(order);
+        var mealAtIndex = GetRecipe(order);
         if (mealAtIndex is not null)
         {
             throw new InvalidOperationException($"There is already a meal added as #{order + 1} in the day");
         }
     }
     
-    public Recipe? GetMeal(int order) => _meals.FirstOrDefault(x => x.Order == order)?.Recipe;
+    public Recipe? GetRecipe(int order) => _meals.FirstOrDefault(x => x.Order == order)?.Recipe;
 
     private void ValidateRecipeAndThrow(Recipe recipe)
     {

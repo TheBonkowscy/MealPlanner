@@ -51,10 +51,27 @@ public class MenuUpdaterTests
     }
 
     [Fact]
-    public async Task Update_WhenMenuDoesNotExist_ShouldThrowInvalidOperationException()
+    public async Task Update_WhenNoMealsInRequest_ShouldThrowInvalidOperationException()
     {
         // Arrange
         var request = new UpdateMenuRequest(new DateOnly(2026, 8, 6),new Dictionary<int, string>());
+
+        // Act
+        var result = async () => await _sut.Update(request, CancellationToken.None);
+
+        // Assert
+        await result.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("No meals were provided.");
+
+        _ctx.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Update_WhenMenuDoesNotExist_ShouldThrowInvalidOperationException()
+    {
+        // Arrange
+        var mealDtos = new Dictionary<int, string> { { 0, PreExistingRecipe.Name } };
+        var request = new UpdateMenuRequest(new DateOnly(2026, 8, 6), mealDtos);
 
         // Act
         var result = async () => await _sut.Update(request, CancellationToken.None);

@@ -61,11 +61,11 @@ public class Recipe
         return recipe;
     }
 
-    private static void ValidateNameAndThrow(string meal)
+    private static void ValidateNameAndThrow(string name)
     {
-        if (string.IsNullOrWhiteSpace(meal))
+        if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentNullException(null, "Please specify a name of the meal");
+            throw new ArgumentNullException(null, "Please specify a name of the recipe");
         }
     }
 

@@ -26,7 +26,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Post_ReturnsId()
     {
         // Arrange
-        await AddMealToDatabase(PreExistingRecipe);
+        await AddRecipeToDatabase(PreExistingRecipe);
         var request = new CreateMenuRequest(Tomorrow, Meals);
         
         // Act
@@ -185,17 +185,17 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Put_UpdatesExistingMenu_WhenMenuExists()
     {
         // Arrange
-        var initialMeal = TestRecipes.Create("Obiad");
-        var updatedMeal = TestRecipes.Create("Kolacja");
-        await AddMealToDatabase(initialMeal);
-        await AddMealToDatabase(updatedMeal);
+        var initialRecipe = TestRecipes.Create("Obiad");
+        var updatedRecipe = TestRecipes.Create("Kolacja");
+        await AddRecipeToDatabase(initialRecipe);
+        await AddRecipeToDatabase(updatedRecipe);
 
-        var existingMenu = Menu.Create(SpecificDate, [initialMeal]);
+        var existingMenu = Menu.Create(SpecificDate, [initialRecipe]);
         await AddMenuToDatabase(existingMenu);
 
         var updatedMealsDict = new Dictionary<int, string>
         {
-            { 0, updatedMeal.Name }
+            { 0, updatedRecipe.Name }
         };
         var request = new UpdateMenuRequest(SpecificDate, updatedMealsDict);
 
@@ -211,7 +211,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         getResult.Should().NotBeNull();
         getResult.Meals.Should().HaveCount(1);
         var firstMeal = getResult.Meals.First();
-        firstMeal.Name.Should().Be(updatedMeal.Name);
+        firstMeal.Name.Should().Be(updatedRecipe.Name);
     }
 
     [Fact]
@@ -274,16 +274,4 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     private static string BuildEditRoute(DateOnly date) => $"{Constants.MenusRoute}/{date.ToString("O")}";
     
     private static string BuildGetForTodayRoute() => $"{Constants.MenusRoute}/today";
-
-    private async Task AddMenuToDatabase(Menu menu)
-    {
-        await DatabaseContext.Menus.AddAsync(menu);
-        await DatabaseContext.SaveChangesAsync();
-    }
-    
-    private async Task AddMealToDatabase(Recipe recipe)
-    {
-        await DatabaseContext.Recipes.AddAsync(recipe);
-        await DatabaseContext.SaveChangesAsync();
-    }
 }

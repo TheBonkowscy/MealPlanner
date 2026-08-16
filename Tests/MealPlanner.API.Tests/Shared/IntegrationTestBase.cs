@@ -1,3 +1,5 @@
+using MealPlanner.Domain;
+using MealPlanner.Domain.Ingredients;
 using MealPlanner.Persistence;
 using MealPlanner.Services;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -45,6 +47,25 @@ public abstract class IntegrationTestBase : IDisposable, IAsyncDisposable
         DatabaseContext.RecipeSteps.ExecuteDelete();
         DatabaseContext.Recipes.ExecuteDelete();
         DatabaseContext.Ingredients.ExecuteDelete();
+    }
+    
+
+    protected async Task AddMenuToDatabase(Menu menu)
+    {
+        await DatabaseContext.Menus.AddAsync(menu);
+        await DatabaseContext.SaveChangesAsync();
+    }
+    
+    protected async Task AddRecipeToDatabase(Recipe recipe)
+    {
+        await DatabaseContext.Recipes.AddAsync(recipe);
+        await DatabaseContext.SaveChangesAsync();
+    }
+
+    protected async Task AddIngredientToDatabase(Ingredient ingredient)
+    {
+        await DatabaseContext.Ingredients.AddAsync(ingredient);
+        await DatabaseContext.SaveChangesAsync();
     }
     
     public void Dispose()

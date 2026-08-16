@@ -16,6 +16,11 @@ public class MenuUpdater(MealPlannerDbContext ctx,
 {
     public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
     {
+        if (request.Meals is { Count: 0 })
+        {
+            throw new InvalidOperationException("No meals were provided.");
+        }
+        
         var menu = await ctx.Menus
             .Include(x => x.Meals)
             .ThenInclude(x => x.Recipe)
@@ -29,11 +34,6 @@ public class MenuUpdater(MealPlannerDbContext ctx,
         menu.RemoveAllItems();
         
         // 2. Add new meals
-        if (request.Meals is { Count: 0 })
-        {
-            throw new InvalidOperationException("No meals were provided.");
-        }
-        
         var mappedMeals = await recipeMapper.MapRecipes(request.Meals, cancellationToken);
         menu.AddRecipes(mappedMeals);
         
