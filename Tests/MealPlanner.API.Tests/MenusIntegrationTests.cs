@@ -19,7 +19,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly SpecificDate = new(2026, 03, 26);
     private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Breakfast");
-    private static readonly List<AddMealAction> MealsToAdd = [TestActions.AddMeal(TestRecipes.Create(), 1, 1)];
+    private static readonly List<AddMealAction> MealsToAdd = [TestActions.AddMeal(PreExistingRecipe, 1, 1)];
     
     [Fact]
     public async Task Post_ReturnsId()
