@@ -1,0 +1,104 @@
+﻿using AwesomeAssertions;
+using MealPlanner.Domain;
+using MealPlanner.Domain.Ingredients;
+using MealPlanner.Persistence;
+using MealPlanner.Services.Recipes;
+using MealPlanner.Services.Recipes.Ingredients;
+using MealPlanner.Shared.Recipes.Requests;
+using MealPlanner.Tests.Shared.Factories;
+using Microsoft.Extensions.Localization;
+using Moq;
+using Moq.EntityFrameworkCore;
+
+namespace MealPlanner.Services.Tests.Recipes;
+
+public class RecipeIngredientUpdaterTests
+{
+    private readonly RecipeIngredientUpdater _sut;
+
+    private readonly List<Recipe> _recipes = [];
+
+    public RecipeIngredientUpdaterTests()
+    {
+        var localizer = new Mock<IStringLocalizer<Translations>>();
+        var ctx = new Mock<MealPlannerDbContext>();
+        ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
+        var measureUnitMapper = new MeasureUnitMapper(localizer.Object);
+        _sut = new RecipeIngredientUpdater(ctx.Object, measureUnitMapper, new RecipeMapper(measureUnitMapper));
+    }
+
+    [Fact]
+    public async Task UpdateIngredient_Throws_WhenRecipeWasNotFound()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        var usedIngredient = recipe.Ingredients[0];
+        var request = new AddIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
+        
+        // Act
+        var updateIngredient = () => _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
+        
+        // Assert
+        await updateIngredient.Invoking(x => x.Invoke())
+            .Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage("Recipe could not be found");
+    }
+
+    [Fact]
+    public async Task UpdateIngredient_Throws_WhenIngredientWasNotFound()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        _recipes.Add(recipe);
+        var usedIngredient = recipe.Ingredients[0];
+        var request = new AddIngredientRequest(999,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
+        
+        // Act
+        var updateIngredient = () => _sut.UpdateIngredient(recipe.Id, request.Id, request, CancellationToken.None);
+        
+        // Assert
+        await updateIngredient.Invoking(x => x.Invoke())
+            .Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage("Specified ingredient could not be found");
+    }
+
+    [Fact]
+    public async Task UpdateIngredient_Throws_WhenMeasureUnitDoesNotMatch()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        _recipes.Add(recipe);
+        var usedIngredient = recipe.Ingredients[0];
+        var request = new AddIngredientRequest(999,  usedIngredient.Quantity + 10, nameof(MeasureUnit.Slice2)); 
+        
+        // Act
+        var updateIngredient = () => _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
+        
+        // Assert
+        await updateIngredient.Invoking(x => x.Invoke())
+            .Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage("Specified ingredient could not be found");
+    }
+
+    [Fact]
+    public async Task UpdateIngredient_Succeeds()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        _recipes.Add(recipe);
+        var usedIngredient = recipe.Ingredients[0];
+        var request = new AddIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
+        
+        // Act
+        var result = await _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
+        
+        // Assert
+        result.Name.Should().Be(recipe.Name);
+        result.Servings.Should().Be(recipe.Servings);
+        var responseIngredient = result.Ingredients.First(x => x.Id == usedIngredient.IngredientId);
+        responseIngredient.Quantity.Should().Be(usedIngredient.Quantity);
+    }
+}

@@ -5,7 +5,7 @@ using MealPlanner.Tests.Shared.Factories;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace MealPlanner.Services.Tests;
+namespace MealPlanner.Services.Tests.Recipes;
 
 public class RecipeDeleterTests
 {

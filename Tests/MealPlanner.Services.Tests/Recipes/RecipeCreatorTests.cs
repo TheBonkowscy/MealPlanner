@@ -10,7 +10,7 @@ using Microsoft.Extensions.Localization;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace MealPlanner.Services.Tests;
+namespace MealPlanner.Services.Tests.Recipes;
 
 public class RecipeCreatorTests
 {
