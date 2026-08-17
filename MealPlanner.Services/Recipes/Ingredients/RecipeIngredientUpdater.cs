@@ -1,4 +1,5 @@
-﻿using MealPlanner.Persistence;
+﻿using MealPlanner.Domain.Ingredients.Actions;
+using MealPlanner.Persistence;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -18,21 +19,31 @@ public class RecipeIngredientUpdater(MealPlannerDbContext ctx,
         CancellationToken cancellationToken)
     {
         var recipe = await ctx.Recipes.Include(x => x.Ingredients)
-            .ThenInclude(x => x.IngredientId)
+            .ThenInclude(x => x.Ingredient)
             .FirstOrDefaultAsync(x => x.Id == recipeId, cancellationToken: cancellationToken);
 
         if (recipe is null)
         {
             throw new InvalidOperationException($"Recipe could not be found");   // TODO: custom exceptions?
         }
-        
-        var ingredient = recipe.GetIngredient(ingredientId, measureUnitMapper.Map(request.Unit));
-        if (ingredient is null)
+
+        var measureUnit = measureUnitMapper.Map(request.Unit);
+        var usedIngredient = recipe.GetIngredient(ingredientId, measureUnit);
+        if (usedIngredient is not null)
         {
-            throw new InvalidOperationException($"Specified ingredient could not be found");   // TODO: custom exceptions?
+            usedIngredient.UpdateQuantity(request.Quantity);
+        }
+        else
+        {
+            var ingredient = await ctx.Ingredients.FirstOrDefaultAsync(x => x.Id == ingredientId, cancellationToken);
+            if (ingredient is null)
+            {
+                throw new InvalidOperationException("Ingredient could not be found");
+            }
+            var addIngredient = AddIngredientAction.Create(ingredient, request.Quantity, measureUnit);
+            recipe.AddIngredient(addIngredient);
         }
         
-        ingredient.UpdateQuantity(request.Quantity);
         await ctx.SaveChangesAsync(cancellationToken);
 
         return recipeMapper.ToDetails(recipe);

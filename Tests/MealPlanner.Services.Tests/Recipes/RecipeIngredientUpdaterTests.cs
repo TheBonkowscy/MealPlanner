@@ -17,12 +17,15 @@ public class RecipeIngredientUpdaterTests
     private readonly RecipeIngredientUpdater _sut;
 
     private readonly List<Recipe> _recipes = [];
+    private readonly List<Ingredient> _ingredients = [];
 
     public RecipeIngredientUpdaterTests()
     {
         var localizer = new Mock<IStringLocalizer<Translations>>();
+        
         var ctx = new Mock<MealPlannerDbContext>();
         ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
+        ctx.Setup(x => x.Ingredients).ReturnsDbSet(_ingredients);
         var measureUnitMapper = new MeasureUnitMapper(localizer.Object);
         _sut = new RecipeIngredientUpdater(ctx.Object, measureUnitMapper, new RecipeMapper(measureUnitMapper));
     }
@@ -46,22 +49,39 @@ public class RecipeIngredientUpdaterTests
     }
 
     [Fact]
-    public async Task UpdateIngredient_Throws_WhenIngredientWasNotFound()
+    public async Task UpdateIngredient_AddsIngredient_WhenIngredientWasNotFound()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        _recipes.Add(recipe);
+        var newIngredient = TestIngredients.Create();
+        
+        var request = new AddIngredientRequest(newIngredient.Id,  10, newIngredient.ApplicableUnits.First().ToString()); 
+        
+        // Act
+        var result = await _sut.UpdateIngredient(recipe.Id, request.Id, request, CancellationToken.None);
+        
+        // Assert
+        var newIngredientResponse = result.Ingredients.First(x => x.Id == newIngredient.Id);
+        newIngredientResponse.MeasureUnit.UnderlyingValue.Should().Be(request.Unit);
+        newIngredientResponse.Quantity.Should().Be(request.Quantity);
+    }
+
+    [Fact]
+    public async Task UpdateIngredient_UpdatesIngredient_WhenIngredientWasFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();
         _recipes.Add(recipe);
         var usedIngredient = recipe.Ingredients[0];
-        var request = new AddIngredientRequest(999,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
+        var request = new AddIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
         
         // Act
-        var updateIngredient = () => _sut.UpdateIngredient(recipe.Id, request.Id, request, CancellationToken.None);
+        var result = await _sut.UpdateIngredient(recipe.Id, request.Id, request, CancellationToken.None);
         
         // Assert
-        await updateIngredient.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Specified ingredient could not be found");
+        var usedIngredientResponse = result.Ingredients.First(x => x.Id == usedIngredient.IngredientId);
+        usedIngredientResponse.Quantity.Should().Be(request.Quantity);
     }
 
     [Fact]
@@ -80,7 +100,7 @@ public class RecipeIngredientUpdaterTests
         await updateIngredient.Invoking(x => x.Invoke())
             .Should()
             .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Specified ingredient could not be found");
+            .WithMessage("Ingredient could not be found");
     }
 
     [Fact]

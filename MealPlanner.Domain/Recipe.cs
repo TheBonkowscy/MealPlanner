@@ -53,12 +53,16 @@ public class Recipe
         ValidateRecipeStepsAndThrow(recipeSteps);
         
         var recipe = new Recipe(name, servings);
-        var mappedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(recipe, ingredient)).ToList();
-        mappedIngredients.ForEach(recipe._ingredients.Add);
-        
+        recipe.AddIngredients(ingredientsToAdd);
         recipe._steps = recipeSteps;
         
         return recipe;
+    }
+
+    private void AddIngredients(List<AddIngredientAction> ingredientsToAdd)
+    {
+        var mappedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(this, ingredient)).ToList();
+        mappedIngredients.ForEach(_ingredients.Add);
     }
 
     private static void ValidateNameAndThrow(string name)
@@ -135,4 +139,6 @@ public class Recipe
         Ingredients.FirstOrDefault(x => x.IngredientId == ingredientId && x.Unit == requestUnit);
 
     public void RemoveIngredient(UsedIngredient ingredient) => _ingredients.Remove(ingredient);
+
+    public void AddIngredient(AddIngredientAction addIngredient) => AddIngredients([addIngredient]);
 }

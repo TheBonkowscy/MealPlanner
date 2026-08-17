@@ -60,7 +60,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         result.EnsureSuccessStatusCode();
         var response = await result.Content.ReadFromJsonAsync<GetRecipesResponse>();
         response.Should().NotBeNull();
-        response!.Recipes.Should().BeEmpty();
+        response.Recipes.Should().BeEmpty();
     }
 
     [Fact]
@@ -156,8 +156,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        var detailsResult = await Client.GetAsync($"{Constants.RecipesRoute}/{recipe.Id}");
-        var details = await detailsResult.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
+        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
         var returnedIngredient = details?.Ingredients.First(x => x.Id == ingredient.Id);
         returnedIngredient.Should().NotBeNull();
         returnedIngredient.Name.Should().Be(ingredient.Name);
@@ -195,10 +194,15 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var recipe = TestRecipes.Create();
         await AddRecipeToDatabase(recipe);
         var ingredient = recipe.Ingredients[0];
-        var request = new AddIngredientRequest(ingredient.IngredientId, ingredient.Quantity + 10, ingredient.Unit.ToString());
+        var requestBody = new DeleteRecipeIngredientRequest(ingredient.Unit.ToString());
+        var request = new HttpRequestMessage(HttpMethod.Delete,
+            $"{Constants.RecipesRoute}/{recipe.Id}/ingredients/{ingredient.IngredientId}")
+        {
+            Content = JsonContent.Create(requestBody)
+        };
         
         // Act
-        var result = await Client.DeleteAsync($"{Constants.RecipesRoute}/{recipe.Id}/ingredients/{ingredient.IngredientId}");
+        var result = await Client.SendAsync(request);
         
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);

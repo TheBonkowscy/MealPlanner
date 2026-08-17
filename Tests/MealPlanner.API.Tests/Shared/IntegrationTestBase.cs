@@ -68,6 +68,12 @@ public abstract class IntegrationTestBase : IDisposable, IAsyncDisposable
         await DatabaseContext.Ingredients.AddAsync(ingredient);
         await DatabaseContext.SaveChangesAsync();
     }
+
+    protected async Task AddUsedIngredientToDatabase(UsedIngredient ingredient)
+    {
+        await DatabaseContext.UsedIngredients.AddAsync(ingredient);
+        await DatabaseContext.SaveChangesAsync();
+    }
     
     public void Dispose()
     {

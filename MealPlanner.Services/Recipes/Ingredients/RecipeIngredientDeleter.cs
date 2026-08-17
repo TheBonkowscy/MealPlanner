@@ -20,12 +20,12 @@ public class RecipeIngredientDeleter(MealPlannerDbContext ctx,
         CancellationToken cancellationToken)
     {
         var recipe = await ctx.Recipes.Include(x => x.Ingredients)
-            .ThenInclude(x => x.IngredientId)
+            .ThenInclude(x => x.Ingredient)
             .FirstOrDefaultAsync(x => x.Id == recipeId, cancellationToken: cancellationToken);
 
         if (recipe is null)
         {
-            throw new InvalidOperationException($"Recipe could not be found");   // TODO: custom exceptions?
+            throw new InvalidOperationException("Recipe could not be found");   // TODO: custom exceptions?
         }
         
         var ingredient = recipe.GetIngredient(ingredientId, measureUnitMapper.Map(measureUnit));

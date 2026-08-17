@@ -13,6 +13,7 @@ public class MealPlannerDbContext : DbContext
     public virtual DbSet<RecipeStep> RecipeSteps { get; set; }
     public virtual DbSet<Meal> Meals { get; set; }
     public virtual DbSet<Ingredient> Ingredients { get; set; }
+    public virtual DbSet<UsedIngredient> UsedIngredients { get; set; }
 
     public MealPlannerDbContext(DbContextOptions<MealPlannerDbContext> options) : base(options)
     {
