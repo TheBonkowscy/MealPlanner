@@ -130,4 +130,9 @@ public class Recipe
         ValidateRecipeStepsAndThrow(steps);
         Steps = steps;
     }
+
+    public UsedIngredient? GetIngredient(int ingredientId, MeasureUnit requestUnit) =>
+        Ingredients.FirstOrDefault(x => x.IngredientId == ingredientId && x.Unit == requestUnit);
+
+    public void RemoveIngredient(UsedIngredient ingredient) => _ingredients.Remove(ingredient);
 }
