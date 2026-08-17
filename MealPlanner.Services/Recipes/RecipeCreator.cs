@@ -34,6 +34,8 @@ public class RecipeCreator(MealPlannerDbContext ctx,
         
         return new CreateRecipeResponse(newRecipe.Id);
     }
+    
+    // TODO: przeklikać, zaktualizować Edit menu
 
     private async Task<List<AddIngredientAction>> MapIngredients(CreateRecipeRequest request, CancellationToken cancellationToken)
     {
