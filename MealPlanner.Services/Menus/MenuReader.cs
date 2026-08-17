@@ -1,4 +1,5 @@
 using MealPlanner.Domain;
+using MealPlanner.Domain.Menus;
 using MealPlanner.Persistence;
 using MealPlanner.Shared.Menus.Responses;
 using MealPlanner.Shared.Recipes.Responses;
@@ -26,7 +27,7 @@ public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
 
     private static GetMenuResponse MapMenu(Menu menu)
     {
-        var mappedMeals = menu.Meals.Select(x => new OrderedRecipeListItemResponse(x.Recipe.Id, x.Order, x.Recipe.Name)).ToList();
+        var mappedMeals = menu.Meals.Select(x => new OrderedRecipeListItemResponse(x.Recipe.Id, x.Order, x.Servings, x.Recipe.Name)).ToList();
         return new GetMenuResponse(menu.Id, menu.Date, mappedMeals);
     }
 

@@ -34,7 +34,7 @@ public class RecipeCreator(MealPlannerDbContext ctx,
         
         return new CreateRecipeResponse(newRecipe.Id);
     }
-
+    
     private async Task<List<AddIngredientAction>> MapIngredients(CreateRecipeRequest request, CancellationToken cancellationToken)
     {
         var idsOfUsedIngredients = request.Ingredients.Select(x => x.Id).Distinct().ToList();

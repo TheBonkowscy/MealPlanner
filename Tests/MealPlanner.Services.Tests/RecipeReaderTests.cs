@@ -29,16 +29,16 @@ public class RecipeReaderTests
     }
 
     [Fact]
-    public async Task GetByQuery_NoQuery_ReturnsAllMeals()
+    public async Task GetByQuery_NoQuery_ReturnsAllRecipes()
     {
         // Arrange
-        var meal1 = TestRecipes.Create("Pasta");
-        RandomId.Set(meal1);
-        _recipes.Add(meal1);
+        var recipe1 = TestRecipes.Create("Pasta");
+        RandomId.Set(recipe1);
+        _recipes.Add(recipe1);
         
-        var meal2 = TestRecipes.Create("Pizza");
-        RandomId.Set(meal2);
-        _recipes.Add(meal2);
+        var recipe2 = TestRecipes.Create("Pizza");
+        RandomId.Set(recipe2);
+        _recipes.Add(recipe2);
 
         // Act
         var result = await _sut.GetByQuery(null, CancellationToken.None);
@@ -52,23 +52,23 @@ public class RecipeReaderTests
     [Theory]
     [InlineData("Pas")]
     [InlineData("pas")]
-    public async Task GetByQuery_CaseInsensitiveQuery_ReturnsFilteredMeals(string query)
+    public async Task GetByQuery_CaseInsensitiveQuery_ReturnsFilteredRecipes(string query)
     {
         // Arrange
-        var meal1 = TestRecipes.Create("Pasta");
-        RandomId.Set(meal1);
-        _recipes.Add(meal1);
+        var recipe1 = TestRecipes.Create("Pasta");
+        RandomId.Set(recipe1);
+        _recipes.Add(recipe1);
         
-        var meal2 = TestRecipes.Create("Pizza");
-        RandomId.Set(meal2);
-        _recipes.Add(meal2);
+        var recipe2 = TestRecipes.Create("Pizza");
+        RandomId.Set(recipe2);
+        _recipes.Add(recipe2);
 
         // Act
         var result = await _sut.GetByQuery(query, CancellationToken.None);
 
         // Assert
         result.Recipes.Should().HaveCount(1);
-        result.Recipes.Should().Contain(x => x.Name == "Pasta");
+        result.Recipes.Should().Contain(x => x.Name == recipe1.Name);
     }
     
     [Fact]
@@ -91,21 +91,21 @@ public class RecipeReaderTests
         var ingredient = Ingredient.Create("Bacon", [MeasureUnit.Kilogram]);
         var ingredients = AddIngredientAction.Create(ingredient, 1, MeasureUnit.Kilogram);
         var step = RecipeStep.Create(1, "Cook");
-        var meal = Recipe.Create("Burgers", 1, [ingredients], [step]);
+        var recipe = Recipe.Create("Burgers", 1, [ingredients], [step]);
         RandomId.Set(ingredient);
         RandomId.Set(step);
-        RandomId.Set(meal);
-        RandomId.Set([.. meal.Ingredients]);
-        _recipes.Add(meal);
+        RandomId.Set(recipe);
+        RandomId.Set([.. recipe.Ingredients]);
+        _recipes.Add(recipe);
 
         // Act
-        var result = await _sut.Get(meal.Id, CancellationToken.None);
+        var result = await _sut.Get(recipe.Id, CancellationToken.None);
         
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be(meal.Id);
-        result.Name.Should().Be(meal.Name);
-        result.Servings.Should().Be(meal.Servings);
+        result.Id.Should().Be(recipe.Id);
+        result.Name.Should().Be(recipe.Name);
+        result.Servings.Should().Be(recipe.Servings);
         
         result.Ingredients.Should().HaveCount(1);
         var bacon = result.Ingredients.First();

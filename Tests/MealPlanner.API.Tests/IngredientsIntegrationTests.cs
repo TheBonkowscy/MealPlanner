@@ -25,10 +25,4 @@ public class IngredientsIntegrationTests(MealPlannerWebApplicationFactory factor
         response.Should().NotBeNull();
         response.Ingredients.Should().HaveCount(1);
     }
-
-    private async Task AddIngredientToDatabase(Ingredient ingredient)
-    {
-        await DatabaseContext.Ingredients.AddAsync(ingredient);
-        await DatabaseContext.SaveChangesAsync();
-    }
 }

@@ -1,11 +1,12 @@
 ﻿@page "/menus/edit/{Date:datetime}"
 @using MealPlanner.Client.Menus
 @using MealPlanner.Client.Recipes
-@using MealPlanner.Services.Menus
 @using MealPlanner.Shared.Menus.Requests
 @using MealPlanner.UI.Models
+@using MealPlanner.UI.Models.Editors
 @using MealPlanner.UI.Services
 @inherits ComponentBase
+@implements IDisposable
 @inject IUpdateMenus MenusUpdater
 @inject IFindMenus FindMenus
 @inject IDeleteMenus MenusDeleter
@@ -34,14 +35,22 @@
                          Class="rounded mud-background-gray pa-4 min-height-200">
                 <ItemRenderer>
                     <MudPaper Class="pa-3 my-2 d-flex justify-space-between align-center" Elevation="2">
-                        <div class="d-flex align-center">
-                            <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="mr-3 cursor-grab" />
-                            <MudText Typo="Typo.body1">@context.Name</MudText>
+                        <div class="d-flex align-center gap-3 flex-grow-1">
+                            <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
+                            <MudText Typo="Typo.body1" Class="flex-grow-1">@context.Name</MudText>
                         </div>
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                        <div class="d-flex align-center gap-3">
+                            <MudNumericField @bind-Value="context.Servings"
+                                             Label="Liczba porcji"
+                                             Min="1"
+                                             Step="1"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
                                        Color="Color.Error" 
                                        Size="Size.Small" 
                                        OnClick="@(() => RemoveMeal(context))" />
+                        </div>
                     </MudPaper>
                 </ItemRenderer>
             </MudDropZone>
@@ -50,7 +59,7 @@
 
     <MudPaper Class="pa-4 mt-4 mud-theme-light" Elevation="1">
         <MudText Typo="Typo.subtitle2" Class="mb-2">Dodaj nowy posiłek do menu:</MudText>
-        <MudAutocomplete T="string"
+        <MudAutocomplete T="RecipeByIdDto"
                          Label="Szukaj potrawy..."
                          Value="_selectedMeal"
                          ValueChanged="OnMealSelected"
@@ -73,13 +82,10 @@
 
 @code {
     [Parameter] public DateTime Date { get; set; }
-    
-    private readonly CultureInfo _culture =
-        new("pl-PL");
 
     private MudDropContainer<MealDto>? _container;
     private List<MealDto> _meals = [];
-    private string? _selectedMeal;
+    private RecipeByIdDto? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
 
     protected override async Task OnParametersSetAsync()
@@ -142,23 +148,21 @@
         _container?.Refresh();
     }
 
-    private async Task<IEnumerable<string>> SearchRecipesAsync(string value, CancellationToken token)
-    {
-        if (string.IsNullOrWhiteSpace(value)) return [];
-        return await FetchRecipesFromApiAsync(value, token);
-    }
+    private async Task<IEnumerable<RecipeByIdDto>> SearchRecipesAsync(string query, CancellationToken token) => 
+        string.IsNullOrWhiteSpace(query) 
+            ? [] 
+            : MealMapper.MapMeals(await FindRecipes.Get(query, token));
 
-    private void OnMealSelected(string selectedMeal)
+    private void OnMealSelected(RecipeByIdDto selectedMeal)
     {
-        if (string.IsNullOrWhiteSpace(selectedMeal)) return;
-
         _meals.Add(new MealDto
         {
-            Name = selectedMeal,
+            Id = selectedMeal.Id,
+            Name = selectedMeal.Name,
             Order = _meals.Count
         });
 
-        _selectedMeal = string.Empty;
+        _selectedMeal = null;
         _container?.Refresh();
     }
 
@@ -180,31 +184,19 @@
             return;
         }
 
-        var orderedMeals = _meals.ToDictionary(x => x.Order, x => x.Name);
-        
-
+        var orderedMeals = _meals.Select(x => new AddMealRequest(x.Id, x.Order + 1, x.Servings)).ToList();
         var request = new UpdateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
         var response = await MenusUpdater.Update(request, _cts.Token);
         Snackbar.Add("Pomyślnie edytowano menu!", Severity.Success);
         
         Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Date));
     }
-
-    #region API Calls
     
     private async Task<List<MealDto>> FetchMenuForDateAsync(DateTime date)
     {
         var result = await FindMenus.Get(date, _cts.Token);
         return MealMapper.MapMeals(result?.Meals) ?? [];
     }
-    
-    private async Task<IEnumerable<string>> FetchRecipesFromApiAsync(string? query, CancellationToken token)
-    {
-        var results = await FindRecipes.Get(query, token);
-
-        return results.Recipes.Select(x => x.Name);
-    }
-    #endregion
 
     public void Dispose()
     {

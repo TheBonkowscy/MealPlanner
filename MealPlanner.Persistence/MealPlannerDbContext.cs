@@ -1,5 +1,6 @@
 ﻿using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
+using MealPlanner.Domain.Menus;
 using MealPlanner.Persistence.Seeders;
 using Microsoft.EntityFrameworkCore;
 

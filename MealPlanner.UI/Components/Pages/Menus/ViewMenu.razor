@@ -36,7 +36,7 @@ else
         @foreach (var meal in _meals)
         {
             <MudListItem T="string" Value="meal.Name" Href="@(RoutingConstants.Recipes.DetailsFor(meal.Id))">
-                @meal.Name
+                @meal.Name (Porcje: @meal.Servings)
             </MudListItem>
         }
 

@@ -2,6 +2,8 @@ using System.Net;
 using AwesomeAssertions;
 using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
+using MealPlanner.Domain.Menus;
+using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
@@ -17,17 +19,15 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly SpecificDate = new(2026, 03, 26);
     private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Breakfast");
-    private static readonly Dictionary<int, string> Meals = new()
-    {
-        { 0, PreExistingRecipe.Name }
-    };
+    private static readonly List<AddMealAction> MealsToAdd = [TestActions.AddMeal(PreExistingRecipe, 1, 1)];
     
     [Fact]
     public async Task Post_ReturnsId()
     {
         // Arrange
-        await AddMealToDatabase(PreExistingRecipe);
-        var request = new CreateMenuRequest(Tomorrow, Meals);
+        await AddRecipeToDatabase(PreExistingRecipe);
+        List<AddMealRequest> meals = [new(PreExistingRecipe.Id, 1, 1)];
+        var request = new CreateMenuRequest(Tomorrow, meals);
         
         // Act
         var result = await Client.PostAsJsonAsync(Constants.MenusRoute, request);
@@ -42,8 +42,8 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     [Fact]
     public async Task Get_ById_ReturnsMenuIfExists()
     {
-        // Arrange
-        var menu = Menu.Create(Tomorrow, [.. Meals.Values.Select(x => TestRecipes.Create(x))]);
+        // Arrange 
+        var menu = Menu.Create(Tomorrow, MealsToAdd);
         await AddMenuToDatabase(menu);
         
         // Act
@@ -80,8 +80,8 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     [Fact]
     public async Task Get_ForSpecificDate_ReturnsMenuIfExists()
     {
-        // Arrange
-        var menu = Menu.Create(SpecificDate, [..Meals.Values.Select(x => TestRecipes.Create(x))]);
+        // Arrange 
+        var menu = Menu.Create(SpecificDate, MealsToAdd);
         await AddMenuToDatabase(menu);
         
         // Act
@@ -109,7 +109,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Get_ForToday_ReturnsMenuIfExists()
     {
         // Arrange
-        var menu = Menu.Create(Today, [..Meals.Values.Select(x => TestRecipes.Create(x))]);
+        var menu = Menu.Create(Today, MealsToAdd);
         await AddMenuToDatabase(menu);
         
         // Act
@@ -128,8 +128,8 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Get_ForDateRange(string query, int expectedCount)
     {
         // Arrange
-        await AddMenuToDatabase(Menu.Create(Today, [..Meals.Values.Select(x => TestRecipes.Create(x))]));
-        await AddMenuToDatabase(Menu.Create(Tomorrow, [..Meals.Values.Select(x => TestRecipes.Create(x))]));
+        await AddMenuToDatabase(Menu.Create(Today, MealsToAdd));
+        await AddMenuToDatabase(Menu.Create(Tomorrow, MealsToAdd));
         
         // Act
         var result = await Client.GetAsync($"{Constants.MenusRoute}{query}");
@@ -163,12 +163,12 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Get_ForDateRange_ReturnsOnlyMenusWithinRange_WhenBothFromAndToProvided()
     {
         // Arrange
-        await AddMenuToDatabase(Menu.Create(Today.AddDays(-1), [..Meals.Values.Select(x => TestRecipes.Create(x))]));
-        var menu1 = Menu.Create(Today, [..Meals.Values.Select(x => TestRecipes.Create(x))]);
-        var menu2 = Menu.Create(Tomorrow, [..Meals.Values.Select(x => TestRecipes.Create(x))]);
+        await AddMenuToDatabase(Menu.Create(Today.AddDays(-1), MealsToAdd));
+        var menu1 = Menu.Create(Today, MealsToAdd);
+        var menu2 = Menu.Create(Tomorrow, MealsToAdd);
         await AddMenuToDatabase(menu1);
         await AddMenuToDatabase(menu2);
-        await AddMenuToDatabase(Menu.Create(Tomorrow.AddDays(1), [..Meals.Values.Select(x => TestRecipes.Create(x))]));
+        await AddMenuToDatabase(Menu.Create(Tomorrow.AddDays(1), MealsToAdd));
 
         // Act
         var result = await Client.GetAsync($"{Constants.MenusRoute}?from={Today:O}&to={Tomorrow:O}");
@@ -185,19 +185,16 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Put_UpdatesExistingMenu_WhenMenuExists()
     {
         // Arrange
-        var initialMeal = TestRecipes.Create("Obiad");
-        var updatedMeal = TestRecipes.Create("Kolacja");
-        await AddMealToDatabase(initialMeal);
-        await AddMealToDatabase(updatedMeal);
+        var initialRecipe = TestRecipes.Create("Obiad");
+        var updatedRecipe = TestRecipes.Create("Kolacja");
+        await AddRecipeToDatabase(initialRecipe);
+        await AddRecipeToDatabase(updatedRecipe);
 
-        var existingMenu = Menu.Create(SpecificDate, [initialMeal]);
+        var existingMenu = Menu.Create(SpecificDate, [TestActions.AddMeal(initialRecipe, 1, 1)]);
         await AddMenuToDatabase(existingMenu);
 
-        var updatedMealsDict = new Dictionary<int, string>
-        {
-            { 0, updatedMeal.Name }
-        };
-        var request = new UpdateMenuRequest(SpecificDate, updatedMealsDict);
+        List<AddMealRequest> meals = [new(updatedRecipe.Id, 1, 1)];
+        var request = new UpdateMenuRequest(SpecificDate, meals);
 
         // Act
         var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
@@ -211,14 +208,15 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         getResult.Should().NotBeNull();
         getResult.Meals.Should().HaveCount(1);
         var firstMeal = getResult.Meals.First();
-        firstMeal.Name.Should().Be(updatedMeal.Name);
+        firstMeal.Name.Should().Be(updatedRecipe.Name);
     }
 
     [Fact]
     public async Task Put_ReturnsNotFound_WhenMenuDoesNotExist()
     {
         // Arrange
-        var request = new UpdateMenuRequest(SpecificDate, Meals);
+        List<AddMealRequest> meals = [new(PreExistingRecipe.Id, 1, 1)];
+        var request = new UpdateMenuRequest(SpecificDate, meals);
 
         // Act
         var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
@@ -231,7 +229,8 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     public async Task Put_ReturnsBadRequest_WhenRouteDateDoesNotMatchRequestBodyDate()
     {
         // Arrange
-        var request = new UpdateMenuRequest(Tomorrow, Meals);
+        List<AddMealRequest> meals = [new(PreExistingRecipe.Id, 1, 1)];
+        var request = new UpdateMenuRequest(Tomorrow, meals);
 
         // Act
         var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
@@ -263,7 +262,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         yield return
         [
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
-            Menu.Create(Tomorrow, [.. Meals.Values.Select(x => TestRecipes.Create(x))])
+            Menu.Create(Tomorrow, MealsToAdd)
         ];
     }
 
@@ -274,16 +273,4 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     private static string BuildEditRoute(DateOnly date) => $"{Constants.MenusRoute}/{date.ToString("O")}";
     
     private static string BuildGetForTodayRoute() => $"{Constants.MenusRoute}/today";
-
-    private async Task AddMenuToDatabase(Menu menu)
-    {
-        await DatabaseContext.Menus.AddAsync(menu);
-        await DatabaseContext.SaveChangesAsync();
-    }
-    
-    private async Task AddMealToDatabase(Recipe recipe)
-    {
-        await DatabaseContext.Recipes.AddAsync(recipe);
-        await DatabaseContext.SaveChangesAsync();
-    }
 }

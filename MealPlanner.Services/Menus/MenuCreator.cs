@@ -1,4 +1,5 @@
 using MealPlanner.Domain;
+using MealPlanner.Domain.Menus;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
@@ -13,7 +14,7 @@ public interface ICreateMenu
 }
 
 public class MenuCreator(MealPlannerDbContext ctx,
-    IMapRecipe recipeMapper) : ICreateMenu
+    IMapMeals mealsMapper) : ICreateMenu
 {
     public async Task<CreateMenuResponse> Create(CreateMenuRequest createMenuRequest, CancellationToken ct)
     {
@@ -25,12 +26,12 @@ public class MenuCreator(MealPlannerDbContext ctx,
                 throw new InvalidOperationException($"There is already a Menu defined for {createMenuRequest.Date}.");
             }
 
-            if (createMenuRequest.Meals.Keys is { Count: 0 })
+            if (createMenuRequest.Meals is { Count: 0 })
             {
                 throw new InvalidOperationException("No meals were provided.");
             }
             
-            var chosenRecipes = await recipeMapper.MapRecipes(createMenuRequest.Meals, ct);
+            var chosenRecipes = await mealsMapper.MapMeals(createMenuRequest.Meals, ct);
             
             var result = Menu.Create(createMenuRequest.Date, chosenRecipes);
 

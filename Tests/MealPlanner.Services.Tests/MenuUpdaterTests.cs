@@ -1,5 +1,7 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
+using MealPlanner.Domain.Menus;
+using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
 using MealPlanner.Services.Recipes;
@@ -16,7 +18,7 @@ public class MenuUpdaterTests
     private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Fish and chips");
 
     private readonly Mock<MealPlannerDbContext> _ctx;
-    private readonly Mock<IMapRecipe> _mealsMapper;
+    private readonly Mock<IMapMeals> _mealsMapper;
     private readonly MenuUpdater _sut;
 
     private readonly List<Menu> _menus = [];
@@ -28,7 +30,7 @@ public class MenuUpdaterTests
         _ctx = new Mock<MealPlannerDbContext>();
         _ctx.Setup(x => x.Menus).ReturnsDbSet([]);
         
-        _mealsMapper = new Mock<IMapRecipe>();
+        _mealsMapper = new Mock<IMapMeals>();
         _ctx.Setup(x => x.Menus).ReturnsDbSet(_menus);
         _ctx.Setup(x => x.Menus.AddAsync(It.IsAny<Menu>(), It.IsAny<CancellationToken>())).Callback<Menu, CancellationToken>((menu, _) =>
         {
@@ -51,10 +53,27 @@ public class MenuUpdaterTests
     }
 
     [Fact]
+    public async Task Update_WhenNoMealsInRequest_ShouldThrowInvalidOperationException()
+    {
+        // Arrange
+        var request = new UpdateMenuRequest(new DateOnly(2026, 8, 6),[]);
+
+        // Act
+        var result = async () => await _sut.Update(request, CancellationToken.None);
+
+        // Assert
+        await result.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("No meals were provided.");
+
+        _ctx.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Update_WhenMenuDoesNotExist_ShouldThrowInvalidOperationException()
     {
         // Arrange
-        var request = new UpdateMenuRequest(new DateOnly(2026, 8, 6),new Dictionary<int, string>());
+        List<AddMealRequest> mealDtos = [new(PreExistingRecipe.Id, 1, 1)];
+        var request = new UpdateMenuRequest(new DateOnly(2026, 8, 6), mealDtos);
 
         // Act
         var result = async () => await _sut.Update(request, CancellationToken.None);
@@ -71,9 +90,9 @@ public class MenuUpdaterTests
     {
         // Arrange
         var date = new DateOnly(2026, 8, 6);
-        var menuForDate = Menu.Create(date, [PreExistingRecipe]);
+        var menuForDate = Menu.Create(date, [TestActions.AddMeal(PreExistingRecipe, 1, 1)]);
         _menus.Add(menuForDate);
-        var request = new UpdateMenuRequest(date, new Dictionary<int, string>());
+        var request = new UpdateMenuRequest(date, []);
 
         // Act
         Func<Task> act = async () => await _sut.Update(request, CancellationToken.None);
@@ -92,14 +111,15 @@ public class MenuUpdaterTests
     public async Task Update_WhenValidRequest_ShouldCallMapperAndSaveChanges()
     {
         // Arrange
+        List<AddMealAction> mealsToAdd = [TestActions.AddMeal(PreExistingRecipe, 1, 1)];
         var date = new DateOnly(2026, 8, 6);
-        var menuForDate = Menu.Create(date, [PreExistingRecipe]);
+        var menuForDate = Menu.Create(date, mealsToAdd);
         _menus.Add(menuForDate);
-        var mealDtos = new Dictionary<int, string>() { { 0, PreExistingRecipe.Name } };
+        List<AddMealRequest> mealDtos = [new(PreExistingRecipe.Id, 1, 1)];
 
         _mealsMapper
-            .Setup(x => x.MapRecipes(mealDtos, It.IsAny<CancellationToken>()))
-            .ReturnsAsync([PreExistingRecipe]);
+            .Setup(x => x.MapMeals(mealDtos, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mealsToAdd);
 
         var request = new UpdateMenuRequest(date, mealDtos);
 
@@ -110,6 +130,6 @@ public class MenuUpdaterTests
         result.Should().NotBeNull();
         result.Date.Should().Be(date);
 
-        _mealsMapper.Verify(x => x.MapRecipes(mealDtos, It.IsAny<CancellationToken>()), Times.Once);
+        _mealsMapper.Verify(x => x.MapMeals(mealDtos, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

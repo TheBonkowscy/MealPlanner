@@ -1,14 +1,11 @@
 ﻿using System.Net;
 using AwesomeAssertions;
 using MealPlanner.API.Tests.Shared;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Shared.Menus;
-using MealPlanner.Shared.Recipes;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;
 using MealPlanner.Tests.Shared.Factories;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace MealPlanner.API.Tests;
@@ -17,7 +14,7 @@ namespace MealPlanner.API.Tests;
 public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
     [Fact]
-    public async Task Get_ReturnsAllMeals_WhenNoQueryProvided()
+    public async Task Get_ReturnsAllRecipes_WhenNoQueryProvided()
     {
         // Arrange
         await AddRecipeToDatabase(TestRecipes.Create("Burger"));
@@ -33,11 +30,11 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
     }
 
     [Fact]
-    public async Task Get_ReturnsFilteredMeals_WhenQueryProvided()
+    public async Task Get_ReturnsFilteredRecipes_WhenQueryProvided()
     {
         // Arrange
-        var uniqueMealName = "Unique Sandwich";
-        await AddRecipeToDatabase(TestRecipes.Create(uniqueMealName));
+        const string uniqueRecipeName = "Unique Sandwich";
+        await AddRecipeToDatabase(TestRecipes.Create(uniqueRecipeName));
 
         // Act
         var result = await Client.GetAsync($"{Constants.RecipesRoute}?q=sandw");
@@ -47,7 +44,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var response = await result.Content.ReadFromJsonAsync<GetRecipesResponse>();
         response.Should().NotBeNull();
         response.Recipes.Should().HaveCount(1);
-        response.Recipes.Should().Contain(m => m.Name == uniqueMealName);
+        response.Recipes.Should().Contain(m => m.Name == uniqueRecipeName);
     }
 
     [Fact]
@@ -73,7 +70,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var testIngredient = TestIngredients.Create();
         DatabaseContext.Ingredients.Add(testIngredient);
         await DatabaseContext.SaveChangesAsync();
-        var request = CreateNewRecipeRequest($"New Recipe_{Guid.NewGuid()}", testIngredient);
+        var request = CreateNewRecipeRequest($"Recipe_{Guid.NewGuid()}", testIngredient);
 
         // Act
         var result = await Client.PostAsJsonAsync(Constants.RecipesRoute, request);
@@ -107,7 +104,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
     }
 
     [Fact]
-    public async Task Get_ReturnsNotFound_WhenNoMealById()
+    public async Task Get_ReturnsNotFound_WhenNoRecipeById()
     {
         // Act
         var result = await Client.GetAsync($"{Constants.RecipesRoute}/{-200}");
@@ -117,7 +114,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
     }
 
     [Fact]
-    public async Task Get_ReturnsOk_WhenMealWasFound()
+    public async Task Get_ReturnsOk_WhenRecipeWasFound()
     {
         // Arrange 
         var recipe = TestRecipes.Create("Pizza");
@@ -142,11 +139,5 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
-    }
-
-    private async Task AddRecipeToDatabase(Recipe recipe)
-    {
-        await DatabaseContext.Recipes.AddAsync(recipe);
-        await DatabaseContext.SaveChangesAsync();
     }
 }

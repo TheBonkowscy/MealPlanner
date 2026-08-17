@@ -15,22 +15,22 @@ public class RecipeTests
     public void Create_WithoutName_ThrowsException()
     {   
         // Act
-        Action<string> createMeal = (name) => Recipe.Create(name, 1, [SharedIngredient], SharedSteps);
+        Action<string> createRecipe = (name) => Recipe.Create(name, 1, [SharedIngredient], SharedSteps);
         
         // Assert
-        createMeal.Invoking(x => x.Invoke(""))
+        createRecipe.Invoking(x => x.Invoke(""))
             .Should().Throw<ArgumentNullException>()
-            .WithMessage("Please specify a name of the meal");
+            .WithMessage("Please specify a name of the recipe");
     }
 
     [Fact]
     public void Create_WithEmptyIngredients_ThrowsException()
     {
         // Act
-        Action<string, int, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, servings, ingredients, recipeSteps) => Recipe.Create(name, servings, ingredients, recipeSteps);
+        Action<string, int, List<AddIngredientAction>, List<RecipeStep>> createRecipe = (name, servings, ingredients, recipeSteps) => Recipe.Create(name, servings, ingredients, recipeSteps);
         
         // Assert
-        createMeal.Invoking(x => x.Invoke(Name, 1, [], SharedSteps))
+        createRecipe.Invoking(x => x.Invoke(Name, 1, [], SharedSteps))
             .Should().Throw<ArgumentNullException>()
             .WithMessage("At least one ingredient must be specified");
     }
@@ -39,10 +39,10 @@ public class RecipeTests
     public void Create_WithEmptySteps_ThrowsException()
     {
         // Act
-        Action<string, int, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, servings, ingredients, recipeSteps) => Recipe.Create(name, servings, ingredients, recipeSteps);
+        Action<string, int, List<AddIngredientAction>, List<RecipeStep>> createRecipe = (name, servings, ingredients, recipeSteps) => Recipe.Create(name, servings, ingredients, recipeSteps);
         
         // Assert
-        createMeal.Invoking(x => x.Invoke(Name, 1, [SharedIngredient], []))
+        createRecipe.Invoking(x => x.Invoke(Name, 1, [SharedIngredient], []))
             .Should().Throw<ArgumentNullException>()
             .WithMessage("At least one recipe step must be specified");
     }
@@ -53,10 +53,10 @@ public class RecipeTests
     public void Create_WithInvalidServings_ThrowsException(int invalidServings)
     {
         // Act
-        Action<string, int, List<AddIngredientAction>, List<RecipeStep>> createMeal = (name, servings, ingredients, recipeSteps) => Recipe.Create(name, servings, ingredients, recipeSteps);
+        Action<string, int, List<AddIngredientAction>, List<RecipeStep>> createRecipe = (name, servings, ingredients, recipeSteps) => Recipe.Create(name, servings, ingredients, recipeSteps);
         
         // Assert
-        createMeal.Invoking(x => x.Invoke(Name, invalidServings, [SharedIngredient], SharedSteps))
+        createRecipe.Invoking(x => x.Invoke(Name, invalidServings, [SharedIngredient], SharedSteps))
             .Should().Throw<ArgumentOutOfRangeException>()
             .WithMessage("Recipe must yield at least one serving");
     }
@@ -65,10 +65,10 @@ public class RecipeTests
     public void Create_Succeeds()
     {
         // Act
-        var meal = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps);
+        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps);
         
         // Assert
-        meal.Should().NotBeNull();
-        meal.Name.Should().Be(Name);
+        recipe.Should().NotBeNull();
+        recipe.Name.Should().Be(Name);
     }
 }
