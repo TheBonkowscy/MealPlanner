@@ -208,7 +208,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         // Arrange
         var recipe = TestRecipes.Create();
         await AddRecipeToDatabase(recipe);
-        var request = new CreateRecipeStepRequest(1, "New step");
+        var request = new CreateRecipeStepRequest(2, "New step");
         
         // Act
         var result = await Client.PostAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/steps", request);
