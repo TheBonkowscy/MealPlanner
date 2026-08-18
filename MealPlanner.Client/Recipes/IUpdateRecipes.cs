@@ -10,4 +10,10 @@ public interface IUpdateRecipes
     Task<GetRecipeDetailsResponse> AddIngredientToRecipe(int id, UpdateRecipeIngredientRequest request, CancellationToken cancellationToken);
     
     Task DeleteIngredientFromRecipe(int id, DeleteRecipeIngredientRequest deleteRecipeIngredientRequest, CancellationToken cancellationToken);
+    
+    Task<GetRecipeDetailsResponse> AddStep(int id, AddRecipeStepRequest request, CancellationToken cancellationToken);
+    
+    Task<GetRecipeDetailsResponse> UpdateStep(int id, UpdateRecipeStepRequest request, CancellationToken cancellationToken);
+    
+    Task DeleteStep(int id, int stepId, CancellationToken cancellationToken);
 }

@@ -4,6 +4,7 @@
 @using MealPlanner.Shared.Recipes.Requests
 @using MealPlanner.Shared.Shared
 @using MealPlanner.Client.Recipes
+@using MealPlanner.Shared.Recipes.Responses
 @using System.Linq
 
 @implements IDisposable
@@ -132,9 +133,10 @@
                     <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
                         <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
                         
-                        <MudChip T="string" Color="Color.Primary" Size="Size.Small">Krok @(context.Order + 1)</MudChip>
+                        <MudChip T="string" Color="Color.Primary" Size="Size.Small">Krok @(context.Order)</MudChip>
 
                         <MudTextField @bind-Value="context.Instructions"
+                                      @bind-Value:after="() => UpdateOrAddStep(context)"
                                       Label="Opis kroku"
                                       Lines="2"
                                       Variant="Variant.Outlined"
@@ -207,6 +209,7 @@
         [
             .. recipe.Steps.Select((x, index) => new StepDto()
             {
+                Id = x.Id,
                 Order = x.Order,
                 Instructions = x.Instructions
             }).OrderBy(x => x.Order)
@@ -328,15 +331,19 @@
         _stepsContainer?.Refresh();
     }
 
-    private void StepDropped(MudItemDropInfo<StepDto> dropItem)
+    private async Task StepDropped(MudItemDropInfo<StepDto> dropItem)
     {
         if (dropItem?.Item is null) return;
 
         _steps.Remove(dropItem.Item);
         var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _steps.Count);
         _steps.Insert(targetIndex, dropItem.Item);
-
+        
         ReindexSteps();
+        
+        var requestBody = new UpdateRecipeStepRequest(dropItem.Item.Id, dropItem.Item.Order, dropItem.Item.Instructions);
+        var result = await RecipeUpdater.UpdateStep(RecipeId, requestBody, _cts.Token);
+        
         _stepsContainer?.Refresh();
     }
 
@@ -368,4 +375,22 @@
         _cts.Dispose();
         AppBarService.ClearActions();
     }
+
+    private async Task UpdateOrAddStep(StepDto context)
+    {
+        var isNew = context.Id == 0;
+        if (isNew)
+        {
+            var request = new AddRecipeStepRequest(context.Order, context.Instructions);
+            await RecipeUpdater.AddStep(RecipeId, request, _cts.Token);
+        }
+        else
+        {
+            var request = new UpdateRecipeStepRequest(context.Id, context.Order, context.Instructions);
+            await RecipeUpdater.UpdateStep(RecipeId, request, _cts.Token);
+        }
+        
+        Snackbar.Add("Krok zapisany pomyślnie!");
+    }
+
 }

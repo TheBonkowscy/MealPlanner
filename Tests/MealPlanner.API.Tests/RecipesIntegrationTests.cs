@@ -201,6 +201,61 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
+
+    [Fact]
+    public async Task Post_Step_ReturnsOk()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var request = new CreateRecipeStepRequest(1, "New step");
+        
+        // Act
+        var result = await Client.PostAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/steps", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
+        var returnedStep =  details?.Steps.First(x => x.Order == request.Order);
+        returnedStep.Should().NotBeNull();
+        returnedStep.Instructions.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task Put_Step_ReturnsOk_WhenStepWasFound()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var step = recipe.Steps[0];
+        var request = new UpdateRecipeStepRequest(step.Id, step.Order, "Revised Instructions");
+        
+        // Act
+        var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/steps/{step.Id}", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
+        var returnedStep = details?.Steps.First(x => x.Id == step.Id);
+        returnedStep.Should().NotBeNull();
+        returnedStep.Order.Should().Be(request.Order);
+        returnedStep.Instructions.Should().Be(request.Instructions);
+    }
+
+    [Fact]
+    public async Task Delete_Step_ReturnsNoContent()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var step = recipe.Steps[0];
+        
+        // Act
+        var result = await Client.DeleteAsync($"{Constants.RecipesRoute}/{recipe.Id}/steps/{step.Id}");
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
     
     [Fact]
     public async Task Put_ReturnsOk_WhenRecipeExists()
@@ -237,5 +292,5 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         new(recipeName,
             1,
             [new AddIngredientRequest(ingredient.Id, 1, ingredient.ApplicableUnits.First().ToString())],
-            [new AddStepRequest(1, "Test")]);
+            [new AddRecipeStepRequest(1, "Test")]);
 }

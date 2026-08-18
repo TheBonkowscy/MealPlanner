@@ -119,7 +119,7 @@ public class RecipeCreatorTests
     private static CreateRecipeRequest NewRequest()
     {
         var ingredient = new AddIngredientRequest(PreExistingIngredient.Id, 1, nameof(MeasureUnit.Bottle));
-        var step = new AddStepRequest(1, "Step 1");
+        var step = new AddRecipeStepRequest(1, "Step 1");
         return new CreateRecipeRequest(Guid.NewGuid().ToString(), 1, [ingredient], [step]);
     }
 }

@@ -311,7 +311,7 @@
                     i.SelectedUnit!.UnderlyingValue)).ToList();
 
         var finalSteps = _steps.Select(s => 
-            new AddStepRequest(s.Order + 1, s.Instructions)
+            new AddRecipeStepRequest(s.Order + 1, s.Instructions)
         ).ToList();
 
         var request = new CreateRecipeRequest(_recipeName, _servings, finalIngredients, finalSteps);

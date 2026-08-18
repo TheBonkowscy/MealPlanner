@@ -1,7 +1,9 @@
+using MealPlanner.Domain;
 using MealPlanner.Services.Ingredients;
 using MealPlanner.Services.Menus;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Services.Recipes.Ingredients;
+using MealPlanner.Services.Recipes.Steps;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MealPlanner.Services;
@@ -26,6 +28,9 @@ public static class ServiceRegistration
         services.AddTransient<IUpdateRecipe, RecipeUpdater>();
         services.AddTransient<IUpdateRecipeIngredient, RecipeIngredientUpdater>();
         services.AddTransient<IDeleteRecipeIngredient, RecipeIngredientDeleter>();
+        services.AddTransient<ICreateRecipeStep, RecipeStepCreator>();
+        services.AddTransient<IUpdateRecipeStep, RecipeStepUpdater>();
+        services.AddTransient<IDeleteRecipeStep, RecipeStepDeleter>();
         services.AddSingleton<RecipeMapper>();
         
         /* Ingredients */
