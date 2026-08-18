@@ -141,4 +141,16 @@ public class Recipe
     public void RemoveIngredient(UsedIngredient ingredient) => _ingredients.Remove(ingredient);
 
     public void AddIngredient(AddIngredientAction addIngredient) => AddIngredients([addIngredient]);
+
+    public void UpdateName(string name)
+    {
+        ValidateNameAndThrow(name);
+        Name = name;
+    }
+
+    public void UpdateServings(int servings)
+    {
+        ValidateServingsAndThrow(servings);
+        Servings = servings;
+    }
 }

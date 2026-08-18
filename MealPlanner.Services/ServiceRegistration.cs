@@ -16,11 +16,14 @@ public static class ServiceRegistration
         services.AddTransient<IUpdateMenu, MenuUpdater>();
         services.AddTransient<IDeleteMenu, MenuDeleter>();
         
-        /* Meals & Recipes */
+        /* Meals */
+        services.AddTransient<IMapMeals, MealsMapper>();
+
+        /* Recipes */
         services.AddTransient<IReadRecipe, RecipeReader>();
         services.AddTransient<ICreateRecipe, RecipeCreator>();
-        services.AddTransient<IMapMeals, MealsMapper>();
         services.AddTransient<IDeleteRecipe, RecipeDeleter>();
+        services.AddTransient<IUpdateRecipe, RecipeUpdater>();
         services.AddTransient<IUpdateRecipeIngredient, RecipeIngredientUpdater>();
         services.AddTransient<IDeleteRecipeIngredient, RecipeIngredientDeleter>();
         services.AddSingleton<RecipeMapper>();

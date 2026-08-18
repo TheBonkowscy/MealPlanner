@@ -41,7 +41,7 @@ namespace MealPlanner.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ingredients");
+                    b.ToTable("Ingredients", (string)null);
                 });
 
             modelBuilder.Entity("MealPlanner.Domain.Ingredients.UsedIngredient", b =>
@@ -62,7 +62,7 @@ namespace MealPlanner.Persistence.Migrations
 
                     b.HasIndex("IngredientId");
 
-                    b.ToTable("UsedIngredient");
+                    b.ToTable("UsedIngredient", (string)null);
                 });
 
             modelBuilder.Entity("MealPlanner.Domain.Menus.Meal", b =>
@@ -147,7 +147,7 @@ namespace MealPlanner.Persistence.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("RecipeSteps");
+                    b.ToTable("RecipeSteps", (string)null);
                 });
 
             modelBuilder.Entity("MealPlanner.Domain.Ingredients.UsedIngredient", b =>

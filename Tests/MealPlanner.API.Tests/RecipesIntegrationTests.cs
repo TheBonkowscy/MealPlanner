@@ -81,12 +81,6 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         response.Should().NotBeNull();
     }
 
-    private static CreateRecipeRequest CreateNewRecipeRequest(string recipeName, Ingredient ingredient) =>
-        new(recipeName,
-            1,
-            [new AddIngredientRequest(ingredient.Id, 1, ingredient.ApplicableUnits.First().ToString())],
-            [new AddStepRequest(1, "Test")]);
-
     [Fact]
     public async Task Post_ReturnsBadRequest_WhenRecipeIsNotValid()
     {
@@ -207,4 +201,41 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
+    
+    [Fact]
+    public async Task Put_ReturnsOk_WhenRecipeExists()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var request = new UpdateRecipeRequest("Updated name", 15);
+        
+        // Act
+        var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
+        details.Name.Should().Be(request.Name);
+        details.Servings.Should().Be(request.Servings);
+    }
+
+    [Fact]
+    public async Task Put_ReturnsNotFound_WhenRecipeDoesNotExist()
+    {
+        // Arrange
+        var request = new UpdateRecipeRequest("Updated name", 15);
+        
+        // Act
+        var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{999}", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);   // TODO: fix this when introducing custom exceptions
+    }
+
+    private static CreateRecipeRequest CreateNewRecipeRequest(string recipeName, Ingredient ingredient) =>
+        new(recipeName,
+            1,
+            [new AddIngredientRequest(ingredient.Id, 1, ingredient.ApplicableUnits.First().ToString())],
+            [new AddStepRequest(1, "Test")]);
 }
