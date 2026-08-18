@@ -154,7 +154,13 @@
         if (_recipeId is not null)
         {
             actions.AddRange(
-                // TODO: edit action
+                new AppBarAction
+                {
+                    Icon = Icons.Material.Filled.Edit,
+                    Tooltip = "Edytuj przepis",
+                    Color = Color.Inherit,
+                    OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Editors.Recipe.EditFor(_recipeId.Value)))
+                },
                 new AppBarAction
                 {
                     Icon = Icons.Material.Filled.Delete,
@@ -249,21 +255,5 @@
         _cts.Cancel();
         _cts.Dispose();
         AppBarService.ClearActions();
-    }
-
-    private class IngredientViewItem
-    {
-        public string ProductName { get; set; } = string.Empty;
-        public decimal Quantity { get; set; }
-        public string UnitName { get; set; } = string.Empty;
-        public bool IsDone { get; set; }
-    }
-
-    private class StepViewItem
-    {
-        public int Order { get; set; }
-        public string Instructions { get; set; } = string.Empty;
-        public bool IsExpanded { get; set; }
-        public bool IsCompleted { get; set; }
     }
 }

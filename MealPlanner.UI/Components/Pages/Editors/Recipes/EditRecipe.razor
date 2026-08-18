@@ -1,0 +1,371 @@
+﻿@page "/editors/recipes/edit/{RecipeId:int}"
+@using MealPlanner.UI.Services
+@using MealPlanner.UI.Models.Editors
+@using MealPlanner.Shared.Recipes.Requests
+@using MealPlanner.Shared.Shared
+@using MealPlanner.Client.Recipes
+@using System.Linq
+
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject IFindIngredients IngredientsFinder
+@inject IFindRecipes RecipeFinder
+@inject IUpdateRecipes RecipeUpdater
+@inject ISnackbar Snackbar
+@inject AppBarService AppBarService
+
+<MudPaper Class="pa-6 ma-4" Elevation="3">
+    <MudTextField @bind-Value="_recipeName"
+                  @bind-Value:after="SaveBasicInfoAsync"
+                  Label="Nazwa przepisu"
+                  Variant="Variant.Outlined"
+                  Class="mb-6"
+                  Required="true"
+                  RequiredError="Nazwa jest wymagana" />
+
+    <MudNumericField @bind-Value="_servings"
+                     @bind-Value:after="SaveBasicInfoAsync"
+                     Label="Liczba porcji"
+                     Variant="Variant.Outlined"
+                     Class="mb-6"
+                     Required="true"
+                     Min="1"
+                     RequiredError="Liczba porcji jest wymagana" />
+
+    <MudText Typo="Typo.h6" Class="mb-2">Składniki</MudText>
+    
+    <MudDropContainer @ref="_ingredientsContainer"
+                      T="IngredientDto"
+                      Items="_ingredients"
+                      ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)"
+                      ItemDropped="IngredientDropped"
+                      Class="d-flex flex-column mb-4">
+        <ChildContent>
+            <MudDropZone T="IngredientDto"
+                         Identifier="IngredientsZone"
+                         AllowReorder="true"
+                         Class="rounded mud-background-gray pa-3 min-height-100">
+                <ItemRenderer>
+                    <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
+                        <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
+
+                        <MudAutocomplete T="PredefinedProductDto"
+                                         Label="Szukaj składnika..."
+                                         Value="@context.SelectedProduct"
+                                         ValueChanged="@(product => OnProductChanged(context, product))"
+                                         SearchFunc="SearchIngredientsAsync"
+                                         ToStringFunc="@(p => p?.Name)"
+                                         Disabled="@context.IsPersisted"
+                                         ResetValueOnSelected="false"
+                                         CoerceText="true"
+                                         AdornmentIcon="@Icons.Material.Filled.Search"
+                                         AdornmentColor="Color.Primary"
+                                         Dense="true"
+                                         Margin="Margin.Dense"
+                                         Variant="Variant.Outlined"
+                                         DebounceInterval="200"
+                                         MinCharacters="0" />
+
+                        <MudNumericField @bind-Value="context.Quantity"
+                                         Label="Ilość"
+                                         Min="0.01m"
+                                         Step="0.1m"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense" />
+
+                        <MudSelect T="MeasureUnitDto"
+                                   Label="Jednostka"
+                                   Value="@context.SelectedUnit"
+                                   ValueChanged="@(unit => OnUnitChanged(context, unit))"
+                                   ToStringFunc="@(u => u?.DisplayName)"
+                                   Disabled="@(context.IsPersisted || !GetAvailableUnits(context).Any())"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Dense="true">
+                            @foreach (var unit in GetAvailableUnits(context))
+                            {
+                                <MudSelectItem Value="@unit">@unit.DisplayName</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudSpacer />
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Save"
+                                       Color="Color.Success"
+                                       Size="Size.Small"
+                                       OnClick="@(() => SaveIngredientAsync(context))" />
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="@(() => RemoveIngredientAsync(context))" />
+                    </MudPaper>
+                </ItemRenderer>
+            </MudDropZone>
+        </ChildContent>
+    </MudDropContainer>
+
+    <MudButton StartIcon="@Icons.Material.Filled.Add"
+               Color="Color.Secondary"
+               Variant="Variant.Outlined"
+               OnClick="AddIngredientLocal"
+               Class="mb-6">
+        Dodaj składnik
+    </MudButton>
+
+    <MudDivider Class="my-4" />
+
+    <MudText Typo="Typo.h6" Class="mb-2">Kroki instrukcji</MudText>
+
+    <MudDropContainer @ref="_stepsContainer"
+                      T="StepDto"
+                      Items="_steps"
+                      ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)"
+                      ItemDropped="StepDropped"
+                      Class="d-flex flex-column mb-4">
+        <ChildContent>
+            <MudDropZone T="StepDto"
+                         Identifier="StepsZone"
+                         AllowReorder="true"
+                         Class="rounded mud-background-gray pa-3 min-height-100">
+                <ItemRenderer>
+                    <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
+                        <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
+                        
+                        <MudChip T="string" Color="Color.Primary" Size="Size.Small">Krok @(context.Order + 1)</MudChip>
+
+                        <MudTextField @bind-Value="context.Instructions"
+                                      Label="Opis kroku"
+                                      Lines="2"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Class="flex-grow-1" />
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="@(() => RemoveStep(context))" />
+                    </MudPaper>
+                </ItemRenderer>
+            </MudDropZone>
+        </ChildContent>
+    </MudDropContainer>
+
+    <MudButton StartIcon="@Icons.Material.Filled.Add"
+               Color="Color.Secondary"
+               Variant="Variant.Outlined"
+               OnClick="AddStep"
+               Class="mb-6">
+        Dodaj krok
+    </MudButton>
+</MudPaper>
+
+@code {
+    [Parameter] public int RecipeId { get; set; }
+
+    private string _recipeName = string.Empty;
+    private int _servings = 1;
+    
+    private MudDropContainer<IngredientDto>? _ingredientsContainer;
+    private List<IngredientDto> _ingredients = [];
+
+    private MudDropContainer<StepDto>? _stepsContainer;
+    private List<StepDto> _steps = [];
+
+    private List<PredefinedProductDto> _predefinedProducts = [];
+    private readonly CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppBarService.SetTitle("Edycja Przepisu");
+        await LoadPredefinedProductsAsync();
+        await LoadRecipeDataAsync();
+    }
+
+    private async Task LoadRecipeDataAsync()
+    {
+        var recipe = await RecipeFinder.Get(RecipeId, _cts.Token);
+        if (recipe is null) return;
+        
+        _recipeName = recipe.Name;
+        _servings = recipe.Servings;
+        _ingredients =
+        [
+            .. recipe.Ingredients
+                .Select(x => new IngredientDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    SelectedProduct = _predefinedProducts.FirstOrDefault(y => y.Id == x.Id),
+                    Quantity = x.Quantity,
+                    SelectedUnit = x.MeasureUnit,
+                    IsPersisted = true
+                })
+        ];
+        
+        _steps =
+        [
+            .. recipe.Steps.Select((x, index) => new StepDto()
+            {
+                Order = x.Order,
+                Instructions = x.Instructions
+            }).OrderBy(x => x.Order)
+        ];
+    }
+
+    private async Task LoadPredefinedProductsAsync()
+    {
+        var response = await IngredientsFinder.Get(_cts.Token);
+        _predefinedProducts =
+        [
+            .. response.Ingredients.Select(i => new PredefinedProductDto(i.Id,
+                i.Name,
+                [.. i.ApplicableUnits]))
+        ];
+    }
+
+    private async Task SaveBasicInfoAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_recipeName) || _servings < 1)
+            return;
+
+        var request = new UpdateRecipeRequest(_recipeName, _servings);
+
+        await RecipeUpdater.UpdateRecipe(RecipeId, request, _cts.Token);
+
+        Snackbar.Add("Zaktualizowano dane podstawowe", Severity.Success);
+        Navigation.NavigateTo(RoutingConstants.Recipes.DetailsFor(RecipeId));
+    }
+
+    private async Task SaveIngredientAsync(IngredientDto item)
+    {
+        if (item.SelectedProduct == null || item.SelectedUnit == null)
+        {
+            Snackbar.Add("Wybierz produkt i jednostkę przed zapisem", Severity.Warning);
+            return;
+        }
+
+        var request = new UpdateRecipeIngredientRequest(item.Id, item.Quantity, item.SelectedUnit.UnderlyingValue);
+        await RecipeUpdater.AddIngredientToRecipe(RecipeId, request, _cts.Token);
+        Snackbar.Add($"Zapisano składnik: {item.SelectedProduct.Name}", Severity.Success);
+        
+        item.IsPersisted = true;
+        _ingredientsContainer?.Refresh();
+    }
+
+    private async Task RemoveIngredientAsync(IngredientDto item)
+    {
+        if (item is { Id: > 0, SelectedUnit: not null })
+        {
+            var request = new DeleteRecipeIngredientRequest(item.Id, item.SelectedUnit.UnderlyingValue);
+            await RecipeUpdater.DeleteIngredientFromRecipe(RecipeId, request, _cts.Token);
+            Snackbar.Add("Składnik został usunięty", Severity.Info);
+        }
+
+        _ingredients.Remove(item);
+        _ingredientsContainer?.Refresh();
+    }
+
+    private void AddIngredientLocal()
+    {
+        _ingredients.Add(new IngredientDto());
+        _ingredientsContainer?.Refresh();
+    }
+
+    private IEnumerable<MeasureUnitDto> GetAvailableUnits(IngredientDto currentItem)
+    {
+        if (currentItem.SelectedProduct == null)
+            return [];
+
+        var usedUnitValuesInOtherRows = _ingredients
+            .Where(i => i != currentItem && i.SelectedProduct?.Id == currentItem.SelectedProduct.Id)
+            .Select(i => i.SelectedUnit?.UnderlyingValue)
+            .Where(val => val != null)
+            .ToHashSet();
+
+        return currentItem.AvailableUnits
+            .Where(u => !usedUnitValuesInOtherRows.Contains(u.UnderlyingValue));
+    }
+
+    private void OnProductChanged(IngredientDto item, PredefinedProductDto? product)
+    {
+        item.SelectedProduct = product;
+        item.Id = product?.Id ?? 0;
+        item.SelectedUnit = GetAvailableUnits(item).FirstOrDefault();
+        _ingredientsContainer?.Refresh();
+    }
+    
+    private void OnUnitChanged(IngredientDto item, MeasureUnitDto? unit)
+    {
+        item.SelectedUnit = unit;
+        _ingredientsContainer?.Refresh();
+    }
+
+    private void IngredientDropped(MudItemDropInfo<IngredientDto> dropItem)
+    {
+        if (dropItem.Item is null) return;
+
+        _ingredients.Remove(dropItem.Item);
+        var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _ingredients.Count);
+        _ingredients.Insert(targetIndex, dropItem.Item);
+        _ingredientsContainer?.Refresh();
+    }
+
+    private void AddStep()
+    {
+        _steps.Add(new StepDto
+        {
+            Order = _steps.Count,
+            Instructions = string.Empty
+        });
+        _stepsContainer?.Refresh();
+    }
+
+    private void RemoveStep(StepDto item)
+    {
+        _steps.Remove(item);
+        ReindexSteps();
+        _stepsContainer?.Refresh();
+    }
+
+    private void StepDropped(MudItemDropInfo<StepDto> dropItem)
+    {
+        if (dropItem?.Item is null) return;
+
+        _steps.Remove(dropItem.Item);
+        var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _steps.Count);
+        _steps.Insert(targetIndex, dropItem.Item);
+
+        ReindexSteps();
+        _stepsContainer?.Refresh();
+    }
+
+    private void ReindexSteps()
+    {
+        for (int i = 0; i < _steps.Count; i++)
+        {
+            _steps[i].Order = i;
+        }
+    }
+
+    private Task<IEnumerable<PredefinedProductDto>> SearchIngredientsAsync(string value, CancellationToken arg2)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Task.FromResult<IEnumerable<PredefinedProductDto>>([.. _predefinedProducts.Take(20)]);
+        }
+
+        return Task.FromResult<IEnumerable<PredefinedProductDto>>([
+            .. _predefinedProducts
+                .Where(p => p.Name.Contains(value, StringComparison.OrdinalIgnoreCase))
+                .Take(20)
+        ]);
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+        AppBarService.ClearActions();
+    }
+}

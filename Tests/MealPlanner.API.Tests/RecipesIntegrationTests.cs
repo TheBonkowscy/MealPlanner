@@ -188,7 +188,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var recipe = TestRecipes.Create();
         await AddRecipeToDatabase(recipe);
         var ingredient = recipe.Ingredients[0];
-        var requestBody = new DeleteRecipeIngredientRequest(ingredient.Unit.ToString());
+        var requestBody = new DeleteRecipeIngredientRequest(ingredient.IngredientId, ingredient.Unit.ToString());
         var request = new HttpRequestMessage(HttpMethod.Delete,
             $"{Constants.RecipesRoute}/{recipe.Id}/ingredients/{ingredient.IngredientId}")
         {

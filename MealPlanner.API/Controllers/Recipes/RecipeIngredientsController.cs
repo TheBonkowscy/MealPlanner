@@ -18,7 +18,7 @@ public class RecipeIngredientsController(
     public async Task<GetRecipeDetailsResponse> UpdateIngredient(
         [FromRoute(Name = "recipeId")] int recipeId, 
         [FromRoute(Name = "ingredientId")] int ingredientId,
-        AddIngredientRequest request, 
+        UpdateRecipeIngredientRequest request, 
         CancellationToken cancellationToken) =>
         await recipeIngredientUpdater.UpdateIngredient(recipeId, ingredientId, request, cancellationToken);
     

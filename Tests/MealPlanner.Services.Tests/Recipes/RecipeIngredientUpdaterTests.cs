@@ -36,7 +36,7 @@ public class RecipeIngredientUpdaterTests
         // Arrange
         var recipe = TestRecipes.Create();
         var usedIngredient = recipe.Ingredients[0];
-        var request = new AddIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
+        var request = new UpdateRecipeIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
         
         // Act
         var updateIngredient = () => _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
@@ -56,7 +56,7 @@ public class RecipeIngredientUpdaterTests
         _recipes.Add(recipe);
         var newIngredient = TestIngredients.Create();
         
-        var request = new AddIngredientRequest(newIngredient.Id,  10, newIngredient.ApplicableUnits.First().ToString()); 
+        var request = new UpdateRecipeIngredientRequest(newIngredient.Id,  10, newIngredient.ApplicableUnits.First().ToString()); 
         
         // Act
         var result = await _sut.UpdateIngredient(recipe.Id, request.Id, request, CancellationToken.None);
@@ -74,7 +74,7 @@ public class RecipeIngredientUpdaterTests
         var recipe = TestRecipes.Create();
         _recipes.Add(recipe);
         var usedIngredient = recipe.Ingredients[0];
-        var request = new AddIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
+        var request = new UpdateRecipeIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
         
         // Act
         var result = await _sut.UpdateIngredient(recipe.Id, request.Id, request, CancellationToken.None);
@@ -91,7 +91,7 @@ public class RecipeIngredientUpdaterTests
         var recipe = TestRecipes.Create();
         _recipes.Add(recipe);
         var usedIngredient = recipe.Ingredients[0];
-        var request = new AddIngredientRequest(999,  usedIngredient.Quantity + 10, nameof(MeasureUnit.Slice2)); 
+        var request = new UpdateRecipeIngredientRequest(999,  usedIngredient.Quantity + 10, nameof(MeasureUnit.Slice2)); 
         
         // Act
         var updateIngredient = () => _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
@@ -110,7 +110,7 @@ public class RecipeIngredientUpdaterTests
         var recipe = TestRecipes.Create();
         _recipes.Add(recipe);
         var usedIngredient = recipe.Ingredients[0];
-        var request = new AddIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
+        var request = new UpdateRecipeIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
         
         // Act
         var result = await _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);

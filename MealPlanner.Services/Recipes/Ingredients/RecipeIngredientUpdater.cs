@@ -8,14 +8,19 @@ namespace MealPlanner.Services.Recipes.Ingredients;
 
 public interface IUpdateRecipeIngredient
 {
-    Task<GetRecipeDetailsResponse> UpdateIngredient(int recipeId, int ingredientId, AddIngredientRequest request, CancellationToken cancellationToken);
+    Task<GetRecipeDetailsResponse> UpdateIngredient(int recipeId,
+        int ingredientId,
+        UpdateRecipeIngredientRequest request,
+        CancellationToken cancellationToken);
 }
 
 public class RecipeIngredientUpdater(MealPlannerDbContext ctx,
     MeasureUnitMapper measureUnitMapper,
     RecipeMapper recipeMapper) : IUpdateRecipeIngredient
 {
-    public async Task<GetRecipeDetailsResponse> UpdateIngredient(int recipeId, int ingredientId, AddIngredientRequest request,
+    public async Task<GetRecipeDetailsResponse> UpdateIngredient(int recipeId,
+        int ingredientId,
+        UpdateRecipeIngredientRequest request,
         CancellationToken cancellationToken)
     {
         var recipe = await ctx.Recipes.Include(x => x.Ingredients)
@@ -24,7 +29,7 @@ public class RecipeIngredientUpdater(MealPlannerDbContext ctx,
 
         if (recipe is null)
         {
-            throw new InvalidOperationException($"Recipe could not be found");   // TODO: custom exceptions?
+            throw new InvalidOperationException("Recipe could not be found");   // TODO: custom exceptions?
         }
 
         var measureUnit = measureUnitMapper.Map(request.Unit);

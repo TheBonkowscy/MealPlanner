@@ -8,7 +8,7 @@ using MealPlanner.Shared.Recipes.Responses;
 namespace MealPlanner.Client.Recipes;
 
 internal class RecipeClient(HttpClient httpClient) : 
-    IFindRecipes, ICreateRecipes, IDeleteRecipes,
+    IFindRecipes, ICreateRecipes, IDeleteRecipes, IUpdateRecipes,
     IFindIngredients
 {
     public async Task<GetRecipesResponse> Get(string? query, CancellationToken cancellationToken)
@@ -71,5 +71,52 @@ internal class RecipeClient(HttpClient httpClient) :
         var endpoint = Constants.RecipesRoute.AppendPathSegment(id);
         var result = await httpClient.DeleteAsync(endpoint, cancellationToken);
         return result.IsSuccessStatusCode;
+    }
+
+    public async Task<GetRecipeDetailsResponse> UpdateRecipe(int id, UpdateRecipeRequest updateRecipeRequest, CancellationToken cancellationToken)
+    {
+        var endpoint = Constants.RecipesRoute.AppendPathSegment(id);
+        var response =
+            await httpClient.PutAsJsonAsync(endpoint, updateRecipeRequest, options: null, cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>(cancellationToken);
+        }
+
+        throw new Exception("Unable to update recipe");   // TODO: concrete types?
+    }
+
+    public async Task<GetRecipeDetailsResponse> AddIngredientToRecipe(int id, UpdateRecipeIngredientRequest request, CancellationToken cancellationToken)
+    {
+        var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/ingredients/").AppendPathSegment(request.Id);
+        var response =
+            await httpClient.PutAsJsonAsync(endpoint, request, options: null, cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>(cancellationToken);
+        }
+
+        throw new Exception("Unable to update ingredients for this recipe");   // TODO: concrete types?
+    }
+
+    public async Task DeleteIngredientFromRecipe(int id, DeleteRecipeIngredientRequest deleteRecipeIngredientRequest,
+        CancellationToken cancellationToken)
+    {
+        var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/ingredients/").AppendPathSegment(deleteRecipeIngredientRequest.Id);
+        var request = new HttpRequestMessage(HttpMethod.Delete, endpoint)
+        {
+            Content = JsonContent.Create(deleteRecipeIngredientRequest)
+        };
+        
+        var response = await httpClient.SendAsync(request, cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        throw new Exception("Unable to delete ingredients from this recipe");   // TODO: concrete types?
     }
 }
