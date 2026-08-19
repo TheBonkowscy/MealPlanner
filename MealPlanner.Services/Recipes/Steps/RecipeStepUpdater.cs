@@ -23,6 +23,11 @@ public class RecipeStepUpdater(MealPlannerDbContext ctx, RecipeMapper recipeMapp
         }
 
         recipe.UpdateStep(stepId, request.Order, request.Instructions);
+        foreach (var step in recipe.Steps)
+        {
+            ctx.Entry(step).State = EntityState.Modified;
+        }
+        
         await ctx.SaveChangesAsync(cancellationToken);
 
         return recipeMapper.ToDetails(recipe);

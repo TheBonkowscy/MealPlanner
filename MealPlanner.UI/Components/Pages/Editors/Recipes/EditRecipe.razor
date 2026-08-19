@@ -130,9 +130,9 @@
                          AllowReorder="true"
                          Class="rounded mud-background-gray pa-3 min-height-100">
                 <ItemRenderer>
-                    <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
+                    <MudPaper @key="context.ClientGuid" Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
                         <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
-                        
+        
                         <MudChip T="string" Color="Color.Primary" Size="Size.Small">Krok @(context.Order)</MudChip>
 
                         <MudTextField @bind-Value="context.Instructions"
@@ -188,10 +188,21 @@
     {
         var recipe = await RecipeFinder.Get(RecipeId, _cts.Token);
         if (recipe is null) return;
-        
+
+        ResetRecipe(recipe);
+    }
+
+    private void ResetRecipe(GetRecipeDetailsResponse recipe)
+    {
         _recipeName = recipe.Name;
         _servings = recipe.Servings;
-        _ingredients =
+        _ingredients = MapIngredients(recipe);
+        _steps = MapSteps(recipe);
+    }
+
+    private List<IngredientDto> MapIngredients(GetRecipeDetailsResponse recipe)
+    {
+        return
         [
             .. recipe.Ingredients
                 .Select(x => new IngredientDto
@@ -204,8 +215,11 @@
                     IsPersisted = true
                 })
         ];
-        
-        _steps =
+    }
+
+    private static List<StepDto> MapSteps(GetRecipeDetailsResponse recipe)
+    {
+        return
         [
             .. recipe.Steps.Select((x, index) => new StepDto()
             {
@@ -318,16 +332,27 @@
     {
         _steps.Add(new StepDto
         {
-            Order = _steps.Count,
+            Id = 0,
+            Order = _steps.Count + 1,
             Instructions = string.Empty
         });
+    
         _stepsContainer?.Refresh();
     }
 
-    private void RemoveStep(StepDto item)
+    private async Task RemoveStep(StepDto item)
     {
-        _steps.Remove(item);
-        ReindexSteps();
+        if (item.Id > 0)
+        {
+            await RecipeUpdater.DeleteStep(RecipeId, item.Id, _cts.Token);
+            await LoadRecipeDataAsync();
+        }
+        else
+        {
+            _steps.Remove(item);
+            ReindexSteps();
+        }
+        
         _stepsContainer?.Refresh();
     }
 
@@ -335,23 +360,73 @@
     {
         if (dropItem?.Item is null) return;
 
-        _steps.Remove(dropItem.Item);
+        // 1. Wyciągamy przeciągnięty krok
+        var itemToMove = dropItem.Item;
+        _steps.Remove(itemToMove);
+
+        // 2. Wstawiamy go na nową pozycję wskazaną przez MudDropZone
         var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _steps.Count);
-        _steps.Insert(targetIndex, dropItem.Item);
-        
+        _steps.Insert(targetIndex, itemToMove);
+
+        // 3. Przeliczamy lokalnie `Order` (1..N) dla wszystkich elementów w nowej kolejności
         ReindexSteps();
-        
-        var requestBody = new UpdateRecipeStepRequest(dropItem.Item.Id, dropItem.Item.Order, dropItem.Item.Instructions);
-        var result = await RecipeUpdater.UpdateStep(RecipeId, requestBody, _cts.Token);
-        
+
+        // Odświeżamy MudDropContainer natychmiast, aby UI i widok były w 100% spójne
         _stepsContainer?.Refresh();
+
+        // 4. Jeśli krok nie był jeszcze zapisany w bazie (Id == 0)
+        if (itemToMove.Id == 0)
+        {
+            if (!string.IsNullOrWhiteSpace(itemToMove.Instructions))
+            {
+                var addRequest = new AddRecipeStepRequest(itemToMove.Order, itemToMove.Instructions);
+                await RecipeUpdater.AddStep(RecipeId, addRequest, _cts.Token);
+                await RefreshStepsFromBackendAsync();
+            }
+        }
+        else
+        {
+            // Wysyłamy update z nowym numerem `Order` wyliczonym po przesunięciu
+            var updateRequest = new UpdateRecipeStepRequest(itemToMove.Id, itemToMove.Order, itemToMove.Instructions);
+            await RecipeUpdater.UpdateStep(RecipeId, updateRequest, _cts.Token);
+        
+            // Pobieramy spójne dane z backendu po reindeksacji przez bazę
+            await RefreshStepsFromBackendAsync();
+        }
+    }
+    
+    private async Task RefreshStepsFromBackendAsync()
+    {
+        var recipe = await RecipeFinder.Get(RecipeId, _cts.Token);
+        if (recipe is null) return;
+
+        var backendSteps = recipe.Steps.OrderBy(x => x.Order).ToList();
+
+        _steps =
+        [
+            .. backendSteps.Select(ns =>
+            {
+                var existing = _steps.FirstOrDefault(s => s.Id == ns.Id && s.Id != 0);
+
+                return new StepDto
+                {
+                    ClientGuid = existing?.ClientGuid ?? Guid.NewGuid(),
+                    Id = ns.Id,
+                    Order = ns.Order,
+                    Instructions = ns.Instructions
+                };
+            })
+        ];
+
+        _stepsContainer?.Refresh();
+        StateHasChanged();
     }
 
     private void ReindexSteps()
     {
         for (int i = 0; i < _steps.Count; i++)
         {
-            _steps[i].Order = i;
+            _steps[i].Order = i + 1;
         }
     }
 
@@ -378,8 +453,11 @@
 
     private async Task UpdateOrAddStep(StepDto context)
     {
-        var isNew = context.Id == 0;
-        if (isNew)
+        // Nie wywołuj tej metody, jeśli treść instrukcji jest pusta (np. przy świeżo dodanym wierszu w UI)
+        if (string.IsNullOrWhiteSpace(context.Instructions))
+            return;
+
+        if (context.Id == 0)
         {
             var request = new AddRecipeStepRequest(context.Order, context.Instructions);
             await RecipeUpdater.AddStep(RecipeId, request, _cts.Token);
@@ -389,8 +467,12 @@
             var request = new UpdateRecipeStepRequest(context.Id, context.Order, context.Instructions);
             await RecipeUpdater.UpdateStep(RecipeId, request, _cts.Token);
         }
-        
-        Snackbar.Add("Krok zapisany pomyślnie!");
+    
+        // Zapisujemy i pobieramy świeży stan, aby nadane przez bazę Id przypisało się do DTO
+        await LoadRecipeDataAsync();
+        _stepsContainer?.Refresh();
+    
+        Snackbar.Add("Krok zapisany pomyślnie!", Severity.Success);
     }
 
 }

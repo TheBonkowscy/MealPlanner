@@ -140,6 +140,8 @@ public class Recipe
         {
             throw new InvalidOperationException("Recipe step could not be found");
         }
+        
+        _steps = [.. _steps.OrderBy(x => x.Order)];
 
         updatedStep.UpdateInstructions(newInstructions);
 
@@ -152,6 +154,7 @@ public class Recipe
 
     public void AddStep(int targetOrder, string instructions)
     {
+        _steps = [.. _steps.OrderBy(x => x.Order)];
         var newStep = RecipeStep.Create(targetOrder, instructions);
         
         var clampedOrder = Math.Clamp(targetOrder, 1, _steps.Count + 1);
@@ -163,6 +166,7 @@ public class Recipe
     
     public void RemoveStep(RecipeStep step)
     {
+        _steps = [.. _steps.OrderBy(x => x.Order)];
         if (_steps.Remove(step))
         {
             ReindexSteps();
