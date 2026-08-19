@@ -10,7 +10,7 @@ using Microsoft.Extensions.Localization;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace MealPlanner.Services.Tests;
+namespace MealPlanner.Services.Tests.Recipes;
 
 public class RecipeReaderTests
 {
@@ -25,7 +25,7 @@ public class RecipeReaderTests
         _localiser = new Mock<IStringLocalizer<Translations>>();
         _ctx = new Mock<MealPlannerDbContext>();
         _ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
-        _sut = new RecipeReader(_ctx.Object, new MeasureUnitMapper(_localiser.Object));
+        _sut = new RecipeReader(_ctx.Object, new RecipeMapper(new MeasureUnitMapper(_localiser.Object)));
     }
 
     [Fact]

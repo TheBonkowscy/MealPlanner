@@ -10,7 +10,6 @@ public class MealPlannerDbContext : DbContext
 {
     public virtual DbSet<Menu> Menus { get; set; }
     public virtual DbSet<Recipe> Recipes { get; set; }
-    public virtual DbSet<RecipeStep> RecipeSteps { get; set; }
     public virtual DbSet<Meal> Meals { get; set; }
     public virtual DbSet<Ingredient> Ingredients { get; set; }
 
@@ -27,6 +26,9 @@ public class MealPlannerDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(MealPlannerDbContext).Assembly);
         modelBuilder.HasPostgresEnum<MeasureUnit>();
+        
+        // Custom table names for entities without configuration
+        modelBuilder.Entity<RecipeStep>().ToTable("RecipeSteps");
     }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

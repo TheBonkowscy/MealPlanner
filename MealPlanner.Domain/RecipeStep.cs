@@ -40,4 +40,16 @@ public class RecipeStep
             throw new ArgumentNullException(null, "Instruction cannot be null or whitespace");
         }
     }
+
+    public void UpdateOrder(int newOrder)
+    {
+        ValidateOrderAndThrow(newOrder);
+        Order = newOrder;
+    }
+
+    public void UpdateInstructions(string newInstructions)
+    {
+        ValidateInstructionAndThrow(newInstructions);
+        Instructions = newInstructions;
+    }
 }

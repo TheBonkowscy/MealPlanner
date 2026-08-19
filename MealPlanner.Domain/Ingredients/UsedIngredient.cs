@@ -31,6 +31,32 @@ public class UsedIngredient
         Unit = unit;
     }
 
-    public static UsedIngredient Create(Recipe recipe, AddIngredientAction action) =>
-        new(recipe, action.Ingredient, action.Quantity, action.Unit);
+    public static UsedIngredient Create(Recipe recipe, AddIngredientAction action)
+    {
+        ValidateRecipeAndThrow(recipe);
+        ValidateQuantityAndThrow(action.Quantity);
+        return new UsedIngredient(recipe, action.Ingredient, action.Quantity, action.Unit);
+    }
+
+    private static void ValidateRecipeAndThrow(Recipe recipe)
+    {
+        if (recipe is null)
+        {
+            throw new ArgumentNullException(null, "Recipe can not be null");
+        }
+    }
+
+    private static void ValidateQuantityAndThrow(decimal quantity)
+    {
+        if (quantity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(null, "Quantity must be greater than zero");
+        }
+    }
+
+    public void UpdateQuantity(decimal quantity)
+    {
+        ValidateQuantityAndThrow(quantity);
+        Quantity = quantity;
+    }
 }

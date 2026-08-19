@@ -45,7 +45,6 @@ public abstract class IntegrationTestBase : IDisposable, IAsyncDisposable
     {
         DatabaseContext.Meals.ExecuteDelete();
         DatabaseContext.Menus.ExecuteDelete();
-        DatabaseContext.RecipeSteps.ExecuteDelete();
         DatabaseContext.Recipes.ExecuteDelete();
         DatabaseContext.Ingredients.ExecuteDelete();
     }
@@ -68,7 +67,7 @@ public abstract class IntegrationTestBase : IDisposable, IAsyncDisposable
         await DatabaseContext.Ingredients.AddAsync(ingredient);
         await DatabaseContext.SaveChangesAsync();
     }
-    
+
     public void Dispose()
     {
         _serviceScope.Dispose();

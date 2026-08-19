@@ -10,7 +10,7 @@ using Microsoft.Extensions.Localization;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace MealPlanner.Services.Tests;
+namespace MealPlanner.Services.Tests.Recipes;
 
 public class RecipeCreatorTests
 {
@@ -19,7 +19,6 @@ public class RecipeCreatorTests
 
     private static readonly Ingredient PreExistingIngredient = TestIngredients.Create("PreExistingIngredient");
     private readonly List<Ingredient> _ingredients = [PreExistingIngredient];
-    private readonly List<RecipeStep> _recipeSteps = [];
     private readonly List<Recipe> _recipes = [];
     
     public RecipeCreatorTests()
@@ -30,14 +29,9 @@ public class RecipeCreatorTests
         {
             RandomId.Set(recipe);
             _recipes.Add(recipe);
-
-            var steps = recipe.Steps.ToArray();
-            RandomId.Set(steps);
-            _recipeSteps.AddRange(steps);
         });
         
         ctx.Setup(x => x.Ingredients).ReturnsDbSet(_ingredients);
-        ctx.Setup(x => x.RecipeSteps).ReturnsDbSet(_recipeSteps);
         
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
         _sut = new RecipeCreator(ctx.Object, new MeasureUnitMapper(_localizer.Object));
@@ -119,7 +113,7 @@ public class RecipeCreatorTests
     private static CreateRecipeRequest NewRequest()
     {
         var ingredient = new AddIngredientRequest(PreExistingIngredient.Id, 1, nameof(MeasureUnit.Bottle));
-        var step = new AddStepRequest(1, "Step 1");
+        var step = new AddRecipeStepRequest(1, "Step 1");
         return new CreateRecipeRequest(Guid.NewGuid().ToString(), 1, [ingredient], [step]);
     }
 }

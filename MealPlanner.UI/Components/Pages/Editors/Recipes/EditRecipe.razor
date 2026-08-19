@@ -1,34 +1,37 @@
-﻿@page "/editors/recipes/create"
+﻿@page "/editors/recipes/edit/{RecipeId:int}"
 @using MealPlanner.UI.Services
 @using MealPlanner.UI.Models.Editors
 @using MealPlanner.Shared.Recipes.Requests
 @using MealPlanner.Shared.Shared
 @using MealPlanner.Client.Recipes
+@using MealPlanner.Shared.Recipes.Responses
 @using System.Linq
 
 @implements IDisposable
 @inject NavigationManager Navigation
 @inject IFindIngredients IngredientsFinder
-@inject ICreateRecipes RecipeCreator
+@inject IFindRecipes RecipeFinder
+@inject IUpdateRecipes RecipeUpdater
 @inject ISnackbar Snackbar
 @inject AppBarService AppBarService
 
-<h3>Tworzenie nowego przepisu</h3>
-
 <MudPaper Class="pa-6 ma-4" Elevation="3">
     <MudTextField @bind-Value="_recipeName"
+                  @bind-Value:after="SaveBasicInfoAsync"
                   Label="Nazwa przepisu"
                   Variant="Variant.Outlined"
                   Class="mb-6"
                   Required="true"
                   RequiredError="Nazwa jest wymagana" />
+
     <MudNumericField @bind-Value="_servings"
-                  Label="Liczba porcji"
-                  Variant="Variant.Outlined"
-                  Class="mb-6"
-                  Required="true"
-                  Min="1"
-                  RequiredError="Liczba porcji jest wymagana" />
+                     @bind-Value:after="SaveBasicInfoAsync"
+                     Label="Liczba porcji"
+                     Variant="Variant.Outlined"
+                     Class="mb-6"
+                     Required="true"
+                     Min="1"
+                     RequiredError="Liczba porcji jest wymagana" />
 
     <MudText Typo="Typo.h6" Class="mb-2">Składniki</MudText>
     
@@ -53,6 +56,7 @@
                                          ValueChanged="@(product => OnProductChanged(context, product))"
                                          SearchFunc="SearchIngredientsAsync"
                                          ToStringFunc="@(p => p?.Name)"
+                                         Disabled="@context.IsPersisted"
                                          ResetValueOnSelected="false"
                                          CoerceText="true"
                                          AdornmentIcon="@Icons.Material.Filled.Search"
@@ -75,7 +79,7 @@
                                    Value="@context.SelectedUnit"
                                    ValueChanged="@(unit => OnUnitChanged(context, unit))"
                                    ToStringFunc="@(u => u?.DisplayName)"
-                                   Disabled="@(!GetAvailableUnits(context).Any())"
+                                   Disabled="@(context.IsPersisted || !GetAvailableUnits(context).Any())"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Dense="true">
@@ -87,10 +91,15 @@
 
                         <MudSpacer />
 
+                        <MudIconButton Icon="@Icons.Material.Filled.Save"
+                                       Color="Color.Success"
+                                       Size="Size.Small"
+                                       OnClick="@(() => SaveIngredientAsync(context))" />
+
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                        Color="Color.Error"
                                        Size="Size.Small"
-                                       OnClick="@(() => RemoveIngredient(context))" />
+                                       OnClick="@(() => RemoveIngredientAsync(context))" />
                     </MudPaper>
                 </ItemRenderer>
             </MudDropZone>
@@ -100,7 +109,7 @@
     <MudButton StartIcon="@Icons.Material.Filled.Add"
                Color="Color.Secondary"
                Variant="Variant.Outlined"
-               OnClick="AddIngredient"
+               OnClick="AddIngredientLocal"
                Class="mb-6">
         Dodaj składnik
     </MudButton>
@@ -121,12 +130,13 @@
                          AllowReorder="true"
                          Class="rounded mud-background-gray pa-3 min-height-100">
                 <ItemRenderer>
-                    <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
+                    <MudPaper @key="context.ClientGuid" Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
                         <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
-                        
-                        <MudChip T="string" Color="Color.Primary" Size="Size.Small">Krok @(context.Order + 1)</MudChip>
+        
+                        <MudChip T="string" Color="Color.Primary" Size="Size.Small">Krok @(context.Order)</MudChip>
 
                         <MudTextField @bind-Value="context.Instructions"
+                                      @bind-Value:after="() => UpdateOrAddStep(context)"
                                       Label="Opis kroku"
                                       Lines="2"
                                       Variant="Variant.Outlined"
@@ -150,36 +160,74 @@
                Class="mb-6">
         Dodaj krok
     </MudButton>
-
-    <MudDivider Class="my-4" />
-
-    <MudButton Variant="Variant.Filled"
-               Color="Color.Primary"
-               StartIcon="@Icons.Material.Filled.Add"
-               Size="Size.Large"
-               Class="mt-2"
-               OnClick="SaveRecipeAsync">
-        Dodaj przepis +
-    </MudButton>
 </MudPaper>
 
 @code {
+    [Parameter] public int RecipeId { get; set; }
+
     private string _recipeName = string.Empty;
     private int _servings = 1;
     
     private MudDropContainer<IngredientDto>? _ingredientsContainer;
-    private readonly List<IngredientDto> _ingredients = [];
+    private List<IngredientDto> _ingredients = [];
 
     private MudDropContainer<StepDto>? _stepsContainer;
-    private readonly List<StepDto> _steps = [];
+    private List<StepDto> _steps = [];
 
     private List<PredefinedProductDto> _predefinedProducts = [];
     private readonly CancellationTokenSource _cts = new();
 
     protected override async Task OnInitializedAsync()
     {
-        AppBarService.SetTitle("Dodaj Nowy Przepis");
+        AppBarService.SetTitle("Edycja Przepisu");
         await LoadPredefinedProductsAsync();
+        await LoadRecipeDataAsync();
+    }
+
+    private async Task LoadRecipeDataAsync()
+    {
+        var recipe = await RecipeFinder.Get(RecipeId, _cts.Token);
+        if (recipe is null) return;
+
+        ResetRecipe(recipe);
+    }
+
+    private void ResetRecipe(GetRecipeDetailsResponse recipe)
+    {
+        _recipeName = recipe.Name;
+        _servings = recipe.Servings;
+        _ingredients = MapIngredients(recipe);
+        _steps = MapSteps(recipe);
+    }
+
+    private List<IngredientDto> MapIngredients(GetRecipeDetailsResponse recipe)
+    {
+        return
+        [
+            .. recipe.Ingredients
+                .Select(x => new IngredientDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    SelectedProduct = _predefinedProducts.FirstOrDefault(y => y.Id == x.Id),
+                    Quantity = x.Quantity,
+                    SelectedUnit = x.MeasureUnit,
+                    IsPersisted = true
+                })
+        ];
+    }
+
+    private static List<StepDto> MapSteps(GetRecipeDetailsResponse recipe)
+    {
+        return
+        [
+            .. recipe.Steps.Select((x, index) => new StepDto()
+            {
+                Id = x.Id,
+                Order = x.Order,
+                Instructions = x.Instructions
+            }).OrderBy(x => x.Order)
+        ];
     }
 
     private async Task LoadPredefinedProductsAsync()
@@ -193,12 +241,54 @@
         ];
     }
 
-    private void AddIngredient()
+    private async Task SaveBasicInfoAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_recipeName) || _servings < 1)
+            return;
+
+        var request = new UpdateRecipeRequest(_recipeName, _servings);
+
+        await RecipeUpdater.UpdateRecipe(RecipeId, request, _cts.Token);
+
+        Snackbar.Add("Zaktualizowano dane podstawowe", Severity.Success);
+        Navigation.NavigateTo(RoutingConstants.Recipes.DetailsFor(RecipeId));
+    }
+
+    private async Task SaveIngredientAsync(IngredientDto item)
+    {
+        if (item.SelectedProduct == null || item.SelectedUnit == null)
+        {
+            Snackbar.Add("Wybierz produkt i jednostkę przed zapisem", Severity.Warning);
+            return;
+        }
+
+        var request = new UpdateRecipeIngredientRequest(item.Id, item.Quantity, item.SelectedUnit.UnderlyingValue);
+        await RecipeUpdater.AddIngredientToRecipe(RecipeId, request, _cts.Token);
+        Snackbar.Add($"Zapisano składnik: {item.SelectedProduct.Name}", Severity.Success);
+        
+        item.IsPersisted = true;
+        _ingredientsContainer?.Refresh();
+    }
+
+    private async Task RemoveIngredientAsync(IngredientDto item)
+    {
+        if (item is { Id: > 0, SelectedUnit: not null })
+        {
+            var request = new DeleteRecipeIngredientRequest(item.Id, item.SelectedUnit.UnderlyingValue);
+            await RecipeUpdater.DeleteIngredientFromRecipe(RecipeId, request, _cts.Token);
+            Snackbar.Add("Składnik został usunięty", Severity.Info);
+        }
+
+        _ingredients.Remove(item);
+        _ingredientsContainer?.Refresh();
+    }
+
+    private void AddIngredientLocal()
     {
         _ingredients.Add(new IngredientDto());
         _ingredientsContainer?.Refresh();
     }
-    
+
     private IEnumerable<MeasureUnitDto> GetAvailableUnits(IngredientDto currentItem)
     {
         if (currentItem.SelectedProduct == null)
@@ -218,22 +308,13 @@
     {
         item.SelectedProduct = product;
         item.Id = product?.Id ?? 0;
-    
         item.SelectedUnit = GetAvailableUnits(item).FirstOrDefault();
-    
         _ingredientsContainer?.Refresh();
     }
     
     private void OnUnitChanged(IngredientDto item, MeasureUnitDto? unit)
     {
         item.SelectedUnit = unit;
-    
-        _ingredientsContainer?.Refresh();
-    }
-
-    private void RemoveIngredient(IngredientDto item)
-    {
-        _ingredients.Remove(item);
         _ingredientsContainer?.Refresh();
     }
 
@@ -244,7 +325,6 @@
         _ingredients.Remove(dropItem.Item);
         var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _ingredients.Count);
         _ingredients.Insert(targetIndex, dropItem.Item);
-        
         _ingredientsContainer?.Refresh();
     }
 
@@ -252,81 +332,102 @@
     {
         _steps.Add(new StepDto
         {
-            Order = _steps.Count,
+            Id = 0,
+            Order = _steps.Count + 1,
             Instructions = string.Empty
         });
+    
         _stepsContainer?.Refresh();
     }
 
-    private void RemoveStep(StepDto item)
+    private async Task RemoveStep(StepDto item)
     {
-        _steps.Remove(item);
-        ReindexSteps();
+        if (item.Id > 0)
+        {
+            await RecipeUpdater.DeleteStep(RecipeId, item.Id, _cts.Token);
+            await LoadRecipeDataAsync();
+        }
+        else
+        {
+            _steps.Remove(item);
+            ReindexSteps();
+        }
+        
         _stepsContainer?.Refresh();
     }
 
-    private void StepDropped(MudItemDropInfo<StepDto> dropItem)
+    private async Task StepDropped(MudItemDropInfo<StepDto> dropItem)
     {
         if (dropItem?.Item is null) return;
 
-        _steps.Remove(dropItem.Item);
-        var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _steps.Count);
-        _steps.Insert(targetIndex, dropItem.Item);
+        // 1. Wyciągamy przeciągnięty krok
+        var itemToMove = dropItem.Item;
+        _steps.Remove(itemToMove);
 
+        // 2. Wstawiamy go na nową pozycję wskazaną przez MudDropZone
+        var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _steps.Count);
+        _steps.Insert(targetIndex, itemToMove);
+
+        // 3. Przeliczamy lokalnie `Order` (1..N) dla wszystkich elementów w nowej kolejności
         ReindexSteps();
+
+        // Odświeżamy MudDropContainer natychmiast, aby UI i widok były w 100% spójne
         _stepsContainer?.Refresh();
+
+        // 4. Jeśli krok nie był jeszcze zapisany w bazie (Id == 0)
+        if (itemToMove.Id == 0)
+        {
+            if (!string.IsNullOrWhiteSpace(itemToMove.Instructions))
+            {
+                var addRequest = new AddRecipeStepRequest(itemToMove.Order, itemToMove.Instructions);
+                await RecipeUpdater.AddStep(RecipeId, addRequest, _cts.Token);
+                await RefreshStepsFromBackendAsync();
+            }
+        }
+        else
+        {
+            // Wysyłamy update z nowym numerem `Order` wyliczonym po przesunięciu
+            var updateRequest = new UpdateRecipeStepRequest(itemToMove.Id, itemToMove.Order, itemToMove.Instructions);
+            await RecipeUpdater.UpdateStep(RecipeId, updateRequest, _cts.Token);
+        
+            // Pobieramy spójne dane z backendu po reindeksacji przez bazę
+            await RefreshStepsFromBackendAsync();
+        }
+    }
+    
+    private async Task RefreshStepsFromBackendAsync()
+    {
+        var recipe = await RecipeFinder.Get(RecipeId, _cts.Token);
+        if (recipe is null) return;
+
+        var backendSteps = recipe.Steps.OrderBy(x => x.Order).ToList();
+
+        _steps =
+        [
+            .. backendSteps.Select(ns =>
+            {
+                var existing = _steps.FirstOrDefault(s => s.Id == ns.Id && s.Id != 0);
+
+                return new StepDto
+                {
+                    ClientGuid = existing?.ClientGuid ?? Guid.NewGuid(),
+                    Id = ns.Id,
+                    Order = ns.Order,
+                    Instructions = ns.Instructions
+                };
+            })
+        ];
+
+        _stepsContainer?.Refresh();
+        StateHasChanged();
     }
 
     private void ReindexSteps()
     {
         for (int i = 0; i < _steps.Count; i++)
         {
-            _steps[i].Order = i;
+            _steps[i].Order = i + 1;
         }
-    }
-
-    private async Task SaveRecipeAsync()
-    {
-        if (string.IsNullOrWhiteSpace(_recipeName))
-        {
-            Snackbar.Add("Podaj nazwę przepisu!", Severity.Warning);
-            return;
-        }
-
-        if (!_ingredients.Any() || _ingredients.Any(i => i.SelectedProduct == null || i.SelectedUnit == null))
-        {
-            Snackbar.Add("Uzupełnij wszystkie dodane składniki oraz ich jednostki!", Severity.Warning);
-            return;
-        }
-
-        if (!_steps.Any() || _steps.Any(s => string.IsNullOrWhiteSpace(s.Instructions)))
-        {
-            Snackbar.Add("Uzupełnij treść wszystkich kroków!", Severity.Warning);
-            return;
-        }
-
-        var finalIngredients = _ingredients.Select(i => 
-                new AddIngredientRequest(i.Id, 
-                    i.Quantity, 
-                    i.SelectedUnit!.UnderlyingValue)).ToList();
-
-        var finalSteps = _steps.Select(s => 
-            new AddRecipeStepRequest(s.Order + 1, s.Instructions)
-        ).ToList();
-
-        var request = new CreateRecipeRequest(_recipeName, _servings, finalIngredients, finalSteps);
-        var response = await RecipeCreator.CreateRecipe(request, _cts.Token);
-
-        Snackbar.Add("Pomyślnie dodano nowy przepis!", Severity.Success);
-
-         Navigation.NavigateTo(RoutingConstants.Recipes.DetailsFor(response.Id));
-    }
-
-    public void Dispose()
-    {
-        _cts.Cancel();
-        _cts.Dispose();
-        AppBarService.ClearActions();
     }
 
     private Task<IEnumerable<PredefinedProductDto>> SearchIngredientsAsync(string value, CancellationToken arg2)
@@ -342,4 +443,36 @@
                 .Take(20)
         ]);
     }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+        AppBarService.ClearActions();
+    }
+
+    private async Task UpdateOrAddStep(StepDto context)
+    {
+        // Nie wywołuj tej metody, jeśli treść instrukcji jest pusta (np. przy świeżo dodanym wierszu w UI)
+        if (string.IsNullOrWhiteSpace(context.Instructions))
+            return;
+
+        if (context.Id == 0)
+        {
+            var request = new AddRecipeStepRequest(context.Order, context.Instructions);
+            await RecipeUpdater.AddStep(RecipeId, request, _cts.Token);
+        }
+        else
+        {
+            var request = new UpdateRecipeStepRequest(context.Id, context.Order, context.Instructions);
+            await RecipeUpdater.UpdateStep(RecipeId, request, _cts.Token);
+        }
+    
+        // Zapisujemy i pobieramy świeży stan, aby nadane przez bazę Id przypisało się do DTO
+        await LoadRecipeDataAsync();
+        _stepsContainer?.Refresh();
+    
+        Snackbar.Add("Krok zapisany pomyślnie!", Severity.Success);
+    }
+
 }

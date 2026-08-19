@@ -11,7 +11,7 @@ public interface IReadRecipe
     Task<GetRecipeDetailsResponse?> Get(int id, CancellationToken cancellationToken = default);
 }
 
-public class RecipeReader(MealPlannerDbContext ctx, MeasureUnitMapper measureUnitMapper) : IReadRecipe
+public class RecipeReader(MealPlannerDbContext ctx, RecipeMapper recipeMapper) : IReadRecipe
 {
     public async Task<GetRecipesResponse> GetByQuery(string? query, CancellationToken cancellationToken = default)
     {
@@ -31,13 +31,6 @@ public class RecipeReader(MealPlannerDbContext ctx, MeasureUnitMapper measureUni
             .Include(x => x.Ingredients).ThenInclude(x => x.Ingredient)
             .Include(x => x.Steps).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-        if (recipe is null) return null;
-        
-        var mappedIngredients = recipe.Ingredients.Select(x =>
-            new UsedIngredientDetailsResponse(x.IngredientId, x.Ingredient.Name, x.Quantity, measureUnitMapper.Map(x.Unit))).ToList();
-        var mappedSteps = recipe.Steps.Select(x => new StepDetailsResponse(x.Id, x.Order, x.Instructions)).ToList();
-        return new GetRecipeDetailsResponse(recipe.Id, recipe.Name, recipe.Servings,
-            mappedIngredients, 
-            mappedSteps);
+        return recipe is null ? null : recipeMapper.ToDetails(recipe);
     }
 }

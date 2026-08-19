@@ -60,7 +60,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         result.EnsureSuccessStatusCode();
         var response = await result.Content.ReadFromJsonAsync<GetRecipesResponse>();
         response.Should().NotBeNull();
-        response!.Recipes.Should().BeEmpty();
+        response.Recipes.Should().BeEmpty();
     }
 
     [Fact]
@@ -81,18 +81,12 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         response.Should().NotBeNull();
     }
 
-    private static CreateRecipeRequest CreateNewRecipeRequest(string recipeName, Ingredient ingredient) =>
-        new(recipeName,
-            1,
-            [new AddIngredientRequest(ingredient.Id, 1, ingredient.ApplicableUnits.First().ToString())],
-            [new AddStepRequest(1, "Test")]);
-
     [Fact]
     public async Task Post_ReturnsBadRequest_WhenRecipeIsNotValid()
     {
         // Arrange
         var testIngredient = TestIngredients.Create();
-        var request = CreateNewRecipeRequest($"New Recipe_{Guid.NewGuid()}", testIngredient);
+        var request = CreateNewRecipeRequest($"Recipe_{Guid.NewGuid()}", testIngredient);
         request.Ingredients.Clear();
         request.Steps.Clear();
 
@@ -140,4 +134,163 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
+
+    [Fact]
+    public async Task Put_Ingredient_ReturnsOk_WhenIngredientIsNew()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var ingredient = TestIngredients.Create();
+        await AddIngredientToDatabase(ingredient);
+        var request = new AddIngredientRequest(ingredient.Id, 1, ingredient.ApplicableUnits.First().ToString());
+        
+        // Act
+        var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/ingredients/{ingredient.Id}", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
+        var returnedIngredient = details?.Ingredients.First(x => x.Id == ingredient.Id);
+        returnedIngredient.Should().NotBeNull();
+        returnedIngredient.Name.Should().Be(ingredient.Name);
+        returnedIngredient.MeasureUnit.UnderlyingValue.Should().Be(request.Unit);
+        returnedIngredient.Quantity.Should().Be(request.Quantity);
+    }
+
+    [Fact]
+    public async Task Put_Ingredient_ReturnsOk_WhenIngredientIsChanged()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var ingredient = recipe.Ingredients[0];
+        var request = new AddIngredientRequest(ingredient.IngredientId, ingredient.Quantity + 10, ingredient.Unit.ToString());
+        
+        // Act
+        var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/ingredients/{ingredient.IngredientId}", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var detailsResult = await Client.GetAsync($"{Constants.RecipesRoute}/{recipe.Id}");
+        var details = await detailsResult.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
+        var returnedIngredient = details?.Ingredients.First(x => x.Id == ingredient.IngredientId);
+        returnedIngredient.Should().NotBeNull();
+        returnedIngredient.Name.Should().Be(ingredient.Ingredient.Name);
+        returnedIngredient.MeasureUnit.UnderlyingValue.Should().Be(request.Unit);
+        returnedIngredient.Quantity.Should().Be(request.Quantity);
+    }
+
+    [Fact]
+    public async Task Delete_Ingredient_ReturnsNoContent()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var ingredient = recipe.Ingredients[0];
+        var requestBody = new DeleteRecipeIngredientRequest(ingredient.IngredientId, ingredient.Unit.ToString());
+        var request = new HttpRequestMessage(HttpMethod.Delete,
+            $"{Constants.RecipesRoute}/{recipe.Id}/ingredients/{ingredient.IngredientId}")
+        {
+            Content = JsonContent.Create(requestBody)
+        };
+        
+        // Act
+        var result = await Client.SendAsync(request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task Post_Step_ReturnsOk()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var request = new CreateRecipeStepRequest(2, "New step");
+        
+        // Act
+        var result = await Client.PostAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/steps", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
+        var returnedStep =  details?.Steps.First(x => x.Order == request.Order);
+        returnedStep.Should().NotBeNull();
+        returnedStep.Instructions.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task Put_Step_ReturnsOk_WhenStepWasFound()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var step = recipe.Steps[0];
+        var request = new UpdateRecipeStepRequest(step.Id, step.Order, "Revised Instructions");
+        
+        // Act
+        var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/steps/{step.Id}", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
+        var returnedStep = details?.Steps.First(x => x.Id == step.Id);
+        returnedStep.Should().NotBeNull();
+        returnedStep.Order.Should().Be(request.Order);
+        returnedStep.Instructions.Should().Be(request.Instructions);
+    }
+
+    [Fact]
+    public async Task Delete_Step_ReturnsNoContent()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var step = recipe.Steps[0];
+        
+        // Act
+        var result = await Client.DeleteAsync($"{Constants.RecipesRoute}/{recipe.Id}/steps/{step.Id}");
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+    
+    [Fact]
+    public async Task Put_ReturnsOk_WhenRecipeExists()
+    {
+        // Arrange
+        var recipe = TestRecipes.Create();
+        await AddRecipeToDatabase(recipe);
+        var request = new UpdateRecipeRequest("Updated name", 15);
+        
+        // Act
+        var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
+        details.Name.Should().Be(request.Name);
+        details.Servings.Should().Be(request.Servings);
+    }
+
+    [Fact]
+    public async Task Put_ReturnsNotFound_WhenRecipeDoesNotExist()
+    {
+        // Arrange
+        var request = new UpdateRecipeRequest("Updated name", 15);
+        
+        // Act
+        var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{999}", request);
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);   // TODO: fix this when introducing custom exceptions
+    }
+
+    private static CreateRecipeRequest CreateNewRecipeRequest(string recipeName, Ingredient ingredient) =>
+        new(recipeName,
+            1,
+            [new AddIngredientRequest(ingredient.Id, 1, ingredient.ApplicableUnits.First().ToString())],
+            [new AddRecipeStepRequest(1, "Test")]);
 }
