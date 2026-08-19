@@ -23,7 +23,7 @@ public class Recipe
 
     public IReadOnlyList<RecipeStep> Steps
     {
-        get => _steps;
+        get => [.. _steps.OrderBy(x => x.Order)];
         private set => _steps = [.. value];
     }
 
@@ -55,6 +55,7 @@ public class Recipe
         var recipe = new Recipe(name, servings);
         recipe.AddIngredients(ingredientsToAdd);
         recipe._steps = recipeSteps;
+        recipe.ReindexSteps(); // Zapewnia ciągłość 1..N od samego początku
         
         return recipe;
     }
@@ -104,35 +105,13 @@ public class Recipe
         {
             throw new ArgumentNullException(null, "At least one recipe step must be specified");
         }
-    }
 
-    internal void UpdateIngredients(List<UsedIngredient> recipeIngredients)
-    {
-        ValidateIngredientsAndThrow(recipeIngredients);
-        Ingredients = recipeIngredients;
-    }
 
-    private static void ValidateIngredientsAndThrow(List<UsedIngredient> ingredients)
-    {
-        if (ingredients.Count == 0)
+        var uniqueOrdersCount = recipeSteps.Select(x => x.Order).Distinct().Count();
+        if (uniqueOrdersCount != recipeSteps.Count)
         {
-            throw new ArgumentNullException(null, "At least one ingredient must be specified");
+            throw new InvalidOperationException("Recipe steps must have unique orders");
         }
-        
-        // TODO: is this required?
-        ingredients.ForEach(ingredient =>
-        {
-            if (ingredient.Quantity <= 0)
-            {
-                throw new ArgumentNullException(null, "Ingredient quantity must be greater than zero");
-            }
-        });
-    }
-
-    internal void UpdateSteps(List<RecipeStep> steps)
-    {
-        ValidateRecipeStepsAndThrow(steps);
-        Steps = steps;
     }
 
     public UsedIngredient? GetIngredient(int ingredientId, MeasureUnit requestUnit) =>
@@ -152,5 +131,49 @@ public class Recipe
     {
         ValidateServingsAndThrow(servings);
         Servings = servings;
+    }
+
+    public void UpdateStep(int stepId, int newOrder, string newInstructions)
+    {
+        var updatedStep = _steps.FirstOrDefault(x => x.Id == stepId);
+        if (updatedStep is null)
+        {
+            throw new InvalidOperationException("Recipe step could not be found");
+        }
+
+        updatedStep.UpdateInstructions(newInstructions);
+
+        _steps.Remove(updatedStep);
+        var clampedOrder = Math.Clamp(newOrder, 1, _steps.Count + 1);
+        _steps.Insert(clampedOrder - 1, updatedStep);
+
+        ReindexSteps();
+    }
+
+    public void AddStep(int targetOrder, string instructions)
+    {
+        var newStep = RecipeStep.Create(targetOrder, instructions);
+        
+        var clampedOrder = Math.Clamp(targetOrder, 1, _steps.Count + 1);
+        
+        _steps.Insert(clampedOrder - 1, newStep);
+        
+        ReindexSteps();
+    }
+    
+    public void RemoveStep(RecipeStep step)
+    {
+        if (_steps.Remove(step))
+        {
+            ReindexSteps();
+        }
+    }
+    
+    private void ReindexSteps()
+    {
+        for (int i = 0; i < _steps.Count; i++)
+        {
+            _steps[i].UpdateOrder(i + 1);
+        }
     }
 }
