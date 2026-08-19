@@ -16,7 +16,6 @@ public class RecipeStepCreatorTests
     private readonly RecipeStepCreator _sut;
 
     private readonly List<Recipe> _recipes = [];
-    private readonly List<RecipeStep> _steps = [];
 
     public RecipeStepCreatorTests()
     {
@@ -24,7 +23,6 @@ public class RecipeStepCreatorTests
         
         var ctx = new Mock<MealPlannerDbContext>();
         ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
-        ctx.Setup(x => x.RecipeSteps).ReturnsDbSet(_steps);
         var measureUnitMapper = new MeasureUnitMapper(localizer.Object);
         _sut = new RecipeStepCreator(ctx.Object, new RecipeMapper(measureUnitMapper));
     }

@@ -19,7 +19,6 @@ public class RecipeCreatorTests
 
     private static readonly Ingredient PreExistingIngredient = TestIngredients.Create("PreExistingIngredient");
     private readonly List<Ingredient> _ingredients = [PreExistingIngredient];
-    private readonly List<RecipeStep> _recipeSteps = [];
     private readonly List<Recipe> _recipes = [];
     
     public RecipeCreatorTests()
@@ -30,14 +29,9 @@ public class RecipeCreatorTests
         {
             RandomId.Set(recipe);
             _recipes.Add(recipe);
-
-            var steps = recipe.Steps.ToArray();
-            RandomId.Set(steps);
-            _recipeSteps.AddRange(steps);
         });
         
         ctx.Setup(x => x.Ingredients).ReturnsDbSet(_ingredients);
-        ctx.Setup(x => x.RecipeSteps).ReturnsDbSet(_recipeSteps);
         
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
         _sut = new RecipeCreator(ctx.Object, new MeasureUnitMapper(_localizer.Object));

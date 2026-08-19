@@ -45,7 +45,6 @@ public abstract class IntegrationTestBase : IDisposable, IAsyncDisposable
     {
         DatabaseContext.Meals.ExecuteDelete();
         DatabaseContext.Menus.ExecuteDelete();
-        DatabaseContext.RecipeSteps.ExecuteDelete();
         DatabaseContext.Recipes.ExecuteDelete();
         DatabaseContext.Ingredients.ExecuteDelete();
     }

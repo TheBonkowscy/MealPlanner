@@ -8,6 +8,8 @@ public class IngredientConfiguration : IEntityTypeConfiguration<Ingredient>
 {
     public void Configure(EntityTypeBuilder<Ingredient> builder)
     {
+        builder.ToTable("Ingredients");
+        
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Name).IsRequired();
         builder.Property(x => x.ApplicableUnits).IsRequired()

@@ -18,7 +18,6 @@ public class RecipeUpdaterTests
     private readonly RecipeUpdater _sut;
 
     private static readonly Recipe PreExistingRecipe = TestRecipes.Create("PreExistingRecipe");
-    private readonly List<RecipeStep> _recipeSteps = [];
     private readonly List<Recipe> _recipes = [];
     
     public RecipeUpdaterTests()
@@ -29,15 +28,10 @@ public class RecipeUpdaterTests
         {
             RandomId.Set(recipe);
             _recipes.Add(recipe);
-
-            var steps = recipe.Steps.ToArray();
-            RandomId.Set(steps);
-            _recipeSteps.AddRange(steps);
         });
         
         _recipes.Add(PreExistingRecipe);
         
-        ctx.Setup(x => x.RecipeSteps).ReturnsDbSet(_recipeSteps);
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
         _sut = new RecipeUpdater(ctx.Object, new RecipeMapper(new MeasureUnitMapper(_localizer.Object)));
     }

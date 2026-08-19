@@ -10,6 +10,7 @@ public class MenuConfiguration : IEntityTypeConfiguration<Menu>
     public void Configure(EntityTypeBuilder<Menu> builder)
     {
         builder.ToTable("Menus");
+        
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Date).IsRequired();
         

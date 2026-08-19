@@ -8,6 +8,8 @@ public class UsedIngredientConfiguration : IEntityTypeConfiguration<UsedIngredie
 {
     public void Configure(EntityTypeBuilder<UsedIngredient> builder)
     {
+        builder.ToTable("UsedIngredients");
+        
         builder.HasKey(x => new { x.RecipeId, x.IngredientId, x.Unit });
         
         builder.Property(x => x.Unit).HasConversion<string>();
