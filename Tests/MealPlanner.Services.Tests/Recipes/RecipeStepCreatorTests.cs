@@ -45,23 +45,22 @@ public class RecipeStepCreatorTests
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("Recipe could not be found");
     }
-
+    
     [Fact]
-    public async Task CreateStep_Throws_WhenOrderAlreadyExists()
+    public async Task CreateStep_InsertsStepAndReordersExisting_WhenOrderAlreadyExists()
     {
         // Arrange
         var recipe = TestRecipes.Create();
         _recipes.Add(recipe);
-        var request = new CreateRecipeStepRequest(1, "Instructions for step #1"); 
-        
+        var request = new CreateRecipeStepRequest(1, "New First Step"); 
+    
         // Act
-        var createStep = () => _sut.CreateStep(recipe.Id, request, CancellationToken.None);
-        
+        await _sut.CreateStep(recipe.Id, request, CancellationToken.None);
+    
         // Assert
-        await createStep.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("There is already a step with this order!");
+        recipe.Steps.Should().HaveCount(2);
+        recipe.Steps.First(s => s.Order == 1).Instructions.Should().Be("New First Step");
+        recipe.Steps.Select(s => s.Order).Should().BeEquivalentTo([1, 2], options => options.WithStrictOrdering());
     }
 
     [Fact]
