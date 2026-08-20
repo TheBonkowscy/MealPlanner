@@ -11,6 +11,13 @@ public class DateOutOfRangeException : Exception
 
     public static void ThrowIfNotInRange(DateOnly date)
     {
+     
+        DateOnly[] invalidDates = [DateOnly.MinValue, DateOnly.MaxValue];
+        if (invalidDates.Contains(date))
+        {
+            Throw(Cause.Unset);
+        }
+        
         var dateTooFarInThePast = date < Menu.MinDateInThePast;
         if (dateTooFarInThePast)
         {
@@ -21,12 +28,6 @@ public class DateOutOfRangeException : Exception
         if (dateTooFarInTheFuture)
         {
             Throw(Cause.TooFarInTheFuture);
-        }
-     
-        DateOnly[] invalidDates = [DateOnly.MinValue, DateOnly.MaxValue];
-        if (invalidDates.Contains(date))
-        {
-            Throw(Cause.Unset);
         }
     }
     

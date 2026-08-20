@@ -41,7 +41,7 @@ public class RecipeCreator(MealPlannerDbContext ctx,
         var idsOfUsedIngredients = request.Ingredients.Select(x => x.Id).Distinct().ToList();
         var usedIngredients = await ctx.Ingredients.Where(x => idsOfUsedIngredients.Contains(x.Id)).ToListAsync(cancellationToken);
         
-        if (usedIngredients.Count != idsOfUsedIngredients.Count)
+        if (usedIngredients.Count != idsOfUsedIngredients.Count || idsOfUsedIngredients.Count == 0)
         {
             throw new InvalidOperationException("One or more ingredients not found");   // TODO: custom exception?
         }

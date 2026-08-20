@@ -1,5 +1,6 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
+using MealPlanner.Domain.Ingredients.Exceptions;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 using MealPlanner.Tests.Shared.Helpers;
@@ -20,8 +21,7 @@ public class IngredientTests
         
         // Assert
         create.Invoking(c => c.Invoke(ingredientName, Units))
-            .Should().Throw<ArgumentNullException>()
-            .WithMessage("Ingredient name cannot be null or whitespace");
+            .Should().Throw<MissingIngredientNameException>();
     }
     
     [Fact]
@@ -32,8 +32,7 @@ public class IngredientTests
         
         // Assert
         create.Invoking(c => c.Invoke(Name, []))
-            .Should().Throw<ArgumentException>()
-            .WithMessage("Ingredient must have at least one applicable unit");
+            .Should().Throw<MissingMeasureUnitsException>();
     }
     
     [Fact]

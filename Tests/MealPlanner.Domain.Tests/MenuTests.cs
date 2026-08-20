@@ -1,8 +1,11 @@
 using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Menus.Actions;
+using MealPlanner.Domain.Menus.Exceptions;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Tests.Shared.Factories;
+using MealPlanner.Tests.Shared.Helpers;
 
 namespace MealPlanner.Domain.Tests;
 
@@ -14,8 +17,8 @@ public class MenuTests
     private static readonly string InvalidDateExceptionMessage = $"Invalid date specified. The date can not be before {Menu.MinDateInThePast} and must be in the near future.";
 
     [Theory]
-    [MemberData(nameof(InvalidDatesSource))]
-    public void Create_ThrowsForInvalidDate(DateOnly invalidDate)
+    [ClassData(typeof(InvalidDatesTestDataProvider))]
+    public void Create_ThrowsForInvalidDate(DateOnly invalidDate, DateOutOfRangeException.Cause underlyingCause)
     {
         // Arrange
         List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1), AddMealAction.Create(SharedSecondRecipe, 2, 1)];
@@ -25,8 +28,8 @@ public class MenuTests
         
         // Assert
         createNewMenu.Invoking(x => x.Invoke(invalidDate))
-            .Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessage(InvalidDateExceptionMessage);
+            .Should().Throw<DateOutOfRangeException>()
+            .Which.UnderlyingCause.Should().Be(underlyingCause);
     }
 
     [Theory]
@@ -71,8 +74,8 @@ public class MenuTests
         var addMeal = () => menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, order, 1));
         
         // Assert
-        addMeal.Should().Throw<InvalidOperationException>()
-            .WithMessage($"There is already a meal added as #{order} in the day");
+        addMeal.Should().Throw<MealExistsAtPositionException>()
+            .Which.Order.Should().Be(order);
     }
 
     [Fact]
@@ -88,9 +91,14 @@ public class MenuTests
         var addMealToMenu = menu.AddMeal;
         
         // Assert
-        addMealToMenu.Invoking(x => x.Invoke(thirdMeal))
-            .Should().Throw<InvalidOperationException>()
-            .WithMessage($"Meal '{SharedFirstRecipe.Name}' is already present in the menu for {menu.Date}.");
+        var exception = addMealToMenu.Invoking(x => x.Invoke(thirdMeal))
+            .Should().Throw<MealAlreadyPresentInTheDayException>()
+            .Which;
+        using (new AssertionScope())
+        {
+            exception.Name.Should().Be(SharedFirstRecipe.Name);
+            exception.Date.Should().Be(menu.Date);
+        }
     }
 
     [Fact]
@@ -104,26 +112,10 @@ public class MenuTests
         var addMeal = () => menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, 999, 1));
         
         // Assert
-        addMeal.Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessage("Order must not exceed the number of already added meals.");
+        addMeal.Should().Throw<InvalidMealOrderException>()
+            .Which.UnderlyingCause.Should().Be(InvalidMealOrderException.Cause.ExceedsRange);
     }
-
-    public static TheoryData<DateOnly> InvalidDatesSource
-    {
-        get
-        {
-            var data = new TheoryData<DateOnly>
-            {
-                DateOnly.MinValue,
-                DateOnly.MaxValue, 
-                Menu.MinDateInThePast.AddDays(-1),
-                DateOnly.FromDateTime(DateTime.UtcNow).AddYears(100).AddDays(1)
-                
-            };
-            return data;
-        }
-    }
-
+    
     public static TheoryData<DateOnly> ValidDatesSource
     {
         get

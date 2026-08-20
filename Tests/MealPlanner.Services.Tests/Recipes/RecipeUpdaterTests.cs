@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Recipes.Exceptions;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Recipes.Requests;
@@ -62,8 +63,7 @@ public class RecipeUpdaterTests
         var result = () => _sut.Update(PreExistingRecipe.Id, request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<ArgumentNullException>()
-            .WithMessage("Please specify a name of the recipe");
+        await result.Should().ThrowAsync<MissingRecipeNameException>();
     }
     
     [Theory]
@@ -77,8 +77,7 @@ public class RecipeUpdaterTests
         var result = () => _sut.Update(PreExistingRecipe.Id, request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<ArgumentOutOfRangeException>()
-            .WithMessage("Recipe must yield at least one serving");
+        await result.Should().ThrowAsync<InvalidNumberOfServingsException>();
     }
     
     [Fact]

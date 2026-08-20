@@ -2,7 +2,9 @@ using System.Collections;
 using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
+using MealPlanner.Domain.Ingredients.Exceptions;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Recipes.Exceptions;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 
@@ -22,8 +24,7 @@ public class RecipeTests
         
         // Assert
         createRecipe.Invoking(x => x.Invoke(""))
-            .Should().Throw<ArgumentNullException>()
-            .WithMessage("Please specify a name of the recipe");
+            .Should().Throw<MissingRecipeNameException>();
     }
 
     [Fact]
@@ -34,8 +35,7 @@ public class RecipeTests
         
         // Assert
         createRecipe.Invoking(x => x.Invoke(Name, 1, [], SharedSteps))
-            .Should().Throw<ArgumentNullException>()
-            .WithMessage("At least one ingredient must be specified");
+            .Should().Throw<MissingIngredientsException>();
     }
 
     [Fact]
@@ -46,8 +46,7 @@ public class RecipeTests
         
         // Assert
         createRecipe.Invoking(x => x.Invoke(Name, 1, [SharedIngredient], []))
-            .Should().Throw<ArgumentNullException>()
-            .WithMessage("At least one recipe step must be specified");
+            .Should().Throw<MissingRecipeStepsException>();
     }
 
     [Theory]
@@ -60,8 +59,7 @@ public class RecipeTests
         
         // Assert
         createRecipe.Invoking(x => x.Invoke(Name, invalidServings, [SharedIngredient], SharedSteps))
-            .Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessage("Recipe must yield at least one serving");
+            .Should().Throw<InvalidNumberOfServingsException>();
     }
 
     [Fact]

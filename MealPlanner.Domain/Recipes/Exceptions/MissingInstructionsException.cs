@@ -10,5 +10,5 @@ public class MissingInstructionsException : Exception
         }
     }
     
-    private static void Throw() => throw new MissingRecipeNameException();
+    private static void Throw() => throw new MissingInstructionsException();
 }

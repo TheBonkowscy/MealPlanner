@@ -4,7 +4,7 @@ namespace MealPlanner.Domain.Menus.Exceptions;
 
 public class MealExistsAtPositionException : Exception
 {
-    private int Order { get; }
+    public int Order { get; }
     
     private MealExistsAtPositionException(int order)
     {
