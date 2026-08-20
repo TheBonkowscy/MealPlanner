@@ -32,7 +32,19 @@ builder.Services.AddControllers();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    const string defaultCulture = "en";
+    string[] cultures = [defaultCulture, "pl"];
+
+    options.SetDefaultCulture(defaultCulture)
+        .AddSupportedCultures(cultures)
+        .AddSupportedUICultures(cultures);
+
+});
 
 await builder.Services.RegisterMenuServices();
 
@@ -51,7 +63,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseExceptionHandler();
-app.UseLocalizationMiddleware();
+app.UseRequestLocalization();
 
 app.MapControllers();
 

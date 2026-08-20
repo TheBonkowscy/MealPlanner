@@ -1,6 +1,6 @@
 ﻿using MealPlanner.Domain.Recipes.Exceptions;
 
-namespace MealPlanner.Domain;
+namespace MealPlanner.Domain.Recipes;
 
 public class RecipeStep
 {
@@ -19,17 +19,18 @@ public class RecipeStep
         Instructions = instructions;
     }
 
-    public static RecipeStep Create(int order, string instruction)
+    public static Result<RecipeStep> Create(int order, string instruction)
     {
-        ValidateOrderAndThrow(order);
-        ValidateInstructionAndThrow(instruction);
+        var errors = new List<Error>();
+        errors.AddRule(ValidateOrderAndThrow(order), DomainErrors.RecipeStep.InvalidOrder);
+        errors.AddRule(ValidateInstructionAndThrow(instruction), DomainErrors.RecipeStep.InvalidInstruction);
 
-        return new RecipeStep(order, instruction);
+        return errors.Count > 0 ? Result.Failure<RecipeStep>(errors) : Result.Success(new RecipeStep(order, instruction));
     }
 
-    private static void ValidateOrderAndThrow(int order) => InvalidStepOrderException.ThrowIfOrderIsInvalid(order);
+    private static bool ValidateOrderAndThrow(int order) => order < 1;
 
-    private static void ValidateInstructionAndThrow(string instruction) => MissingInstructionsException.ThrowIfInstructionsAreInvalid(instruction);
+    private static bool ValidateInstructionAndThrow(string instructions) => string.IsNullOrWhiteSpace(instructions);
 
     public void UpdateOrder(int newOrder)
     {

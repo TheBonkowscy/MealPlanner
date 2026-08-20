@@ -18,7 +18,9 @@ public class GlobalExceptionHandler(IProblemDetailsService problemDetailsService
         {
             ArgumentNullException ex => Error.BadRequest(ex.Message),
             ArgumentOutOfRangeException ex => Error.BadRequest(ex.Message),
-            InvalidOperationException ex => Error.BadRequest(ex.Message), 
+            InvalidOperationException ex => Error.BadRequest(ex.Message),
+            
+            
             _ => Error.InternalServerError
         };
         

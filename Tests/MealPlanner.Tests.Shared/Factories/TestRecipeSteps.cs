@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Domain;
+using MealPlanner.Domain.Recipes;
 
 namespace MealPlanner.Tests.Shared.Factories;
 

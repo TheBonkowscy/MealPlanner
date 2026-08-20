@@ -1,4 +1,5 @@
 ﻿using AwesomeAssertions;
+using MealPlanner.Domain.Recipes;
 using MealPlanner.Domain.Recipes.Exceptions;
 using MealPlanner.Tests.Shared.Helpers;
 

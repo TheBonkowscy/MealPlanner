@@ -47,19 +47,25 @@ public class Recipe
         // It allows you to create a recipe with no ingredients and add them later.
     }
     
-    public static Recipe Create(string name, int servings, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
+    public static Result<Recipe> Create(string name, int servings, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
     {
-        ValidateNameAndThrow(name);
-        ValidateServingsAndThrow(servings);
-        ValidateIngredientsAndThrow(ingredientsToAdd);
-        ValidateRecipeStepsAndThrow(recipeSteps);
+        var errors = new List<Error>();
+        errors.AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName);
+        errors.AddRule(ValidateServings(servings), DomainErrors.Recipe.InvalidServings);
+        errors.AddRule(ValidateIngredients(ingredientsToAdd), DomainErrors.Recipe.InvalidIngredients);
+        errors.AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps);
+
+        if (errors.Count > 0)
+        {
+            return Result.Failure<Recipe>(errors);
+        }
         
         var recipe = new Recipe(name, servings);
         recipe.AddIngredients(ingredientsToAdd);
         recipe._steps = recipeSteps;
         recipe.ReindexSteps();
         
-        return recipe;
+        return Result.Success(recipe);
     }
 
     private void AddIngredients(List<AddIngredientAction> ingredientsToAdd)
@@ -68,20 +74,26 @@ public class Recipe
         mappedIngredients.ForEach(_ingredients.Add);
     }
 
-    private static void ValidateNameAndThrow(string name) => MissingRecipeNameException.ThrowIfNameIsInvalid(name);
+    private static bool ValidateName(string name) => string.IsNullOrWhiteSpace(name);
 
-    private static void ValidateServingsAndThrow(int servings) => InvalidNumberOfServingsException.ThrowIfServingsIsInvalid(servings);
+    private static bool ValidateServings(int servings) => servings < 1;
 
-    private static void ValidateIngredientsAndThrow(List<AddIngredientAction> ingredients)
+    private static bool ValidateIngredients(List<AddIngredientAction> ingredients) => ingredients.Count != 0 && ingredients.All(ingredient => ingredient.Quantity > 0);
+
+    private static bool ValidateRecipeSteps(List<RecipeStep> recipeSteps)
     {
-        MissingIngredientsException.ThrowIfIngredientsMissing(ingredients);
-        InvalidIngredientQuantityException.ThrowIfQuantityIsInvalid(ingredients);
-    }
-    
-    private static void ValidateRecipeStepsAndThrow(List<RecipeStep> recipeSteps)
-    {
-        MissingRecipeStepsException.ThrowIfRecipeStepsMissing(recipeSteps);
-        NonUniqueOrderDetectedException.ThrowIfOrderIsNotUnique(recipeSteps);
+        if (recipeSteps.Count == 0)
+        {
+            return false;
+        }
+        
+        var uniqueOrdersCount = recipeSteps.Select(x => x.Order).Distinct().Count();
+        if (uniqueOrdersCount != recipeSteps.Count)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public UsedIngredient? GetIngredient(int ingredientId, MeasureUnit requestUnit) =>
@@ -93,13 +105,13 @@ public class Recipe
 
     public void UpdateName(string name)
     {
-        ValidateNameAndThrow(name);
+        ValidateName(name);
         Name = name;
     }
 
     public void UpdateServings(int servings)
     {
-        ValidateServingsAndThrow(servings);
+        ValidateServings(servings);
         Servings = servings;
     }
 
@@ -122,16 +134,22 @@ public class Recipe
         ReindexSteps();
     }
 
-    public void AddStep(int targetOrder, string instructions)
+    public Result AddStep(int targetOrder, string instructions)
     {
         _steps = [.. _steps.OrderBy(x => x.Order)];
         var newStep = RecipeStep.Create(targetOrder, instructions);
+        if (newStep.IsFailure)
+        {
+            return newStep;
+        }
         
         var clampedOrder = Math.Clamp(targetOrder, 1, _steps.Count + 1);
         
-        _steps.Insert(clampedOrder - 1, newStep);
+        _steps.Insert(clampedOrder - 1, newStep.Value);
         
         ReindexSteps();
+        
+        return Result.Success();
     }
     
     public void RemoveStep(RecipeStep step)
