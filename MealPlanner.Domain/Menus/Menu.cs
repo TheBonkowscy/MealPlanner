@@ -1,4 +1,6 @@
 using MealPlanner.Domain.Menus.Actions;
+using MealPlanner.Domain.Menus.Exceptions;
+using MealPlanner.Domain.Recipes;
 
 namespace MealPlanner.Domain.Menus;
 
@@ -44,16 +46,10 @@ public class Menu
 
     private void ValidateOrderAndThrow(int order)
     {
-        if (order > _meals.Count +1 && _meals.Count != 0)
-        {
-            throw new ArgumentOutOfRangeException(null, "Order must not exceed the number of already added meals.");
-        }
+        InvalidMealOrderException.ThrowIfExceedsNumberOfMeals(order, _meals.Count);
 
         var mealAtIndex = GetRecipe(order);
-        if (mealAtIndex is not null)
-        {
-            throw new InvalidOperationException($"There is already a meal added as #{order} in the day");
-        }
+        MealExistsAtPositionException.ThrowIfExists(mealAtIndex, order);
     }
     
     public Recipe? GetRecipe(int order) => _meals.FirstOrDefault(x => x.Order == order)?.Recipe;
@@ -62,7 +58,7 @@ public class Menu
     {
         if (HasRecipe(recipe))
         {
-            throw new InvalidOperationException($"Meal '{recipe.Name}' is already present in the menu for {Date}.");
+            throw new MealAlreadyPresentInTheDayException(recipe.Name, Date);
         }
     }
 
@@ -70,22 +66,11 @@ public class Menu
     
     public static Menu Create(DateOnly date, List<AddMealAction> mealsToAdd)
     {
-        ValidateDateAndThrow(date);
+        DateOutOfRangeException.ThrowIfNotInRange(date);
+        
         var menu = new Menu(date);
         mealsToAdd.ForEach(menu.AddMeal);
         return menu;
-    }
-
-    private static void ValidateDateAndThrow(DateOnly date)
-    {
-        DateOnly[] invalidDates = [DateOnly.MinValue, DateOnly.MaxValue];
-        var dateTooFarInThePast = date < MinDateInThePast;
-        var dateTooFarInTheFuture = DateOnly.FromDateTime(DateTime.UtcNow).AddYears(100) < date;
-        var dateIsInvalid = invalidDates.Contains(date) || dateTooFarInThePast || dateTooFarInTheFuture;
-        if (dateIsInvalid)
-        {
-            throw new ArgumentOutOfRangeException(null, $"Invalid date specified. The date can not be before {MinDateInThePast} and must be in the near future.");
-        }
     }
 
     public void RemoveAllItems()

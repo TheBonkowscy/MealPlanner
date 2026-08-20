@@ -2,8 +2,10 @@
 using MealPlanner.Domain;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Menus.Actions;
+using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
+using MealPlanner.Services.Menus.Exceptions;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared;
@@ -62,8 +64,7 @@ public class MenuUpdaterTests
         var result = async () => await _sut.Update(request, CancellationToken.None);
 
         // Assert
-        await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("No meals were provided.");
+        await result.Should().ThrowAsync<MissingMealsException>();
 
         _ctx.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -79,8 +80,7 @@ public class MenuUpdaterTests
         var result = async () => await _sut.Update(request, CancellationToken.None);
 
         // Assert
-        await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"Menu for {request.Date} does not exist.");
+        await result.Should().ThrowAsync<MenuDoesNotExistException>();
 
         _ctx.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -98,8 +98,7 @@ public class MenuUpdaterTests
         Func<Task> act = async () => await _sut.Update(request, CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("No meals were provided.");
+        await act.Should().ThrowAsync<MissingMealsException>();
         
         _ctx.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         

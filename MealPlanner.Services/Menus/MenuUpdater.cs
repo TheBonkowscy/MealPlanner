@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Persistence;
+using MealPlanner.Services.Menus.Exceptions;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public class MenuUpdater(MealPlannerDbContext ctx,
     {
         if (request.Meals is { Count: 0 })
         {
-            throw new InvalidOperationException("No meals were provided.");
+            throw new MissingMealsException();
         }
         
         var menu = await ctx.Menus
@@ -26,7 +27,7 @@ public class MenuUpdater(MealPlannerDbContext ctx,
             .FirstOrDefaultAsync(x => x.Date == request.Date, cancellationToken);
         if (menu is null)
         {
-            throw new InvalidOperationException($"Menu for {request.Date} does not exist.");
+            throw new MenuDoesNotExistException(request.Date);
         }
 
         // 1. Remove all meals - this will work for now, revisit this when the meal model is extended

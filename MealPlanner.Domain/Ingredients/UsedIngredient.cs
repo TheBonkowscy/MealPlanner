@@ -1,4 +1,7 @@
 ﻿using MealPlanner.Domain.Ingredients.Actions;
+using MealPlanner.Domain.Ingredients.Exceptions;
+using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Recipes.Exceptions;
 
 namespace MealPlanner.Domain.Ingredients;
 
@@ -38,21 +41,11 @@ public class UsedIngredient
         return new UsedIngredient(recipe, action.Ingredient, action.Quantity, action.Unit);
     }
 
-    private static void ValidateRecipeAndThrow(Recipe recipe)
-    {
-        if (recipe is null)
-        {
-            throw new ArgumentNullException(null, "Recipe can not be null");
-        }
-    }
+    private static void ValidateRecipeAndThrow(Recipe recipe) =>
+        MissingRecipeException.ThrowIfRecipeIsNull(recipe);
 
-    private static void ValidateQuantityAndThrow(decimal quantity)
-    {
-        if (quantity <= 0)
-        {
-            throw new ArgumentOutOfRangeException(null, "Quantity must be greater than zero");
-        }
-    }
+    private static void ValidateQuantityAndThrow(decimal quantity) =>
+        InvalidIngredientQuantityException.ThrowIfQuantityIsInvalid(quantity);
 
     public void UpdateQuantity(decimal quantity)
     {

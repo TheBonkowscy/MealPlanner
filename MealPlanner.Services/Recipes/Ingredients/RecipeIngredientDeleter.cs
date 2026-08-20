@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Persistence;
+using MealPlanner.Services.Recipes.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Recipes.Ingredients;
@@ -25,13 +26,13 @@ public class RecipeIngredientDeleter(MealPlannerDbContext ctx,
 
         if (recipe is null)
         {
-            throw new InvalidOperationException("Recipe could not be found");   // TODO: custom exceptions?
+            throw new RecipeDoesNotExistException();
         }
         
         var ingredient = recipe.GetIngredient(ingredientId, measureUnitMapper.Map(measureUnit));
         if (ingredient is null)
         {
-            throw new InvalidOperationException($"Specified ingredient could not be found");   // TODO: custom exceptions?
+            throw new IngredientDoesNotExistException();
         }
 
         recipe.RemoveIngredient(ingredient);

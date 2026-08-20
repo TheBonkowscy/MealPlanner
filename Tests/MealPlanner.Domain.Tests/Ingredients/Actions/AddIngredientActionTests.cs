@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
+using MealPlanner.Domain.Ingredients.Exceptions;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 
@@ -37,7 +38,7 @@ public class AddIngredientActionTests
         
         // Assert
         create.Invoking(x => x.Invoke(ingredientToAdd, -SharedExpectedQuantity, MeasureUnit.GlassCup))
-            .Should().Throw<ArgumentOutOfRangeException>("Ingredient quantity must be positive");
+            .Should().Throw<InvalidIngredientQuantityException>();
     }
     
     [Fact]

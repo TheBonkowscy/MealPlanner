@@ -1,7 +1,9 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
+using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
+using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Services.Recipes.Steps;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared.Factories;
@@ -40,8 +42,7 @@ public class RecipeStepCreatorTests
         // Assert
         await updateStep.Invoking(x => x.Invoke())
             .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Recipe could not be found");
+            .ThrowAsync<RecipeDoesNotExistException>();
     }
     
     [Fact]

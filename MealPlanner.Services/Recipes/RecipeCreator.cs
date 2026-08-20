@@ -1,7 +1,10 @@
 ﻿using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
+using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Recipes.Exceptions;
 using MealPlanner.Persistence;
+using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +24,7 @@ public class RecipeCreator(MealPlannerDbContext ctx,
         var existingRecipe = await ctx.Recipes.FirstOrDefaultAsync(x => x.Name.ToLower() == request.Name.ToLower(), cancellationToken);
         if (existingRecipe is not null)
         {
-            throw new InvalidOperationException($"Recipe '{request.Name}' already exists");   // TODO: custom exceptions?
+            throw new RecipeDoesNotExistException();
         }
 
         var mappedIngredients = await MapIngredients(request, cancellationToken);
@@ -37,15 +40,16 @@ public class RecipeCreator(MealPlannerDbContext ctx,
     
     private async Task<List<AddIngredientAction>> MapIngredients(CreateRecipeRequest request, CancellationToken cancellationToken)
     {
-        var idsOfUsedIngredients = request.Ingredients.Select(x => x.Id).Distinct().ToList();
-        var usedIngredients = await ctx.Ingredients.Where(x => idsOfUsedIngredients.Contains(x.Id)).ToListAsync(cancellationToken);
+        var incomingIngredientsIds = request.Ingredients.Select(x => x.Id).Distinct().ToList();
+        var matchingIngredients = await ctx.Ingredients.Where(x => incomingIngredientsIds.Contains(x.Id)).ToListAsync(cancellationToken);
         
-        if (usedIngredients.Count != idsOfUsedIngredients.Count)
+        if (matchingIngredients.Count != incomingIngredientsIds.Count || incomingIngredientsIds.Count == 0)
         {
-            throw new InvalidOperationException("One or more ingredients not found");   // TODO: custom exception?
+            var missingIds = incomingIngredientsIds.Except(matchingIngredients.Select(x => x.Id));
+            throw new MissingIngredientsException(missingIds);
         }
         
-        var ingredientsToMap = usedIngredients.ToDictionary(x => x, 
+        var ingredientsToMap = matchingIngredients.ToDictionary(x => x, 
             x => request.Ingredients.Where(z => z.Id == x.Id).ToList());
 
         var mappedUnits = request.Ingredients.Select(x => x.Unit).Distinct().ToDictionary(x => x, measureUnitMapper.Map);

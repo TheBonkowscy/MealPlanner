@@ -1,4 +1,5 @@
 ﻿using AwesomeAssertions;
+using MealPlanner.Domain.Recipes.Exceptions;
 using MealPlanner.Tests.Shared.Helpers;
 
 namespace MealPlanner.Domain.Tests;
@@ -15,7 +16,7 @@ public class RecipeStepTests
         
         // Assert
         create.Invoking(x => x.Invoke(0))
-            .Should().Throw<ArgumentOutOfRangeException>("Order must be greater than 0");
+            .Should().Throw<InvalidStepOrderException>();
     }
     
     [Theory]
@@ -27,8 +28,7 @@ public class RecipeStepTests
         
         // Assert
         create.Invoking(x => x.Invoke(instructions))
-            .Should().Throw<ArgumentNullException>()
-            .WithMessage("Instruction cannot be null or whitespace");
+            .Should().Throw<MissingInstructionsException>();
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class RecipeStepTests
         var update = () => step.UpdateOrder(newOrder);
         
         // Assert
-        update.Should().Throw<ArgumentOutOfRangeException>("Order must be greater than 0");
+        update.Should().Throw<InvalidStepOrderException>();
     }
 
     [Fact]
@@ -85,11 +85,20 @@ public class RecipeStepTests
         var update = () => step.UpdateInstructions(newInstructions);
         
         // Assert
-        update.Should().Throw<ArgumentNullException>("Instruction cannot be null or whitespace");
+        update.Should().Throw<MissingInstructionsException>();
     }
 
+    [Fact]
     public void UpdateInstructions_WithInstructions_Succeeds()
     {
+        // Arrange
+        var step = RecipeStep.Create(1, Instructions);
+        var newInstructions = "Completely new and previously unheard of instructions";
         
+        // Act
+        step.UpdateInstructions(newInstructions);
+        
+        // Assert
+        step.Instructions.Should().Be(newInstructions);
     }
 }

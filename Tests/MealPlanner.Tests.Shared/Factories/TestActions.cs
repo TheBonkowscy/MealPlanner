@@ -2,6 +2,7 @@
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
 using MealPlanner.Domain.Menus.Actions;
+using MealPlanner.Domain.Recipes;
 
 namespace MealPlanner.Tests.Shared.Factories;
 

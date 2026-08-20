@@ -1,8 +1,10 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
+using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
+using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Services.Recipes.Ingredients;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared.Factories;
@@ -44,8 +46,7 @@ public class RecipeIngredientUpdaterTests
         // Assert
         await updateIngredient.Invoking(x => x.Invoke())
             .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Recipe could not be found");
+            .ThrowAsync<RecipeDoesNotExistException>();
     }
 
     [Fact]
@@ -99,8 +100,7 @@ public class RecipeIngredientUpdaterTests
         // Assert
         await updateIngredient.Invoking(x => x.Invoke())
             .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Ingredient could not be found");
+            .ThrowAsync<IngredientDoesNotExistException>();
     }
 
     [Fact]

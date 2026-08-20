@@ -1,4 +1,6 @@
-﻿namespace MealPlanner.Domain;
+﻿using MealPlanner.Domain.Recipes.Exceptions;
+
+namespace MealPlanner.Domain;
 
 public class RecipeStep
 {
@@ -25,21 +27,9 @@ public class RecipeStep
         return new RecipeStep(order, instruction);
     }
 
-    private static void ValidateOrderAndThrow(int order)
-    {
-        if (order < 1)
-        {
-            throw new ArgumentOutOfRangeException(null, "Order must be greater than 0");
-        }
-    }
+    private static void ValidateOrderAndThrow(int order) => InvalidStepOrderException.ThrowIfOrderIsInvalid(order);
 
-    private static void ValidateInstructionAndThrow(string instruction)
-    {
-        if (string.IsNullOrWhiteSpace(instruction))
-        {
-            throw new ArgumentNullException(null, "Instruction cannot be null or whitespace");
-        }
-    }
+    private static void ValidateInstructionAndThrow(string instruction) => MissingInstructionsException.ThrowIfInstructionsAreInvalid(instruction);
 
     public void UpdateOrder(int newOrder)
     {

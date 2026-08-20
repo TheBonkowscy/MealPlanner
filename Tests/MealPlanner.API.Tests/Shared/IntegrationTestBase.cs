@@ -1,6 +1,7 @@
 using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Menus;
+using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services;
 using Microsoft.AspNetCore.Mvc.Testing;

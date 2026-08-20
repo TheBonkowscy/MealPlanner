@@ -1,4 +1,6 @@
-﻿namespace MealPlanner.Domain.Ingredients.Actions;
+﻿using MealPlanner.Domain.Ingredients.Exceptions;
+
+namespace MealPlanner.Domain.Ingredients.Actions;
 
 // TODO: consider removing this in the future
 public class AddIngredientAction
@@ -20,10 +22,7 @@ public class AddIngredientAction
             throw new InvalidOperationException("Ingredient does not support the specified unit");
         }
 
-        if (quantity <= 0)
-        {
-            throw new ArgumentOutOfRangeException(null, "Ingredient quantity must be positive");
-        }
+        InvalidIngredientQuantityException.ThrowIfQuantityIsInvalid(quantity);
         
         return new AddIngredientAction
         {
