@@ -1,15 +1,18 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
+using MealPlanner.Domain.Ingredients.Exceptions;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
+using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 using Microsoft.Extensions.Localization;
 using Moq;
 using Moq.EntityFrameworkCore;
+using MissingIngredientsException = MealPlanner.Services.Recipes.Exceptions.MissingIngredientsException;
 
 namespace MealPlanner.Services.Tests.Recipes;
 
@@ -49,8 +52,7 @@ public class RecipeCreatorTests
         var result = () => _sut.Create(request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"Recipe '{request.Name}' already exists");
+        await result.Should().ThrowAsync<RecipeDoesNotExistException>();
     }
     
     [Fact]
@@ -64,8 +66,7 @@ public class RecipeCreatorTests
         var result = () => _sut.Create(request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("One or more ingredients not found");
+        await result.Should().ThrowAsync<MissingIngredientsException>();
     }
     
     [Fact]

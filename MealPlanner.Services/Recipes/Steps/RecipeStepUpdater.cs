@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Persistence;
+using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ public class RecipeStepUpdater(MealPlannerDbContext ctx, RecipeMapper recipeMapp
             .FirstOrDefaultAsync(x => x.Id == recipeId, cancellationToken);
         if (recipe is null)
         {
-            throw new InvalidOperationException("Recipe could not be found");   // TODO: custom exceptions?
+            throw new RecipeDoesNotExistException();
         }
 
         recipe.UpdateStep(stepId, request.Order, request.Instructions);

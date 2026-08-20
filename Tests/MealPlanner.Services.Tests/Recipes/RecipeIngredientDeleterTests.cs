@@ -4,6 +4,7 @@ using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
+using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Services.Recipes.Ingredients;
 using MealPlanner.Tests.Shared.Factories;
 using Microsoft.Extensions.Localization;
@@ -41,8 +42,7 @@ public class RecipeIngredientDeleterTests
         // Assert
         await updateIngredient.Invoking(x => x.Invoke())
             .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Recipe could not be found");
+            .ThrowAsync<RecipeDoesNotExistException>();
     }
 
     [Fact]
@@ -60,8 +60,7 @@ public class RecipeIngredientDeleterTests
         // Assert
         await updateIngredient.Invoking(x => x.Invoke())
             .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Specified ingredient could not be found");
+            .ThrowAsync<IngredientDoesNotExistException>();
     }
 
     [Fact]
@@ -79,8 +78,7 @@ public class RecipeIngredientDeleterTests
         // Assert
         await updateIngredient.Invoking(x => x.Invoke())
             .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Specified ingredient could not be found");
+            .ThrowAsync<IngredientDoesNotExistException>();
     }
 
     [Fact]

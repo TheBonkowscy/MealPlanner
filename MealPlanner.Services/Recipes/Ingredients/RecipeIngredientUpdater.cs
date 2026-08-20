@@ -1,5 +1,6 @@
 ﻿using MealPlanner.Domain.Ingredients.Actions;
 using MealPlanner.Persistence;
+using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,7 @@ public class RecipeIngredientUpdater(MealPlannerDbContext ctx,
 
         if (recipe is null)
         {
-            throw new InvalidOperationException("Recipe could not be found");   // TODO: custom exceptions?
+            throw new RecipeDoesNotExistException();
         }
 
         var measureUnit = measureUnitMapper.Map(request.Unit);
@@ -43,7 +44,7 @@ public class RecipeIngredientUpdater(MealPlannerDbContext ctx,
             var ingredient = await ctx.Ingredients.FirstOrDefaultAsync(x => x.Id == ingredientId, cancellationToken);
             if (ingredient is null)
             {
-                throw new InvalidOperationException("Ingredient could not be found");
+                throw new IngredientDoesNotExistException();
             }
             var addIngredient = AddIngredientAction.Create(ingredient, request.Quantity, measureUnit);
             recipe.AddIngredient(addIngredient);

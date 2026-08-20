@@ -4,6 +4,7 @@ using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
+using MealPlanner.Services.Menus.Exceptions;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
@@ -70,8 +71,7 @@ public class MenuCreatorTests
         var result = () => _sut.Create(request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("No meals were provided.");
+        await result.Should().ThrowAsync<MissingMealsException>();
     }
     
     // TODO: move it to Meal mapper tests
@@ -85,8 +85,7 @@ public class MenuCreatorTests
         var result = () => _sut.Create(request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("One or more recipes was not found");
+        await result.Should().ThrowAsync<MissingRecipesException>();
     }
 
     [Fact]
@@ -105,7 +104,6 @@ public class MenuCreatorTests
         
         // Assert
         await createWithConflict.Awaiting(x => x.Invoke(conflictingRequest))
-            .Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"There is already a Menu defined for {conflictingRequest.Date}.");
+            .Should().ThrowAsync<MenuAlreadyExistsException>();
     }
 }

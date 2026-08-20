@@ -4,6 +4,7 @@ using MealPlanner.Domain.Recipes;
 using MealPlanner.Domain.Recipes.Exceptions;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
+using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
@@ -48,8 +49,7 @@ public class RecipeUpdaterTests
         var result = () => _sut.Update(999, request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("Recipe could not be found");
+        await result.Should().ThrowAsync<RecipeDoesNotExistException>();
     }
     
     [Theory]
