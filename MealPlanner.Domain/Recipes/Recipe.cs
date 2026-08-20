@@ -1,7 +1,9 @@
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
+using MealPlanner.Domain.Ingredients.Exceptions;
+using MealPlanner.Domain.Recipes.Exceptions;
 
-namespace MealPlanner.Domain;
+namespace MealPlanner.Domain.Recipes;
 
 public class Recipe
 {
@@ -55,7 +57,7 @@ public class Recipe
         var recipe = new Recipe(name, servings);
         recipe.AddIngredients(ingredientsToAdd);
         recipe._steps = recipeSteps;
-        recipe.ReindexSteps(); // Zapewnia ciągłość 1..N od samego początku
+        recipe.ReindexSteps();
         
         return recipe;
     }
@@ -66,52 +68,20 @@ public class Recipe
         mappedIngredients.ForEach(_ingredients.Add);
     }
 
-    private static void ValidateNameAndThrow(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentNullException(null, "Please specify a name of the recipe");
-        }
-    }
+    private static void ValidateNameAndThrow(string name) => MissingRecipeNameException.ThrowIfNameIsInvalid(name);
 
-    private static void ValidateServingsAndThrow(int servings)
-    {
-        if (servings < 1)
-        {
-            throw new ArgumentOutOfRangeException(null, "Recipe must yield at least one serving");
-        }
-    }
+    private static void ValidateServingsAndThrow(int servings) => InvalidNumberOfServingsException.ThrowIfServingsIsInvalid(servings);
 
     private static void ValidateIngredientsAndThrow(List<AddIngredientAction> ingredients)
     {
-        if (ingredients.Count == 0)
-        {
-            throw new ArgumentNullException(null, "At least one ingredient must be specified");
-        }
-        
-        // TODO: is this required?
-        ingredients.ForEach(ingredient =>
-        {
-            if (ingredient.Quantity <= 0)
-            {
-                throw new ArgumentNullException(null, "Ingredient quantity must be greater than zero");
-            }
-        });
+        MissingIngredientsException.ThrowIfIngredientsMissing(ingredients);
+        InvalidIngredientQuantityException.ThrowIfQuantityIsInvalid(ingredients);
     }
     
     private static void ValidateRecipeStepsAndThrow(List<RecipeStep> recipeSteps)
     {
-        if (recipeSteps.Count == 0)
-        {
-            throw new ArgumentNullException(null, "At least one recipe step must be specified");
-        }
-
-
-        var uniqueOrdersCount = recipeSteps.Select(x => x.Order).Distinct().Count();
-        if (uniqueOrdersCount != recipeSteps.Count)
-        {
-            throw new InvalidOperationException("Recipe steps must have unique orders");
-        }
+        MissingRecipeStepsException.ThrowIfRecipeStepsMissing(recipeSteps);
+        NonUniqueOrderDetectedException.ThrowIfOrderIsNotUnique(recipeSteps);
     }
 
     public UsedIngredient? GetIngredient(int ingredientId, MeasureUnit requestUnit) =>

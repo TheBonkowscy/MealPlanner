@@ -1,4 +1,6 @@
-﻿namespace MealPlanner.Domain.Ingredients;
+﻿using MealPlanner.Domain.Ingredients.Exceptions;
+
+namespace MealPlanner.Domain.Ingredients;
 
 public class Ingredient
 {
@@ -21,27 +23,13 @@ public class Ingredient
 
     public static Ingredient Create(string name, List<MeasureUnit> applicableUnits)
     {
-        ValidateNameAndThrow(name);
+        MissingIngredientNameException.ThrowIfNameIsInvalid(name);
         ValidateUnitsAndThrow(applicableUnits);
 
         return new Ingredient(name, applicableUnits);
     }
 
-    private static void ValidateNameAndThrow(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentNullException(null, "Ingredient name cannot be null or whitespace");
-        }
-    }
-
-    private static void ValidateUnitsAndThrow(List<MeasureUnit> applicableUnits)
-    {
-        if (applicableUnits.Count == 0)
-        {
-            throw new ArgumentException("Ingredient must have at least one applicable unit", null, null);
-        }
-    }
+    private static void ValidateUnitsAndThrow(List<MeasureUnit> applicableUnits) => MissingMeasureUnitsException.ThrowIfEmpty(applicableUnits);
 
     public bool IsApplicableUnit(MeasureUnit unit) => ApplicableUnits.Any(x => x == unit);
 

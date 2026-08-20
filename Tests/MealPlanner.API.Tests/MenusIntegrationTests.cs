@@ -4,6 +4,7 @@ using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Menus.Actions;
+using MealPlanner.Domain.Recipes;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;

@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Menus.Actions;
+using MealPlanner.Domain.Recipes;
 using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests;
