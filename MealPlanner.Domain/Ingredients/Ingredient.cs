@@ -22,21 +22,19 @@ public class Ingredient
     public static Result<Ingredient> Create(string name, List<MeasureUnit> applicableUnits)
     {
         var errors = new List<Error>();
-        errors.AddRule(string.IsNullOrWhiteSpace(name), DomainErrors.Ingredients.InvalidName);
-        errors.AddRule(applicableUnits.Count == 0, DomainErrors.Ingredients.MissingMeasureUnits);
+        errors.AddRule(!string.IsNullOrWhiteSpace(name), DomainErrors.Ingredients.InvalidName);
+        errors.AddRule(applicableUnits.Count > 0, DomainErrors.Ingredients.MissingMeasureUnits);
 
-        return Result.Success(new Ingredient(name, applicableUnits));
+        return errors.Count > 0 ? Result.Failure<Ingredient>(errors) : Result.Success(new Ingredient(name, applicableUnits));
     }
 
     public bool IsApplicableUnit(MeasureUnit unit) => ApplicableUnits.Any(x => x == unit);
 
     public Result UpdateApplicableUnits(List<MeasureUnit> applicableUnits)
     {
-        var errors = new List<Error>();
-        errors.AddRule(applicableUnits.Count == 0, DomainErrors.Ingredients.MissingMeasureUnits);
-        if (errors.Count != 0)
+        if (applicableUnits.Count > 0)
         {
-            return Result.Failure(errors);
+            return Result.Failure(DomainErrors.Ingredients.MissingMeasureUnits);
         }
         
         ApplicableUnits = applicableUnits;

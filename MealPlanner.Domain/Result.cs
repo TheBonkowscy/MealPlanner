@@ -54,4 +54,6 @@ public static class ResultBuilderExtensions
         }
         return errors;
     }
+
+    public static List<Error> AllErrors(this IEnumerable<Result> results) => [.. results.Where(x => x.IsFailure).SelectMany(x => x.Errors)];
 }

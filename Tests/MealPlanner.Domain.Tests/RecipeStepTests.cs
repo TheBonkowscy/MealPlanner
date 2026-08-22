@@ -1,6 +1,5 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Recipes;
-using MealPlanner.Domain.Recipes.Exceptions;
 using MealPlanner.Tests.Shared.Helpers;
 
 namespace MealPlanner.Domain.Tests;
@@ -13,11 +12,12 @@ public class RecipeStepTests
     public void Create_WithNegativeOrder_Throws()
     {
         // Act
-        Action<int> create = order => RecipeStep.Create(order, Instructions);
+        var result = RecipeStep.Create(0, Instructions);
         
         // Assert
-        create.Invoking(x => x.Invoke(0))
-            .Should().Throw<InvalidStepOrderException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidOrder);
     }
     
     [Theory]
@@ -25,11 +25,12 @@ public class RecipeStepTests
     public void Create_WithEmptyInstructions_Throws(string instructions)
     {
         // Act
-        Action<string> create = instruction => RecipeStep.Create(1, instruction);
+        var result = RecipeStep.Create(1, instructions);
         
         // Assert
-        create.Invoking(x => x.Invoke(instructions))
-            .Should().Throw<MissingInstructionsException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidInstruction);
     }
 
     [Fact]
@@ -39,12 +40,13 @@ public class RecipeStepTests
         const int expectedOrder = 15;
         
         // Act
-        var step = RecipeStep.Create(expectedOrder, Instructions);
+        var result = RecipeStep.Create(expectedOrder, Instructions);
         
         // Assert
-        step.Should().NotBeNull();
-        step.Order.Should().Be(expectedOrder);
-        step.Instructions.Should().Be(Instructions);
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        result.Value.Order.Should().Be(expectedOrder);
+        result.Value.Instructions.Should().Be(Instructions);
     }
 
     [Theory]
@@ -52,26 +54,30 @@ public class RecipeStepTests
     public void UpdateOrder_WithNegativeOrder_Throws(int newOrder)
     {
         // Arrange
-        var step = RecipeStep.Create(3, Instructions);
+        var step = RecipeStep.Create(3, Instructions).Value;
         
         // Act
-        var update = () => step.UpdateOrder(newOrder);
+        var result = step.UpdateOrder(newOrder);
         
         // Assert
-        update.Should().Throw<InvalidStepOrderException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidOrder);
     }
 
     [Fact]
     public void UpdateOrder_WithPositiveOrder_Succeeds()
     {
         // Arrange
-        var step = RecipeStep.Create(3, Instructions);
+        var step = RecipeStep.Create(3, Instructions).Value;
         const int newOrder = 4;
         
         // Act
-        step.UpdateOrder(newOrder);
+        var result = step.UpdateOrder(newOrder);
         
         // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
         step.Order.Should().Be(newOrder);
     }
 
@@ -80,26 +86,30 @@ public class RecipeStepTests
     public void UpdateInstructions_WithEmptyInstructions_Throws(string newInstructions)
     {
         // Arrange
-        var step = RecipeStep.Create(1, Instructions);
+        var step = RecipeStep.Create(1, Instructions).Value;
         
         // Act
-        var update = () => step.UpdateInstructions(newInstructions);
+        var result = step.UpdateInstructions(newInstructions);
         
         // Assert
-        update.Should().Throw<MissingInstructionsException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidInstruction);
     }
 
     [Fact]
     public void UpdateInstructions_WithInstructions_Succeeds()
     {
         // Arrange
-        var step = RecipeStep.Create(1, Instructions);
-        var newInstructions = "Completely new and previously unheard of instructions";
+        var step = RecipeStep.Create(1, Instructions).Value;
+        const string newInstructions = "Completely new and previously unheard of instructions";
         
         // Act
-        step.UpdateInstructions(newInstructions);
+        var result = step.UpdateInstructions(newInstructions);
         
         // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
         step.Instructions.Should().Be(newInstructions);
     }
 }

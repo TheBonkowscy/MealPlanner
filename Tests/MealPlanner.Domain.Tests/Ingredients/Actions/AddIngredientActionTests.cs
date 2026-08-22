@@ -1,8 +1,6 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
-using MealPlanner.Domain.Ingredients.Exceptions;
-using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests.Ingredients.Actions;
@@ -18,12 +16,12 @@ public class AddIngredientActionTests
         var ingredientToAdd = TestInitialData.CupsOfFlour();
         
         // Act
-        Action<Ingredient, decimal, MeasureUnit> create = (ingredient, quantity, unit) =>
-            AddIngredientAction.Create(ingredient, quantity, unit);
+        var result = AddIngredientAction.Create(ingredientToAdd, SharedExpectedQuantity, MeasureUnit.Kilogram);
         
         // Assert
-        create.Invoking(x => x.Invoke(ingredientToAdd, SharedExpectedQuantity, MeasureUnit.Kilogram))
-            .Should().Throw<InvalidOperationException>("Ingredient does not support the specified unit");
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredients.UnitNotApplicable);
     }
     
     [Fact]
@@ -33,12 +31,12 @@ public class AddIngredientActionTests
         var ingredientToAdd = TestInitialData.CupsOfFlour();
         
         // Act
-        Action<Ingredient, decimal, MeasureUnit> create = (ingredient, quantity, unit) =>
-            AddIngredientAction.Create(ingredient, quantity, unit);
+        var result = AddIngredientAction.Create(ingredientToAdd, -SharedExpectedQuantity, MeasureUnit.GlassCup);
         
         // Assert
-        create.Invoking(x => x.Invoke(ingredientToAdd, -SharedExpectedQuantity, MeasureUnit.GlassCup))
-            .Should().Throw<InvalidIngredientQuantityException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredients.InvalidQuantity);
     }
     
     [Fact]
@@ -53,8 +51,10 @@ public class AddIngredientActionTests
         
         // Assert
         result.Should().NotBeNull();
-        result.Ingredient.Should().Be(ingredientToAdd);
-        result.Quantity.Should().Be(SharedExpectedQuantity);
-        result.Unit.Should().Be(expectedUnit);
+        result.IsFailure.Should().BeFalse();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Ingredient.Should().Be(ingredientToAdd);
+        result.Value.Quantity.Should().Be(SharedExpectedQuantity);
+        result.Value.Unit.Should().Be(expectedUnit);
     }
 }

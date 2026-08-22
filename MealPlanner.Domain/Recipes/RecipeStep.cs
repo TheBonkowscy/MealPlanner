@@ -26,13 +26,13 @@ public class RecipeStep
         return errors.Count > 0 ? Result.Failure<RecipeStep>(errors) : Result.Success(new RecipeStep(order, instruction));
     }
 
-    private static bool ValidateOrder(int order) => order < 1;
+    private static bool ValidateOrder(int order) => order > 0;
 
-    private static bool ValidateInstruction(string instructions) => string.IsNullOrWhiteSpace(instructions);
+    private static bool ValidateInstruction(string instructions) => !string.IsNullOrWhiteSpace(instructions);
 
     public Result UpdateOrder(int newOrder)
     {
-        if (ValidateOrder(newOrder))
+        if (!ValidateOrder(newOrder))
         {
             return Result.Failure(DomainErrors.RecipeStep.InvalidOrder);
         }
@@ -42,7 +42,7 @@ public class RecipeStep
 
     public Result UpdateInstructions(string newInstructions)
     {
-        if (ValidateInstruction(newInstructions))
+        if (!ValidateInstruction(newInstructions))
         {
             return Result.Failure(DomainErrors.RecipeStep.InvalidInstruction);
         }

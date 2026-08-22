@@ -18,7 +18,7 @@ public static class TestRecipes
         
         var addIngredients = ingredients.Select(i => TestActions.AddIngredient(i, 1, i.ApplicableUnits.First())).ToList();
 
-        var randomRecipe = Recipe.Create(name, servings.Value, addIngredients, steps);
+        var randomRecipe = Recipe.Create(name, servings.Value, addIngredients, steps).Value;
         return randomRecipe;
     }
 }

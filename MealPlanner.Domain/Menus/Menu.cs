@@ -46,16 +46,22 @@ public class Menu
             return Result.Failure(errors);
         }
         
-        return Meal.Create(this, recipe, order, servings);
+        var meal = Meal.Create(this, recipe, order, servings);
+        if (meal.IsFailure)
+        {
+            return meal;
+        }
+        _meals.Add(meal.Value);
+        return Result.Success();
     }
 
     private Result ValidateOrder(int order)
     {
         var errors = new List<Error>();
-        errors.AddRule((order > _meals.Count + 1 && _meals.Count != 0), DomainErrors.Menu.InvalidMealOrder);
+        errors.AddRule(!(order > _meals.Count + 1 && _meals.Count != 0), DomainErrors.Menu.InvalidMealOrder);
 
         var mealAtIndex = GetRecipe(order);
-        errors.AddRule((mealAtIndex is not null), DomainErrors.Meal.AlreadyExistsAtPosition);
+        errors.AddRule(mealAtIndex is null, DomainErrors.Meal.AlreadyExistsAtPosition);
 
         return errors.Count != 0 ? Result.Failure(errors) : Result.Success();
     }
@@ -70,9 +76,9 @@ public class Menu
     {
         var errors = new List<Error>();
         DateOnly[] invalidDates = [DateOnly.MinValue, DateOnly.MaxValue];
-        errors.AddRule(invalidDates.Contains(date), DomainErrors.Menu.DateIsUnset);
-        errors.AddRule(date < MinDateInThePast, DomainErrors.Menu.DateTooFarInThePast);
-        errors.AddRule(DateOnly.FromDateTime(DateTime.UtcNow).AddYears(100) < date, DomainErrors.Menu.DateTooFarInTheFuture);
+        errors.AddRule(!invalidDates.Contains(date), DomainErrors.Menu.DateIsUnset);
+        errors.AddRule(date >= MinDateInThePast, DomainErrors.Menu.DateTooFarInThePast);
+        errors.AddRule(DateOnly.FromDateTime(DateTime.UtcNow).AddYears(100) >= date, DomainErrors.Menu.DateTooFarInTheFuture);
 
         if (errors.Count != 0)
         {
@@ -80,8 +86,7 @@ public class Menu
         }
         
         var menu = new Menu(date);
-        errors.AddRange(mealsToAdd.SelectMany(x => menu.AddMeal(x).Errors));
-
+        errors.AddRange(mealsToAdd.Select(menu.AddMeal).AllErrors());
         return errors.Count != 0 ? Result.Failure<Menu>(errors) : Result.Success(menu);
     }
 

@@ -2,7 +2,6 @@ using AwesomeAssertions;
 using AwesomeAssertions.Execution;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Menus.Actions;
-using MealPlanner.Domain.Menus.Exceptions;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Tests.Shared.Factories;
 using MealPlanner.Tests.Shared.Helpers;
@@ -14,22 +13,21 @@ public class MenuTests
     private static readonly DateOnly SharedDate = DateOnly.FromDateTime(DateTime.UtcNow);
     private static readonly Recipe SharedFirstRecipe = TestRecipes.Create("Fish and chips");
     private static readonly Recipe SharedSecondRecipe = TestRecipes.Create("Pierogi");
-    private static readonly string InvalidDateExceptionMessage = $"Invalid date specified. The date can not be before {Menu.MinDateInThePast} and must be in the near future.";
 
     [Theory]
     [ClassData(typeof(InvalidDatesTestDataProvider))]
-    public void Create_ThrowsForInvalidDate(DateOnly invalidDate, DateOutOfRangeException.Cause underlyingCause)
+    public void Create_ThrowsForInvalidDate(DateOnly invalidDate, Error underlyingCause)
     {
         // Arrange
-        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1), AddMealAction.Create(SharedSecondRecipe, 2, 1)];
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1).Value, AddMealAction.Create(SharedSecondRecipe, 2, 1).Value];
             
         // Act
-        Action<DateOnly> createNewMenu = date => Menu.Create(date, mealsToAdd);
+        var result = Menu.Create(invalidDate, mealsToAdd);
         
         // Assert
-        createNewMenu.Invoking(x => x.Invoke(invalidDate))
-            .Should().Throw<DateOutOfRangeException>()
-            .Which.UnderlyingCause.Should().Be(underlyingCause);
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(underlyingCause);
     }
 
     [Theory]
@@ -37,26 +35,27 @@ public class MenuTests
     public void Create_CreatesSuccessfully(DateOnly validDate)
     {
         // Arrange
-        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1), AddMealAction.Create(SharedSecondRecipe, 2, 1)];
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1).Value, AddMealAction.Create(SharedSecondRecipe, 2, 1).Value];
         
         // Act
         var result = Menu.Create(validDate, mealsToAdd);
         
         // Assert
-        result.Date.Should().Be(validDate);
+        result.Value.Date.Should().Be(validDate);
     }
 
     [Fact]
     public void AddMeal_SuccessfullyAddsMeal_KeepsOrder()
     {
         // Arrange
-        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1)];
-        var menu = Menu.Create(SharedDate, mealsToAdd);
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1).Value];
+        var menu = Menu.Create(SharedDate, mealsToAdd).Value;
         
         // Act
-        menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, 2, 1));
+        var result = menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, 2, 1).Value);
         
         // Assert
+        result.IsSuccess.Should().BeTrue();
         menu.Meals.Should().HaveCount(2);
         menu.GetRecipe(1).Should().Be(SharedFirstRecipe);
         menu.GetRecipe(2).Should().Be(SharedSecondRecipe);
@@ -67,53 +66,47 @@ public class MenuTests
     {
         // Arrange
         const int order = 1;
-        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, order, 1), ];
-        var menu = Menu.Create(SharedDate, mealsToAdd);
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, order, 1).Value];
+        var menu = Menu.Create(SharedDate, mealsToAdd).Value;
         
         // Act
-        var addMeal = () => menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, order, 1));
+        var result = menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, order, 1).Value);
         
         // Assert
-        addMeal.Should().Throw<MealExistsAtPositionException>()
-            .Which.Order.Should().Be(order);
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Meal.AlreadyExistsAtPosition);
     }
 
     [Fact]
     public void AddMeal_WithMealAlreadyAdded_ThrowsException()
     {
         // Arrange
-        var firstMeal = AddMealAction.Create(SharedFirstRecipe, 1, 1);
-        List<AddMealAction> mealsToAdd = [firstMeal, AddMealAction.Create(SharedSecondRecipe, 2, 1)];
-        var menu = Menu.Create(SharedDate, mealsToAdd);
-        var thirdMeal = AddMealAction.Create(SharedFirstRecipe, 3, 1);
+        var firstMeal = AddMealAction.Create(SharedFirstRecipe, 1, 1).Value;
+        List<AddMealAction> mealsToAdd = [firstMeal, AddMealAction.Create(SharedSecondRecipe, 2, 1).Value];
+        var menu = Menu.Create(SharedDate, mealsToAdd).Value;
+        var thirdMeal = AddMealAction.Create(SharedFirstRecipe, 3, 1).Value;
         
         // Act
-        var addMealToMenu = menu.AddMeal;
+        var result = menu.AddMeal(thirdMeal);
         
         // Assert
-        var exception = addMealToMenu.Invoking(x => x.Invoke(thirdMeal))
-            .Should().Throw<MealAlreadyPresentInTheDayException>()
-            .Which;
-        using (new AssertionScope())
-        {
-            exception.Name.Should().Be(SharedFirstRecipe.Name);
-            exception.Date.Should().Be(menu.Date);
-        }
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Meal.AlreadyPresentInTheDay);
     }
 
     [Fact]
     public void AddMeal_Throws_WhenOrderIsOutOfBounds()
     {
         // Arrange
-        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1), ];
-        var menu = Menu.Create(SharedDate, mealsToAdd);
+        List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1).Value];
+        var menu = Menu.Create(SharedDate, mealsToAdd).Value;
         
         // Act
-        var addMeal = () => menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, 999, 1));
+        var result = menu.AddMeal(AddMealAction.Create(SharedSecondRecipe, 999, 1).Value);
         
         // Assert
-        addMeal.Should().Throw<InvalidMealOrderException>()
-            .Which.UnderlyingCause.Should().Be(InvalidMealOrderException.Cause.ExceedsRange);
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().Contain(DomainErrors.Menu.InvalidMealOrder);
     }
     
     public static TheoryData<DateOnly> ValidDatesSource

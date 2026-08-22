@@ -80,9 +80,9 @@ public class Recipe
         return Result.Success();
     }
 
-    private static bool ValidateName(string name) => string.IsNullOrWhiteSpace(name);
+    private static bool ValidateName(string name) => !string.IsNullOrWhiteSpace(name);
 
-    private static bool ValidateServings(int servings) => servings < 1;
+    private static bool ValidateServings(int servings) => servings > 0;
 
     private static bool ValidateIngredients(List<AddIngredientAction> ingredients) => ingredients.Count != 0 && ingredients.All(ingredient => ingredient.Quantity > 0);
 

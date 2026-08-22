@@ -35,18 +35,16 @@ public class UsedIngredient
     public static Result<UsedIngredient> Create(Recipe? recipe, AddIngredientAction action)
     {
         var errors = new List<Error>();
-        errors.AddRule(recipe is null, DomainErrors.Recipe.IsNull);
-        errors.AddRule(action.Quantity <= 0, DomainErrors.Ingredients.InvalidQuantity);
-        return errors.Count > 0 ? Result.Failure<UsedIngredient>(errors) : Result.Success(new UsedIngredient(recipe, action.Ingredient, action.Quantity, action.Unit));
+        errors.AddRule(recipe is not null, DomainErrors.Recipe.IsNull);
+        errors.AddRule(action.Quantity > 0, DomainErrors.Ingredients.InvalidQuantity);
+        return errors.Count > 0 ? Result.Failure<UsedIngredient>(errors) : Result.Success(new UsedIngredient(recipe!, action.Ingredient, action.Quantity, action.Unit));
     }
 
     public Result UpdateQuantity(decimal quantity)
     {
-        var errors = new List<Error>();
-        errors.AddRule(quantity <= 0, DomainErrors.Ingredients.InvalidQuantity);
-        if (errors.Count > 0)
+        if (quantity <= 0)
         {
-            return Result.Failure(errors);
+            return Result.Failure(DomainErrors.Ingredients.InvalidQuantity);
         }
         
         Quantity = quantity;

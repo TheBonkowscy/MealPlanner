@@ -16,8 +16,13 @@ public class AddIngredientAction
     public static Result<AddIngredientAction> Create(Ingredient ingredient, decimal quantity, MeasureUnit unit)
     {
         var errors = new List<Error>();
-        errors.AddRule(!ingredient.IsApplicableUnit(unit), DomainErrors.Ingredients.UnitNotApplicable);
-        errors.AddRule(quantity <= 0, DomainErrors.Ingredients.InvalidQuantity);
+        errors.AddRule(ingredient.IsApplicableUnit(unit), DomainErrors.Ingredients.UnitNotApplicable);
+        errors.AddRule(quantity > 0, DomainErrors.Ingredients.InvalidQuantity);
+
+        if (errors.Count != 0)
+        {
+            return Result.Failure<AddIngredientAction>(errors);
+        }
         
         return Result.Success(new AddIngredientAction
         {
