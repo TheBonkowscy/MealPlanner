@@ -1,7 +1,5 @@
 ﻿using MealPlanner.Domain.Ingredients.Actions;
-using MealPlanner.Domain.Ingredients.Exceptions;
 using MealPlanner.Domain.Recipes;
-using MealPlanner.Domain.Recipes.Exceptions;
 
 namespace MealPlanner.Domain.Ingredients;
 
@@ -34,22 +32,24 @@ public class UsedIngredient
         Unit = unit;
     }
 
-    public static UsedIngredient Create(Recipe recipe, AddIngredientAction action)
+    public static Result<UsedIngredient> Create(Recipe? recipe, AddIngredientAction action)
     {
-        ValidateRecipeAndThrow(recipe);
-        ValidateQuantityAndThrow(action.Quantity);
-        return new UsedIngredient(recipe, action.Ingredient, action.Quantity, action.Unit);
+        var errors = new List<Error>();
+        errors.AddRule(recipe is null, DomainErrors.Recipe.IsNull);
+        errors.AddRule(action.Quantity <= 0, DomainErrors.Ingredients.InvalidQuantity);
+        return errors.Count > 0 ? Result.Failure<UsedIngredient>(errors) : Result.Success(new UsedIngredient(recipe, action.Ingredient, action.Quantity, action.Unit));
     }
 
-    private static void ValidateRecipeAndThrow(Recipe recipe) =>
-        MissingRecipeException.ThrowIfRecipeIsNull(recipe);
-
-    private static void ValidateQuantityAndThrow(decimal quantity) =>
-        InvalidIngredientQuantityException.ThrowIfQuantityIsInvalid(quantity);
-
-    public void UpdateQuantity(decimal quantity)
+    public Result UpdateQuantity(decimal quantity)
     {
-        ValidateQuantityAndThrow(quantity);
+        var errors = new List<Error>();
+        errors.AddRule(quantity <= 0, DomainErrors.Ingredients.InvalidQuantity);
+        if (errors.Count > 0)
+        {
+            return Result.Failure(errors);
+        }
+        
         Quantity = quantity;
+        return Result.Success();
     }
 }

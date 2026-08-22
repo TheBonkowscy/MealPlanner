@@ -1,7 +1,5 @@
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
-using MealPlanner.Domain.Ingredients.Exceptions;
-using MealPlanner.Domain.Recipes.Exceptions;
 
 namespace MealPlanner.Domain.Recipes;
 
@@ -61,17 +59,25 @@ public class Recipe
         }
         
         var recipe = new Recipe(name, servings);
-        recipe.AddIngredients(ingredientsToAdd);
+        errors.AddRange(recipe.AddIngredients(ingredientsToAdd).Errors);
         recipe._steps = recipeSteps;
         recipe.ReindexSteps();
         
         return Result.Success(recipe);
     }
 
-    private void AddIngredients(List<AddIngredientAction> ingredientsToAdd)
+    private Result AddIngredients(List<AddIngredientAction> ingredientsToAdd)
     {
-        var mappedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(this, ingredient)).ToList();
-        mappedIngredients.ForEach(_ingredients.Add);
+        var usedIngredients = ingredientsToAdd.Select(ingredient => UsedIngredient.Create(this, ingredient)).ToList();
+        
+        if (usedIngredients.Any(x => x.IsFailure))
+        {
+            var allErrors = usedIngredients.SelectMany(x => x.Errors).ToList();
+            return Result.Failure(allErrors);
+        }
+        
+        _ingredients.AddRange(usedIngredients.Select(x => x.Value));
+        return Result.Success();
     }
 
     private static bool ValidateName(string name) => string.IsNullOrWhiteSpace(name);
@@ -88,12 +94,7 @@ public class Recipe
         }
         
         var uniqueOrdersCount = recipeSteps.Select(x => x.Order).Distinct().Count();
-        if (uniqueOrdersCount != recipeSteps.Count)
-        {
-            return false;
-        }
-
-        return true;
+        return uniqueOrdersCount == recipeSteps.Count;
     }
 
     public UsedIngredient? GetIngredient(int ingredientId, MeasureUnit requestUnit) =>
@@ -103,35 +104,55 @@ public class Recipe
 
     public void AddIngredient(AddIngredientAction addIngredient) => AddIngredients([addIngredient]);
 
-    public void UpdateName(string name)
+    public Result UpdateName(string name)
     {
-        ValidateName(name);
+        /*
+         * errors.AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName);
+        errors.AddRule(ValidateServings(servings), DomainErrors.Recipe.InvalidServings);
+        errors.AddRule(ValidateIngredients(ingredientsToAdd), DomainErrors.Recipe.InvalidIngredients);
+        errors.AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps);
+
+         */
+        if (ValidateName(name))
+        {
+            return Result.Failure(DomainErrors.Recipe.InvalidName);
+        }
         Name = name;
+        return Result.Success();
     }
 
-    public void UpdateServings(int servings)
+    public Result UpdateServings(int servings)
     {
-        ValidateServings(servings);
+        if (ValidateServings(servings))
+        {
+            return Result.Failure(DomainErrors.Recipe.InvalidServings);
+        }
         Servings = servings;
+        return Result.Success();
     }
 
-    public void UpdateStep(int stepId, int newOrder, string newInstructions)
+    public Result UpdateStep(int stepId, int newOrder, string newInstructions)
     {
         var updatedStep = _steps.FirstOrDefault(x => x.Id == stepId);
         if (updatedStep is null)
         {
-            throw new InvalidOperationException("Recipe step could not be found");
+            return Result.Failure(DomainErrors.RecipeStep.NotFound);
         }
         
         _steps = [.. _steps.OrderBy(x => x.Order)];
 
-        updatedStep.UpdateInstructions(newInstructions);
+        var instructionsUpdated = updatedStep.UpdateInstructions(newInstructions);
+        if (instructionsUpdated.IsFailure)
+        {
+            return instructionsUpdated;
+        }
 
         _steps.Remove(updatedStep);
         var clampedOrder = Math.Clamp(newOrder, 1, _steps.Count + 1);
         _steps.Insert(clampedOrder - 1, updatedStep);
 
         ReindexSteps();
+        return Result.Success();
     }
 
     public Result AddStep(int targetOrder, string instructions)

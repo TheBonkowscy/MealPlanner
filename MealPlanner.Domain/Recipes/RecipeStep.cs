@@ -1,6 +1,4 @@
-﻿using MealPlanner.Domain.Recipes.Exceptions;
-
-namespace MealPlanner.Domain.Recipes;
+﻿namespace MealPlanner.Domain.Recipes;
 
 public class RecipeStep
 {
@@ -22,25 +20,33 @@ public class RecipeStep
     public static Result<RecipeStep> Create(int order, string instruction)
     {
         var errors = new List<Error>();
-        errors.AddRule(ValidateOrderAndThrow(order), DomainErrors.RecipeStep.InvalidOrder);
-        errors.AddRule(ValidateInstructionAndThrow(instruction), DomainErrors.RecipeStep.InvalidInstruction);
+        errors.AddRule(ValidateOrder(order), DomainErrors.RecipeStep.InvalidOrder);
+        errors.AddRule(ValidateInstruction(instruction), DomainErrors.RecipeStep.InvalidInstruction);
 
         return errors.Count > 0 ? Result.Failure<RecipeStep>(errors) : Result.Success(new RecipeStep(order, instruction));
     }
 
-    private static bool ValidateOrderAndThrow(int order) => order < 1;
+    private static bool ValidateOrder(int order) => order < 1;
 
-    private static bool ValidateInstructionAndThrow(string instructions) => string.IsNullOrWhiteSpace(instructions);
+    private static bool ValidateInstruction(string instructions) => string.IsNullOrWhiteSpace(instructions);
 
-    public void UpdateOrder(int newOrder)
+    public Result UpdateOrder(int newOrder)
     {
-        ValidateOrderAndThrow(newOrder);
+        if (ValidateOrder(newOrder))
+        {
+            return Result.Failure(DomainErrors.RecipeStep.InvalidOrder);
+        }
         Order = newOrder;
+        return Result.Success();
     }
 
-    public void UpdateInstructions(string newInstructions)
+    public Result UpdateInstructions(string newInstructions)
     {
-        ValidateInstructionAndThrow(newInstructions);
+        if (ValidateInstruction(newInstructions))
+        {
+            return Result.Failure(DomainErrors.RecipeStep.InvalidInstruction);
+        }
         Instructions = newInstructions;
+        return Result.Success();
     }
 }
