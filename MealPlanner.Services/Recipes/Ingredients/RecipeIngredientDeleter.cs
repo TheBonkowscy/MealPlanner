@@ -1,6 +1,6 @@
-﻿using MealPlanner.Domain;
-using MealPlanner.Domain.Shared;
+﻿using MealPlanner.Domain.Shared;
 using MealPlanner.Persistence;
+using MealPlanner.Services.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Recipes.Ingredients;

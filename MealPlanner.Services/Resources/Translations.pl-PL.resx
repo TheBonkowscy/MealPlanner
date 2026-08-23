@@ -56,4 +56,7 @@
     <data name="Slice2" xml:space="preserve">
         <value>plast.</value>
     </data>
+    <data name="MissingRecipesById" xml:space="preserve">
+        <value>Nie odnaleziono przepisów o podanych ID: {0}</value>
+    </data>
 </root>

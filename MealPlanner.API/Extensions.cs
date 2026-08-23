@@ -51,7 +51,7 @@ public static class Extensions
 
         private static object? FormatValue(object? value) => value switch
         {
-            IEnumerable<DateOnly> dates => string.Join(", ", dates.Select(d => d.ToString("dd.MM.yyyy"))),
+            IEnumerable<int> integers => string.Join(", ", integers),
             IEnumerable<Guid> ids => string.Join(", ", ids),
             _ => value
         };

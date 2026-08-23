@@ -132,6 +132,15 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find recipes by the following IDs: {0}.
+        /// </summary>
+        internal static string MissingRecipesById {
+            get {
+                return ResourceManager.GetString("MissingRecipesById", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to package(s).
         /// </summary>
         public static string Package {
