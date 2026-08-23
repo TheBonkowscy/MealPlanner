@@ -1,5 +1,5 @@
-﻿using MealPlanner.Persistence;
-using MealPlanner.Services.Recipes.Exceptions;
+﻿using MealPlanner.Domain;
+using MealPlanner.Persistence;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -8,12 +8,12 @@ namespace MealPlanner.Services.Recipes;
 
 public interface IUpdateRecipe
 {
-    Task<GetRecipeDetailsResponse> Update(int recipeId, UpdateRecipeRequest request, CancellationToken cancellationToken);
+    Task<Result<GetRecipeDetailsResponse>> Update(int recipeId, UpdateRecipeRequest request, CancellationToken cancellationToken);
 }
 
 public class RecipeUpdater(MealPlannerDbContext ctx, RecipeMapper recipeMapper) : IUpdateRecipe
 {
-    public async Task<GetRecipeDetailsResponse> Update(int recipeId, UpdateRecipeRequest request, CancellationToken cancellationToken)
+    public async Task<Result<GetRecipeDetailsResponse>> Update(int recipeId, UpdateRecipeRequest request, CancellationToken cancellationToken)
     {
         var recipe = await ctx.Recipes.Include(x => x.Steps)
             .Include(x => x.Ingredients)
@@ -22,14 +22,18 @@ public class RecipeUpdater(MealPlannerDbContext ctx, RecipeMapper recipeMapper) 
         
         if (recipe is null)
         {
-            throw new RecipeDoesNotExistException();
+            return Result.Failure<GetRecipeDetailsResponse>(ServiceErrors.Recipe.DoesNotExist);
         }
 
-        recipe.UpdateName(request.Name);
-        recipe.UpdateServings(request.Servings);
+        List<Result> updateResults = [recipe.UpdateName(request.Name), recipe.UpdateServings(request.Servings)];
+        var errors = updateResults.AllErrors();
+        if (errors.Count != 0)
+        {
+            return Result.Failure<GetRecipeDetailsResponse>(errors);
+        }
         
         await ctx.SaveChangesAsync(cancellationToken);
         
-        return recipeMapper.ToDetails(recipe);
+        return Result.Success(recipeMapper.ToDetails(recipe));
     }
 }

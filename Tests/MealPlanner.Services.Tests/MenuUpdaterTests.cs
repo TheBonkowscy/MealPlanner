@@ -5,8 +5,6 @@ using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
-using MealPlanner.Services.Menus.Exceptions;
-using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
@@ -61,10 +59,12 @@ public class MenuUpdaterTests
         var request = new UpdateMenuRequest(new DateOnly(2026, 8, 6),[]);
 
         // Act
-        var result = async () => await _sut.Update(request, CancellationToken.None);
+        var result = await _sut.Update(request, CancellationToken.None);
 
         // Assert
-        await result.Should().ThrowAsync<MissingMealsException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Menu.InvalidMeals);
 
         _ctx.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -77,10 +77,12 @@ public class MenuUpdaterTests
         var request = new UpdateMenuRequest(new DateOnly(2026, 8, 6), mealDtos);
 
         // Act
-        var result = async () => await _sut.Update(request, CancellationToken.None);
+        var result = await _sut.Update(request, CancellationToken.None);
 
         // Assert
-        await result.Should().ThrowAsync<MenuDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Menu.DoesNotExist);
 
         _ctx.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -90,15 +92,17 @@ public class MenuUpdaterTests
     {
         // Arrange
         var date = new DateOnly(2026, 8, 6);
-        var menuForDate = Menu.Create(date, [TestActions.AddMeal(PreExistingRecipe, 1, 1)]);
+        var menuForDate = Menu.Create(date, [TestActions.AddMeal(PreExistingRecipe, 1, 1)]).Value;
         _menus.Add(menuForDate);
         var request = new UpdateMenuRequest(date, []);
 
         // Act
-        Func<Task> act = async () => await _sut.Update(request, CancellationToken.None);
+        var result = await _sut.Update(request, CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<MissingMealsException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Menu.InvalidMeals);
         
         _ctx.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         
@@ -112,13 +116,13 @@ public class MenuUpdaterTests
         // Arrange
         List<AddMealAction> mealsToAdd = [TestActions.AddMeal(PreExistingRecipe, 1, 1)];
         var date = new DateOnly(2026, 8, 6);
-        var menuForDate = Menu.Create(date, mealsToAdd);
+        var menuForDate = Menu.Create(date, mealsToAdd).Value;
         _menus.Add(menuForDate);
         List<AddMealRequest> mealDtos = [new(PreExistingRecipe.Id, 1, 1)];
 
         _mealsMapper
             .Setup(x => x.MapMeals(mealDtos, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mealsToAdd);
+            .ReturnsAsync(Result.Success(mealsToAdd));
 
         var request = new UpdateMenuRequest(date, mealDtos);
 
@@ -127,7 +131,8 @@ public class MenuUpdaterTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Date.Should().Be(date);
+        result.IsFailure.Should().BeFalse();
+        result.Value.Date.Should().Be(date);
 
         _mealsMapper.Verify(x => x.MapMeals(mealDtos, It.IsAny<CancellationToken>()), Times.Once);
     }

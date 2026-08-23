@@ -102,7 +102,7 @@ public class Recipe
 
     public void RemoveIngredient(UsedIngredient ingredient) => _ingredients.Remove(ingredient);
 
-    public void AddIngredient(AddIngredientAction addIngredient) => AddIngredients([addIngredient]);
+    public Result AddIngredient(AddIngredientAction addIngredient) => AddIngredients([addIngredient]);
 
     public Result UpdateName(string name)
     {
@@ -113,7 +113,7 @@ public class Recipe
         errors.AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps);
 
          */
-        if (ValidateName(name))
+        if (!ValidateName(name))
         {
             return Result.Failure(DomainErrors.Recipe.InvalidName);
         }
@@ -123,7 +123,7 @@ public class Recipe
 
     public Result UpdateServings(int servings)
     {
-        if (ValidateServings(servings))
+        if (!ValidateServings(servings))
         {
             return Result.Failure(DomainErrors.Recipe.InvalidServings);
         }

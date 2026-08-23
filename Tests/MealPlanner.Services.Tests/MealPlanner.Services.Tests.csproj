@@ -8,10 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
+        <PackageReference Include="AwesomeAssertions" Version="9.4.0"/>
         <PackageReference Include="coverlet.collector" Version="6.0.4"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>
-        <PackageReference Include="Moq.EntityFrameworkCore" Version="10.0.0" />
+        <PackageReference Include="Moq.EntityFrameworkCore" Version="10.0.0"/>
         <PackageReference Include="xunit" Version="2.9.3"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4"/>
     </ItemGroup>
@@ -21,14 +21,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\MealPlanner.Services\MealPlanner.Services.csproj" />
-      <ProjectReference Include="..\MealPlanner.Tests.Shared\MealPlanner.Tests.Shared.csproj" />
+        <ProjectReference Include="..\..\MealPlanner.Services\MealPlanner.Services.csproj"/>
+        <ProjectReference Include="..\MealPlanner.Tests.Shared\MealPlanner.Tests.Shared.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Extensions.Localization.Abstractions">
-        <HintPath>..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\10.0.5\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
-      </Reference>
+        <Reference Include="Microsoft.Extensions.Localization.Abstractions">
+            <HintPath>..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\10.0.5\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

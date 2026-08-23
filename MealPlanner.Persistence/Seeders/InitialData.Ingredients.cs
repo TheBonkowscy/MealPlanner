@@ -1,10 +1,11 @@
-﻿using MealPlanner.Domain.Ingredients;
+﻿using MealPlanner.Domain;
+using MealPlanner.Domain.Ingredients;
 
 namespace MealPlanner.Persistence.Seeders;
 
 internal static partial class InitialData
 {
-    public static Ingredient[] Ingredients() =>
+    public static Result<Ingredient>[] Ingredients() =>
     [
         Ingredient.Create("Bułka", [MeasureUnit.Piece, MeasureUnit.Slice1]),
         Ingredient.Create("Chleb", [MeasureUnit.Piece, MeasureUnit.Slice1]),

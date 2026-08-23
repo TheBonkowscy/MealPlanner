@@ -1,10 +1,8 @@
 ﻿using AwesomeAssertions;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
-using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Services.Recipes.Ingredients;
 using MealPlanner.Tests.Shared.Factories;
 using Microsoft.Extensions.Localization;
@@ -36,13 +34,13 @@ public class RecipeIngredientDeleterTests
         var usedIngredient = recipe.Ingredients[0]; 
         
         // Act
-        var updateIngredient = () => _sut.DeleteIngredient(recipe.Id, usedIngredient.IngredientId,
+        var result = await _sut.DeleteIngredient(recipe.Id, usedIngredient.IngredientId,
             usedIngredient.Unit.ToString(), CancellationToken.None);
         
         // Assert
-        await updateIngredient.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<RecipeDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Recipe.DoesNotExist);
     }
 
     [Fact]
@@ -54,13 +52,13 @@ public class RecipeIngredientDeleterTests
         var usedIngredient = recipe.Ingredients[0];
         
         // Act
-        var updateIngredient = () => _sut.DeleteIngredient(recipe.Id, 999,
+        var result = await _sut.DeleteIngredient(recipe.Id, 999,
             usedIngredient.Unit.ToString(), CancellationToken.None);
         
         // Assert
-        await updateIngredient.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<IngredientDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Recipe.InvalidIngredients);
     }
 
     [Fact]
@@ -72,13 +70,13 @@ public class RecipeIngredientDeleterTests
         var usedIngredient = recipe.Ingredients[0]; 
         
         // Act
-        var updateIngredient = () => _sut.DeleteIngredient(recipe.Id, usedIngredient.IngredientId,
+        var result = await _sut.DeleteIngredient(recipe.Id, usedIngredient.IngredientId,
             nameof(MeasureUnit.Slice2), CancellationToken.None);
         
         // Assert
-        await updateIngredient.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<IngredientDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Recipe.InvalidIngredients);
     }
 
     [Fact]
@@ -90,10 +88,12 @@ public class RecipeIngredientDeleterTests
         var usedIngredient = recipe.Ingredients[0];
         
         // Act
-        await _sut.DeleteIngredient(recipe.Id, usedIngredient.IngredientId, usedIngredient.Unit.ToString(),
+        var result = await _sut.DeleteIngredient(recipe.Id, usedIngredient.IngredientId, usedIngredient.Unit.ToString(),
             CancellationToken.None);
         
         // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
         recipe.Ingredients.Should().NotContain(x => x.IngredientId == usedIngredient.IngredientId);
     }
 }

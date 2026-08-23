@@ -1,18 +1,14 @@
 ﻿using AwesomeAssertions;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
-using MealPlanner.Domain.Ingredients.Exceptions;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
-using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 using Microsoft.Extensions.Localization;
 using Moq;
 using Moq.EntityFrameworkCore;
-using MissingIngredientsException = MealPlanner.Services.Recipes.Exceptions.MissingIngredientsException;
 
 namespace MealPlanner.Services.Tests.Recipes;
 
@@ -49,10 +45,12 @@ public class RecipeCreatorTests
         await _sut.Create(request, CancellationToken.None);
         
         // Act
-        var result = () => _sut.Create(request, CancellationToken.None);
+        var result = await _sut.Create(request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<RecipeDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Recipe.AlreadyExists);
     }
     
     [Fact]
@@ -63,10 +61,12 @@ public class RecipeCreatorTests
         request.Ingredients.Add(new AddIngredientRequest(Random.Shared.Next(100, 1000), 1, nameof(MeasureUnit.Bottle)));
         
         // Act
-        var result = () => _sut.Create(request, CancellationToken.None);
+        var result = await _sut.Create(request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<MissingIngredientsException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Ingredient.DoesNotExist);
     }
     
     [Fact]
@@ -83,7 +83,9 @@ public class RecipeCreatorTests
         var result = await _sut.Create(request, CancellationToken.None);
         
         // Assert
-        var createdRecipe = _recipes.FirstOrDefault(x => x.Id == result.Id);
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        var createdRecipe = _recipes.FirstOrDefault(x => x.Id == result.Value.Id);
         createdRecipe.Should().NotBeNull();
         createdRecipe.Ingredients.Should().HaveCount(2);
 
@@ -109,7 +111,8 @@ public class RecipeCreatorTests
         
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().BeGreaterThan(0);
+        result.IsFailure.Should().BeFalse();
+        result.Value.Id.Should().BeGreaterThan(0);
     }
 
     private static CreateRecipeRequest NewRequest()

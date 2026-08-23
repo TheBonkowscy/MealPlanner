@@ -1,10 +1,8 @@
 ﻿using AwesomeAssertions;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Menus;
-using MealPlanner.Services.Menus.Exceptions;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
@@ -58,7 +56,9 @@ public class MenuCreatorTests
         var result = await _sut.Create(request, CancellationToken.None);
         
         // Assert
-        result.Date.Should().Be(request.Date);
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        result.Value.Date.Should().Be(request.Date);
     }
     
     [Fact]
@@ -68,10 +68,12 @@ public class MenuCreatorTests
         var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), []);
         
         // Act
-        var result = () => _sut.Create(request, CancellationToken.None);
+        var result = await _sut.Create(request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<MissingMealsException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Menu.InvalidMeals);
     }
     
     // TODO: move it to Meal mapper tests
@@ -82,10 +84,12 @@ public class MenuCreatorTests
         var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), [new AddMealRequest(999, 2, 1)]);
         
         // Act
-        var result = () => _sut.Create(request, CancellationToken.None);
+        var result = await _sut.Create(request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<MissingRecipesException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Meal.MissingRecipesById);
     }
 
     [Fact]
@@ -100,10 +104,11 @@ public class MenuCreatorTests
         var conflictingRequest = new CreateMenuRequest(tomorrow, mealsForConflictingRequest);
 
         // Act
-        var createWithConflict = async (CreateMenuRequest req) => await _sut.Create(req, CancellationToken.None);
+        var result = await _sut.Create(conflictingRequest, CancellationToken.None);
         
         // Assert
-        await createWithConflict.Awaiting(x => x.Invoke(conflictingRequest))
-            .Should().ThrowAsync<MenuAlreadyExistsException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Menu.AlreadyExists);
     }
 }

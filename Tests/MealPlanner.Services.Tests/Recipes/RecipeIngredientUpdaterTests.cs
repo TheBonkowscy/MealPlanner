@@ -1,10 +1,8 @@
 ﻿using AwesomeAssertions;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
-using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Services.Recipes.Ingredients;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared.Factories;
@@ -19,7 +17,6 @@ public class RecipeIngredientUpdaterTests
     private readonly RecipeIngredientUpdater _sut;
 
     private readonly List<Recipe> _recipes = [];
-    private readonly List<Ingredient> _ingredients = [];
 
     public RecipeIngredientUpdaterTests()
     {
@@ -27,7 +24,7 @@ public class RecipeIngredientUpdaterTests
         
         var ctx = new Mock<MealPlannerDbContext>();
         ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
-        ctx.Setup(x => x.Ingredients).ReturnsDbSet(_ingredients);
+        ctx.Setup(x => x.Ingredients).ReturnsDbSet([]);
         var measureUnitMapper = new MeasureUnitMapper(localizer.Object);
         _sut = new RecipeIngredientUpdater(ctx.Object, measureUnitMapper, new RecipeMapper(measureUnitMapper));
     }
@@ -41,12 +38,12 @@ public class RecipeIngredientUpdaterTests
         var request = new UpdateRecipeIngredientRequest(usedIngredient.IngredientId,  usedIngredient.Quantity + 10, usedIngredient.Unit.ToString()); 
         
         // Act
-        var updateIngredient = () => _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
+        var result = await _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
         
         // Assert
-        await updateIngredient.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<RecipeDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Recipe.DoesNotExist);
     }
 
     [Fact]
@@ -63,7 +60,9 @@ public class RecipeIngredientUpdaterTests
         var result = await _sut.UpdateIngredient(recipe.Id, request.Id, request, CancellationToken.None);
         
         // Assert
-        var newIngredientResponse = result.Ingredients.First(x => x.Id == newIngredient.Id);
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        var newIngredientResponse = result.Value.Ingredients.First(x => x.Id == newIngredient.Id);
         newIngredientResponse.MeasureUnit.UnderlyingValue.Should().Be(request.Unit);
         newIngredientResponse.Quantity.Should().Be(request.Quantity);
     }
@@ -81,7 +80,9 @@ public class RecipeIngredientUpdaterTests
         var result = await _sut.UpdateIngredient(recipe.Id, request.Id, request, CancellationToken.None);
         
         // Assert
-        var usedIngredientResponse = result.Ingredients.First(x => x.Id == usedIngredient.IngredientId);
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        var usedIngredientResponse = result.Value.Ingredients.First(x => x.Id == usedIngredient.IngredientId);
         usedIngredientResponse.Quantity.Should().Be(request.Quantity);
     }
 
@@ -95,12 +96,12 @@ public class RecipeIngredientUpdaterTests
         var request = new UpdateRecipeIngredientRequest(999,  usedIngredient.Quantity + 10, nameof(MeasureUnit.Slice2)); 
         
         // Act
-        var updateIngredient = () => _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
+        var result = await _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
         
         // Assert
-        await updateIngredient.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<IngredientDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Recipe.InvalidIngredients);
     }
 
     [Fact]
@@ -116,9 +117,11 @@ public class RecipeIngredientUpdaterTests
         var result = await _sut.UpdateIngredient(recipe.Id, usedIngredient.IngredientId, request, CancellationToken.None);
         
         // Assert
-        result.Name.Should().Be(recipe.Name);
-        result.Servings.Should().Be(recipe.Servings);
-        var responseIngredient = result.Ingredients.First(x => x.Id == usedIngredient.IngredientId);
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        result.Value.Name.Should().Be(recipe.Name);
+        result.Value.Servings.Should().Be(recipe.Servings);
+        var responseIngredient = result.Value.Ingredients.First(x => x.Id == usedIngredient.IngredientId);
         responseIngredient.Quantity.Should().Be(usedIngredient.Quantity);
     }
 }

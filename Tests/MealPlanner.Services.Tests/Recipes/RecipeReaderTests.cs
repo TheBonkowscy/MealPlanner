@@ -15,18 +15,15 @@ namespace MealPlanner.Services.Tests.Recipes;
 
 public class RecipeReaderTests
 {
-    private readonly Mock<IStringLocalizer<Translations>> _localiser;
-    
-    private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly RecipeReader _sut;
     private readonly List<Recipe> _recipes = [];
 
     public RecipeReaderTests()
     {
-        _localiser = new Mock<IStringLocalizer<Translations>>();
-        _ctx = new Mock<MealPlannerDbContext>();
-        _ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
-        _sut = new RecipeReader(_ctx.Object, new RecipeMapper(new MeasureUnitMapper(_localiser.Object)));
+        var localiser = new Mock<IStringLocalizer<Translations>>();
+        var ctx = new Mock<MealPlannerDbContext>();
+        ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
+        _sut = new RecipeReader(ctx.Object, new RecipeMapper(new MeasureUnitMapper(localiser.Object)));
     }
 
     [Fact]
@@ -89,10 +86,10 @@ public class RecipeReaderTests
     public async Task Get_MealExists_ReturnsDetails()
     {
         // Arrange 
-        var ingredient = Ingredient.Create("Bacon", [MeasureUnit.Kilogram]);
-        var ingredients = AddIngredientAction.Create(ingredient, 1, MeasureUnit.Kilogram);
-        var step = RecipeStep.Create(1, "Cook");
-        var recipe = Recipe.Create("Burgers", 1, [ingredients], [step]);
+        var ingredient = Ingredient.Create("Bacon", [MeasureUnit.Kilogram]).Value;
+        var ingredients = AddIngredientAction.Create(ingredient, 1, MeasureUnit.Kilogram).Value;
+        var step = RecipeStep.Create(1, "Cook").Value;
+        var recipe = Recipe.Create("Burgers", 1, [ingredients], [step]).Value;
         RandomId.Set(ingredient);
         RandomId.Set(step);
         RandomId.Set(recipe);
