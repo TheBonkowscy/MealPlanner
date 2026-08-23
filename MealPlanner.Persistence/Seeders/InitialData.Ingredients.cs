@@ -1,5 +1,6 @@
 ﻿using MealPlanner.Domain;
 using MealPlanner.Domain.Ingredients;
+using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Persistence.Seeders;
 

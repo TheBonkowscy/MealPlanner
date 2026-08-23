@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests.Ingredients.Actions;
@@ -14,14 +15,15 @@ public class AddIngredientActionTests
     {
         // Arrange
         var ingredientToAdd = TestInitialData.CupsOfFlour();
+        var missingUnit = MeasureUnit.Kilogram;
         
         // Act
-        var result = AddIngredientAction.Create(ingredientToAdd, SharedExpectedQuantity, MeasureUnit.Kilogram);
+        var result = AddIngredientAction.Create(ingredientToAdd, SharedExpectedQuantity, missingUnit);
         
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredients.UnitNotApplicable);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.UnitNotApplicable(missingUnit));
     }
     
     [Fact]
@@ -36,7 +38,7 @@ public class AddIngredientActionTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredients.InvalidQuantity);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.InvalidQuantity(-SharedExpectedQuantity));
     }
     
     [Fact]

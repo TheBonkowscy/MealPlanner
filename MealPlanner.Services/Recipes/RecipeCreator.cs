@@ -2,6 +2,7 @@
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Persistence;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;

@@ -1,5 +1,6 @@
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
+using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Recipes;
 
@@ -48,8 +49,8 @@ public class Recipe
     public static Result<Recipe> Create(string name, int servings, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
     {
         var errors = new List<Error>();
-        errors.AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName);
-        errors.AddRule(ValidateServings(servings), DomainErrors.Recipe.InvalidServings);
+        errors.AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName(name));
+        errors.AddRule(ValidateServings(servings), DomainErrors.Recipe.InvalidServings(servings));
         errors.AddRule(ValidateIngredients(ingredientsToAdd), DomainErrors.Recipe.InvalidIngredients);
         errors.AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps);
 
@@ -106,16 +107,9 @@ public class Recipe
 
     public Result UpdateName(string name)
     {
-        /*
-         * errors.AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName);
-        errors.AddRule(ValidateServings(servings), DomainErrors.Recipe.InvalidServings);
-        errors.AddRule(ValidateIngredients(ingredientsToAdd), DomainErrors.Recipe.InvalidIngredients);
-        errors.AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps);
-
-         */
         if (!ValidateName(name))
         {
-            return Result.Failure(DomainErrors.Recipe.InvalidName);
+            return Result.Failure(DomainErrors.Recipe.InvalidName(name));
         }
         Name = name;
         return Result.Success();
@@ -125,7 +119,7 @@ public class Recipe
     {
         if (!ValidateServings(servings))
         {
-            return Result.Failure(DomainErrors.Recipe.InvalidServings);
+            return Result.Failure(DomainErrors.Recipe.InvalidServings(servings));
         }
         Servings = servings;
         return Result.Success();

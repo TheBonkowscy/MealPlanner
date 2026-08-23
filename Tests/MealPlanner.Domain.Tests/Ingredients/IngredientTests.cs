@@ -1,5 +1,6 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Tests.Shared.Helpers;
 
 namespace MealPlanner.Domain.Tests.Ingredients;
@@ -19,7 +20,7 @@ public class IngredientTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredients.InvalidName);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.InvalidName(ingredientName));
     }
     
     [Fact]
@@ -31,7 +32,7 @@ public class IngredientTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredients.MissingMeasureUnits);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.MissingMeasureUnits);
     }
     
     [Fact]

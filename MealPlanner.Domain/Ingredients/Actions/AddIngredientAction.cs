@@ -1,4 +1,6 @@
-﻿namespace MealPlanner.Domain.Ingredients.Actions;
+﻿using MealPlanner.Domain.Shared;
+
+namespace MealPlanner.Domain.Ingredients.Actions;
 
 // TODO: consider removing this in the future
 public class AddIngredientAction
@@ -16,8 +18,8 @@ public class AddIngredientAction
     public static Result<AddIngredientAction> Create(Ingredient ingredient, decimal quantity, MeasureUnit unit)
     {
         var errors = new List<Error>();
-        errors.AddRule(ingredient.IsApplicableUnit(unit), DomainErrors.Ingredients.UnitNotApplicable);
-        errors.AddRule(quantity > 0, DomainErrors.Ingredients.InvalidQuantity);
+        errors.AddRule(ingredient.IsApplicableUnit(unit), DomainErrors.Ingredient.UnitNotApplicable(unit));
+        errors.AddRule(quantity > 0, DomainErrors.Ingredient.InvalidQuantity(quantity));
 
         if (errors.Count != 0)
         {

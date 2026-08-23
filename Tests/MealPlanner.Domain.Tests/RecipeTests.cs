@@ -3,6 +3,7 @@ using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 using MealPlanner.Tests.Shared.Helpers;
@@ -25,7 +26,7 @@ public class RecipeTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidName);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidName(invalidName));
     }
 
     [Fact]
@@ -63,7 +64,7 @@ public class RecipeTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidServings);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidServings(invalidServings));
     }
 
     [Fact]

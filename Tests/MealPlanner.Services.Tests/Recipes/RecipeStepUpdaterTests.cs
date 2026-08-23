@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Services.Recipes.Steps;

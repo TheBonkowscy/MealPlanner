@@ -3,6 +3,7 @@ using AwesomeAssertions.Execution;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Tests.Shared.Factories;
 using MealPlanner.Tests.Shared.Helpers;
 

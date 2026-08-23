@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Menus.Actions;
 
@@ -18,8 +19,8 @@ public class AddMealAction
     {
         var errors = new List<Error>();
         errors.AddRule(recipe is not null, DomainErrors.Recipe.IsNull);
-        errors.AddRule(order > 0, DomainErrors.Meal.InvalidOrder);
-        errors.AddRule(servings > 0, DomainErrors.Meal.InvalidServings);
+        errors.AddRule(order > 0, DomainErrors.Meal.InvalidOrder(order));
+        errors.AddRule(servings > 0, DomainErrors.Meal.InvalidServings(servings));
         if (errors.Count != 0)
         {
             return Result.Failure<AddMealAction>(errors);

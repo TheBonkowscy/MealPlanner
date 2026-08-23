@@ -223,7 +223,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
 
         // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.InternalServerError); // TODO: fix in the future
+        result.StatusCode.Should().Be(HttpStatusCode.Conflict); // TODO: fix in the future
     }
 
     [Fact]
@@ -237,7 +237,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
 
         // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);  // TODO: fix in the future
+        result.StatusCode.Should().Be(HttpStatusCode.Conflict);  // TODO: fix in the future
     }
 
     [Theory]
@@ -263,7 +263,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         yield return
         [
             DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
-            Menu.Create(Tomorrow, MealsToAdd)
+            Menu.Create(Tomorrow, MealsToAdd).Value
         ];
     }
 

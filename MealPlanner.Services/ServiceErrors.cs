@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Domain;
+using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Services;
 

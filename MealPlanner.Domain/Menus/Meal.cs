@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Menus;
 
@@ -33,8 +34,8 @@ public class Meal
         var errors = new List<Error>();
         errors.AddRule(menu is not null, DomainErrors.Menu.IsNull);
         errors.AddRule(recipe is not null, DomainErrors.Recipe.IsNull);
-        errors.AddRule(order >= Menu.MinOrder, DomainErrors.Meal.InvalidOrder);
-        errors.AddRule(servings >= 1, DomainErrors.Meal.InvalidServings);
+        errors.AddRule(order >= Menu.MinOrder, DomainErrors.Meal.InvalidOrder(order));
+        errors.AddRule(servings >= 1, DomainErrors.Meal.InvalidServings(servings));
         return errors.Count != 0 ? Result.Failure<Meal>(errors) : Result.Success(new Meal(menu, recipe, order, servings));
     }
 }

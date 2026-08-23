@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Recipes.Requests;
@@ -64,7 +65,7 @@ public class RecipeUpdaterTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidName);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidName(name));
     }
     
     [Theory]
@@ -80,7 +81,7 @@ public class RecipeUpdaterTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidServings);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidServings(servings));
     }
     
     [Fact]

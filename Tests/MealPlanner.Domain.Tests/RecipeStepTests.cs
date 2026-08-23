@@ -1,5 +1,6 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Tests.Shared.Helpers;
 
 namespace MealPlanner.Domain.Tests;
@@ -8,16 +9,17 @@ public class RecipeStepTests
 {
     private const string Instructions = "Bake in 180 degrees for 45 minutes or until golden";
     
-    [Fact]
-    public void Create_WithNegativeOrder_Throws()
+    [Theory]
+    [ClassData(typeof(NegativeNumbersTestDataProvider))]
+    public void Create_WithNegativeOrder_Throws(int invalidOrder)
     {
         // Act
-        var result = RecipeStep.Create(0, Instructions);
+        var result = RecipeStep.Create(invalidOrder, Instructions);
         
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidOrder);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidOrder(invalidOrder));
     }
     
     [Theory]
@@ -30,7 +32,7 @@ public class RecipeStepTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidInstruction);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidInstruction(instructions));
     }
 
     [Fact]
@@ -62,7 +64,7 @@ public class RecipeStepTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidOrder);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidOrder(newOrder));
     }
 
     [Fact]
@@ -94,7 +96,7 @@ public class RecipeStepTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidInstruction);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.InvalidInstruction(newInstructions));
     }
 
     [Fact]

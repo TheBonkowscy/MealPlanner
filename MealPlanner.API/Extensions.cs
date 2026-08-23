@@ -1,4 +1,4 @@
-﻿using MealPlanner.Domain;
+﻿using MealPlanner.Domain.Shared;
 using MealPlanner.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;

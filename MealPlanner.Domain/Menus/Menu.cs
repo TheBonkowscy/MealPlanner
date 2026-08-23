@@ -1,5 +1,6 @@
 using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Menus;
 

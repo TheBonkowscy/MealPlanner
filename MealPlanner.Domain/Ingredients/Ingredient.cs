@@ -1,4 +1,6 @@
-﻿namespace MealPlanner.Domain.Ingredients;
+﻿using MealPlanner.Domain.Shared;
+
+namespace MealPlanner.Domain.Ingredients;
 
 public class Ingredient
 {
@@ -22,8 +24,8 @@ public class Ingredient
     public static Result<Ingredient> Create(string name, List<MeasureUnit> applicableUnits)
     {
         var errors = new List<Error>();
-        errors.AddRule(!string.IsNullOrWhiteSpace(name), DomainErrors.Ingredients.InvalidName);
-        errors.AddRule(applicableUnits.Count > 0, DomainErrors.Ingredients.MissingMeasureUnits);
+        errors.AddRule(!string.IsNullOrWhiteSpace(name), DomainErrors.Ingredient.InvalidName(name));
+        errors.AddRule(applicableUnits.Count > 0, DomainErrors.Ingredient.MissingMeasureUnits);
 
         return errors.Count > 0 ? Result.Failure<Ingredient>(errors) : Result.Success(new Ingredient(name, applicableUnits));
     }
@@ -34,7 +36,7 @@ public class Ingredient
     {
         if (applicableUnits.Count > 0)
         {
-            return Result.Failure(DomainErrors.Ingredients.MissingMeasureUnits);
+            return Result.Failure(DomainErrors.Ingredient.MissingMeasureUnits);
         }
         
         ApplicableUnits = applicableUnits;

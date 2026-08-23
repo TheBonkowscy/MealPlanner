@@ -1,4 +1,4 @@
-﻿namespace MealPlanner.Domain;
+﻿namespace MealPlanner.Domain.Shared;
 
 public class Result
 {
@@ -6,10 +6,8 @@ public class Result
     public bool IsFailure => !IsSuccess;
     public IReadOnlyCollection<Error> Errors { get; }
 
-    // Domyślny błąd dla jednopozycyjnych porażek
     public Error Error => Errors.FirstOrDefault() ?? Error.None;
 
-    // Konstruktor chroniony – przyjmuje powodzenie oraz kolekcję błędów
     protected Result(bool isSuccess, IEnumerable<Error> errors)
     {
         IsSuccess = isSuccess;
@@ -33,7 +31,6 @@ public class Result<TValue> : Result
         ? _value! 
         : throw new InvalidOperationException("Nie można pobrać wartości z wyniku będącego porażką.");
 
-    // POPRAWIONY KONSTRUKTOR: przekazuje isSuccess i errors do klasy bazowej
     protected internal Result(TValue? value, bool isSuccess, IEnumerable<Error> errors) 
         : base(isSuccess, errors)
     {
