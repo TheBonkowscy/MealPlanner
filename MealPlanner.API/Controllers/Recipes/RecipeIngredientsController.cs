@@ -1,8 +1,9 @@
-﻿using MealPlanner.Services.Recipes;
+﻿using MealPlanner.Services;
 using MealPlanner.Services.Recipes.Ingredients;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace MealPlanner.API.Controllers.Recipes;
 
@@ -10,17 +11,18 @@ namespace MealPlanner.API.Controllers.Recipes;
 [Route(Shared.Menus.Constants.RecipeIngredientsRoute)]
 public class RecipeIngredientsController(
     IUpdateRecipeIngredient recipeIngredientUpdater,
-    IDeleteRecipeIngredient recipeIngredientDeleter) : ControllerBase
+    IDeleteRecipeIngredient recipeIngredientDeleter,
+    IStringLocalizer<Translations> localizer) : ControllerBase
 {
     [ProducesResponseType(typeof(GetRecipeDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPut("{ingredientId:int}")]
-    public async Task<GetRecipeDetailsResponse> UpdateIngredient(
+    public async Task<IResult> UpdateIngredient(
         [FromRoute(Name = "recipeId")] int recipeId, 
         [FromRoute(Name = "ingredientId")] int ingredientId,
         UpdateRecipeIngredientRequest request, 
         CancellationToken cancellationToken) =>
-        await recipeIngredientUpdater.UpdateIngredient(recipeId, ingredientId, request, cancellationToken);
+        (await recipeIngredientUpdater.UpdateIngredient(recipeId, ingredientId, request, cancellationToken)).ToHttpResult(localizer);
     
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [HttpDelete("{ingredientId:int}")]

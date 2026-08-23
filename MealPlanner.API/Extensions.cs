@@ -1,27 +1,67 @@
-﻿using System.Globalization;
-using Microsoft.AspNetCore.Localization;
+﻿using MealPlanner.Domain;
+using MealPlanner.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace MealPlanner.API;
 
 public static class Extensions
 {
-    extension(IApplicationBuilder app)
+    extension(Result result)
     {
-        public IApplicationBuilder UseLocalizationMiddleware()
+        public IResult ToHttpResult(IStringLocalizer<Translations> localizer)
         {
-            var supportedCultures = new[]
+            return result.IsSuccess ? Results.NoContent() : result.CreateProblem(localizer);
+        }
+
+        private IResult CreateProblem(IStringLocalizer<Translations> localizer)
+        {
+            var first = result.Error;
+
+            var problem = new ProblemDetails
             {
-                new CultureInfo("pl-PL")
+                Status = MapStatus(first.Type),
+                Type = first.Code,
+                Title = localizer[first.Code, GetArguments(first)]
             };
 
-            var localizationOptions = new RequestLocalizationOptions
+            problem.Extensions["errors"] = result.Errors.Select(error => new
             {
-                DefaultRequestCulture = new RequestCulture("pl-PL"),
-                SupportedCultures = supportedCultures,
-                SupportedUICultures = supportedCultures
-            };
+                Code = error.Code,
+                Message = localizer[error.Code, GetArguments(error)].Value,
+                Metadata = error.Metadata
+            }).ToList();
 
-            return app.UseRequestLocalization(localizationOptions);
+            return Results.Problem(problem);
+        }
+
+        private static int MapStatus(ErrorType type) => type switch
+        {
+            ErrorType.Validation => StatusCodes.Status400BadRequest,
+            ErrorType.NotFound => StatusCodes.Status404NotFound,
+            ErrorType.Conflict => StatusCodes.Status409Conflict,
+            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
+            _ => StatusCodes.Status500InternalServerError
+        };
+
+        private static object[] GetArguments(Error error) =>
+        [
+            ..error.Metadata.Values.Select(FormatValue) ?? []
+        ];
+
+        private static object? FormatValue(object? value) => value switch
+        {
+            IEnumerable<DateOnly> dates => string.Join(", ", dates.Select(d => d.ToString("dd.MM.yyyy"))),
+            IEnumerable<Guid> ids => string.Join(", ", ids),
+            _ => value
+        };
+    }
+
+    extension<T>(Result<T> result)
+    {
+        public IResult ToHttpResult(IStringLocalizer<Translations> localizer)
+        {
+            return result.IsSuccess ? Results.Ok(result.Value) : result.CreateProblem(localizer);
         }
     }
 }

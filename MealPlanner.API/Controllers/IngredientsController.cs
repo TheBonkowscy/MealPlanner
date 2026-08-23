@@ -8,7 +8,6 @@ namespace MealPlanner.API.Controllers;
 [Route(Shared.Menus.Constants.IngredientsRoute)]
 public class IngredientsController(IReadIngredient ingredientsReader) : ControllerBase
 {
- 
     [HttpGet]
     [ProducesResponseType(typeof(GetIngredientsResponse), StatusCodes.Status200OK)]
     public async Task<IResult> Get(CancellationToken cancellationToken)

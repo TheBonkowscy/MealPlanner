@@ -1,7 +1,9 @@
-﻿using MealPlanner.Services.Recipes;
+﻿using MealPlanner.Services;
+using MealPlanner.Services.Recipes;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Shared.Recipes.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace MealPlanner.API.Controllers.Recipes;
 
@@ -10,7 +12,8 @@ namespace MealPlanner.API.Controllers.Recipes;
 public class RecipesController(IReadRecipe recipeReader,
     ICreateRecipe recipeCreator,
     IDeleteRecipe recipeDeleter,
-    IUpdateRecipe recipeUpdater) : ControllerBase
+    IUpdateRecipe recipeUpdater,
+    IStringLocalizer<Translations> localizer) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]
@@ -24,8 +27,8 @@ public class RecipesController(IReadRecipe recipeReader,
     [ProducesResponseType(typeof(CreateRecipeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPost]
-    public async Task<CreateRecipeResponse> Create([FromBody] CreateRecipeRequest createRecipeRequest, CancellationToken cancellationToken) =>
-        await recipeCreator.Create(createRecipeRequest, cancellationToken);
+    public async Task<IResult> Create([FromBody] CreateRecipeRequest createRecipeRequest, CancellationToken cancellationToken) =>
+        (await recipeCreator.Create(createRecipeRequest, cancellationToken)).ToHttpResult(localizer);
     
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]
@@ -47,9 +50,9 @@ public class RecipesController(IReadRecipe recipeReader,
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<GetRecipeDetailsResponse> Update(
+    public async Task<IResult> Update(
         [FromRoute(Name = "id")] int id,
         [FromBody] UpdateRecipeRequest updateRecipeRequest,
-        CancellationToken cancellationToken) => await recipeUpdater.Update(id, updateRecipeRequest, cancellationToken);
-    
+        CancellationToken cancellationToken) =>
+        (await recipeUpdater.Update(id, updateRecipeRequest, cancellationToken)).ToHttpResult(localizer);
 }
