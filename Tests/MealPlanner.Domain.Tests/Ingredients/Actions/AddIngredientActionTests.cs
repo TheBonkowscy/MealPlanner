@@ -11,7 +11,7 @@ public class AddIngredientActionTests
     private const decimal SharedExpectedQuantity = 0.75m;
     
     [Fact]
-    public void Create_WithNotApplicableUnit_Throws()
+    public void Create_WithNotApplicableUnit_Fails()
     {
         // Arrange
         var ingredientToAdd = TestInitialData.CupsOfFlour();
@@ -27,7 +27,7 @@ public class AddIngredientActionTests
     }
     
     [Fact]
-    public void Create_WithNegativeQuantity_Throws()
+    public void Create_WithNegativeQuantity_Fails()
     {
         // Arrange
         var ingredientToAdd = TestInitialData.CupsOfFlour();

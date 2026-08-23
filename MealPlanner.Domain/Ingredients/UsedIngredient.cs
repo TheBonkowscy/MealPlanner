@@ -36,8 +36,8 @@ public class UsedIngredient
     public static Result<UsedIngredient> Create(Recipe? recipe, AddIngredientAction action)
     {
         var errors = new List<Error>();
-        errors.AddRule(recipe is not null, DomainErrors.Recipe.IsNull);
-        errors.AddRule(action.Quantity > 0, DomainErrors.Ingredient.InvalidQuantity(action.Quantity));
+        errors.AddRule(recipe is not null, DomainErrors.Recipe.IsNull)
+            .AddRule(action.Quantity > 0, DomainErrors.Ingredient.InvalidQuantity(action.Quantity));
         return errors.Count > 0 ? Result.Failure<UsedIngredient>(errors) : Result.Success(new UsedIngredient(recipe!, action.Ingredient, action.Quantity, action.Unit));
     }
 

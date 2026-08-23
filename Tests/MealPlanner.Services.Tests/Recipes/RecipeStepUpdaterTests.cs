@@ -30,7 +30,7 @@ public class RecipeStepUpdaterTests
     }
 
     [Fact]
-    public async Task UpdateStep_Throws_WhenRecipeWasNotFound()
+    public async Task UpdateStep_Fails_WhenRecipeWasNotFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();
@@ -47,7 +47,7 @@ public class RecipeStepUpdaterTests
     }
 
     [Fact]
-    public async Task UpdateStep_Throws_WhenStepWasNotFound()
+    public async Task UpdateStep_Fails_WhenStepWasNotFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();

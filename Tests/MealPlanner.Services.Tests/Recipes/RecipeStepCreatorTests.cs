@@ -28,7 +28,7 @@ public class RecipeStepCreatorTests
     }
 
     [Fact]
-    public async Task CreateStep_Throws_WhenRecipeWasNotFound()
+    public async Task CreateStep_Fails_WhenRecipeWasNotFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();

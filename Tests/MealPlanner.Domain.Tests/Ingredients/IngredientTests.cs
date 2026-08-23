@@ -12,7 +12,7 @@ public class IngredientTests
     
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
-    public void Create_WithEmptyName_Throws(string ingredientName)
+    public void Create_WithEmptyName_Fails(string ingredientName)
     {
         // Act
         var result = Ingredient.Create(ingredientName, Units);
@@ -24,7 +24,7 @@ public class IngredientTests
     }
     
     [Fact]
-    public void Create_WithEmptyUnits_Throws()
+    public void Create_WithEmptyUnits_Fails()
     {
         // Act
         var result = Ingredient.Create(Name, []);

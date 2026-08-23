@@ -30,7 +30,7 @@ public class RecipeIngredientUpdaterTests
     }
 
     [Fact]
-    public async Task UpdateIngredient_Throws_WhenRecipeWasNotFound()
+    public async Task UpdateIngredient_Fails_WhenRecipeWasNotFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();
@@ -87,7 +87,7 @@ public class RecipeIngredientUpdaterTests
     }
 
     [Fact]
-    public async Task UpdateIngredient_Throws_WhenMeasureUnitDoesNotMatch()
+    public async Task UpdateIngredient_Fails_WhenMeasureUnitDoesNotMatch()
     {
         // Arrange
         var recipe = TestRecipes.Create();

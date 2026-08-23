@@ -17,7 +17,7 @@ public class MenuTests
 
     [Theory]
     [ClassData(typeof(InvalidDatesTestDataProvider))]
-    public void Create_ThrowsForInvalidDate(DateOnly invalidDate, Error underlyingCause)
+    public void Create_Fails_WhenDateIsInvalid(DateOnly invalidDate, Error underlyingCause)
     {
         // Arrange
         List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1).Value, AddMealAction.Create(SharedSecondRecipe, 2, 1).Value];
@@ -63,7 +63,7 @@ public class MenuTests
     }
 
     [Fact]
-    public void AddMeal_Throws_WhenOrderAlreadyTaken()
+    public void AddMeal_Fails_WhenOrderAlreadyTaken()
     {
         // Arrange
         const int order = 1;
@@ -79,7 +79,7 @@ public class MenuTests
     }
 
     [Fact]
-    public void AddMeal_WithMealAlreadyAdded_ThrowsException()
+    public void AddMeal_WithMealAlreadyAdded_FailsException()
     {
         // Arrange
         var firstMeal = AddMealAction.Create(SharedFirstRecipe, 1, 1).Value;
@@ -96,7 +96,7 @@ public class MenuTests
     }
 
     [Fact]
-    public void AddMeal_Throws_WhenOrderIsOutOfBounds()
+    public void AddMeal_Fails_WhenOrderIsOutOfBounds()
     {
         // Arrange
         List<AddMealAction> mealsToAdd = [AddMealAction.Create(SharedFirstRecipe, 1, 1).Value];

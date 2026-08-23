@@ -38,7 +38,7 @@ public class RecipeUpdaterTests
     }
     
     [Fact]
-    public async Task Update_Throws_WhenRecipeDoesNotExist()
+    public async Task Update_Fails_WhenRecipeDoesNotExist()
     {
         // Arrange
         var request = new UpdateRecipeRequest(Guid.NewGuid().ToString(), 1);
@@ -54,7 +54,7 @@ public class RecipeUpdaterTests
     
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
-    public async Task Update_Throws_WhenNameIsInvalid(string name)
+    public async Task Update_Fails_WhenNameIsInvalid(string name)
     {
         // Arrange
         var request = new UpdateRecipeRequest(name, 1);
@@ -70,7 +70,7 @@ public class RecipeUpdaterTests
     
     [Theory]
     [ClassData(typeof(NegativeNumbersTestDataProvider))]
-    public async Task Update_Throws_WhenServingsAreOutOfRange(int servings)
+    public async Task Update_Fails_WhenServingsAreOutOfRange(int servings)
     {
         // Arrange
         var request = new UpdateRecipeRequest(Guid.NewGuid().ToString(), servings);

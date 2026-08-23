@@ -77,9 +77,9 @@ public class Menu
     {
         var errors = new List<Error>();
         DateOnly[] invalidDates = [DateOnly.MinValue, DateOnly.MaxValue];
-        errors.AddRule(!invalidDates.Contains(date), DomainErrors.Menu.DateIsUnset);
-        errors.AddRule(date >= MinDateInThePast, DomainErrors.Menu.DateTooFarInThePast);
-        errors.AddRule(DateOnly.FromDateTime(DateTime.UtcNow).AddYears(100) >= date, DomainErrors.Menu.DateTooFarInTheFuture);
+        errors.AddRule(!invalidDates.Contains(date), DomainErrors.Menu.DateIsUnset)
+            .AddRule(date >= MinDateInThePast, DomainErrors.Menu.DateTooFarInThePast)
+            .AddRule(DateOnly.FromDateTime(DateTime.UtcNow).AddYears(100) >= date, DomainErrors.Menu.DateTooFarInTheFuture);
 
         if (errors.Count != 0)
         {

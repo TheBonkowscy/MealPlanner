@@ -38,7 +38,7 @@ public class RecipeCreatorTests
     }
     
     [Fact]
-    public async Task Create_Throws_WhenRecipeAlreadyExists()
+    public async Task Create_Fails_WhenRecipeAlreadyExists()
     {
         // Arrange
         var request = NewRequest();
@@ -54,7 +54,7 @@ public class RecipeCreatorTests
     }
     
     [Fact]
-    public async Task Create_Throws_WhenIngredientDoesNotExist()
+    public async Task Create_Fails_WhenIngredientDoesNotExist()
     {
         // Arrange
         var request = NewRequest();

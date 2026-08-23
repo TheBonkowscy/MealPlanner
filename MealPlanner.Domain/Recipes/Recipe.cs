@@ -49,10 +49,10 @@ public class Recipe
     public static Result<Recipe> Create(string name, int servings, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
     {
         var errors = new List<Error>();
-        errors.AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName(name));
-        errors.AddRule(ValidateServings(servings), DomainErrors.Recipe.InvalidServings(servings));
-        errors.AddRule(ValidateIngredients(ingredientsToAdd), DomainErrors.Recipe.InvalidIngredients);
-        errors.AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps);
+        errors.AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName(name))
+            .AddRule(ValidateServings(servings), DomainErrors.Recipe.InvalidServings(servings))
+            .AddRule(ValidateIngredients(ingredientsToAdd), DomainErrors.Recipe.InvalidIngredients)
+            .AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps);
 
         if (errors.Count > 0)
         {

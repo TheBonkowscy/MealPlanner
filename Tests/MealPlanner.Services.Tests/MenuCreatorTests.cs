@@ -62,7 +62,7 @@ public class MenuCreatorTests
     }
     
     [Fact]
-    public async Task Create_ThrowsWhenMealsAreEmpty()
+    public async Task Create_Fails_WhenMealsAreEmpty()
     {
         // Arrange
         var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), []);
@@ -78,7 +78,7 @@ public class MenuCreatorTests
     
     // TODO: move it to Meal mapper tests
     [Fact]
-    public async Task Create_ThrowsWhenMealDoesNotExist()
+    public async Task Create_Fails_WhenMealDoesNotExist()
     {
         // Arrange
         const int missingRecipeId = 999;
@@ -94,7 +94,7 @@ public class MenuCreatorTests
     }
 
     [Fact]
-    public async Task Create_ThrowsWhenMenuAlreadyPresentForSpecifiedDay()
+    public async Task Create_Fails_WhenMenuAlreadyPresentForSpecifiedDay()
     {
         // Arrange
         var tomorrow =  DateOnly.FromDateTime(DateTime.Today.AddDays(1));

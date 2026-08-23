@@ -54,7 +54,7 @@ public class MenuUpdaterTests
     }
 
     [Fact]
-    public async Task Update_WhenNoMealsInRequest_ShouldThrowInvalidOperationException()
+    public async Task Update_WhenNoMealsInRequest_Fails()
     {
         // Arrange
         var request = new UpdateMenuRequest(new DateOnly(2026, 8, 6),[]);
@@ -71,7 +71,7 @@ public class MenuUpdaterTests
     }
 
     [Fact]
-    public async Task Update_WhenMenuDoesNotExist_ShouldThrowInvalidOperationException()
+    public async Task Update_WhenMenuDoesNotExist_Fails()
     {
         // Arrange
         List<AddMealRequest> mealDtos = [new(PreExistingRecipe.Id, 1, 1)];
@@ -89,7 +89,7 @@ public class MenuUpdaterTests
     }
 
     [Fact]
-    public async Task Update_WhenMealsListIsEmpty_ShouldThrowInvalidOperationException()
+    public async Task Update_WhenMealsListIsEmpty_Fails()
     {
         // Arrange
         var date = new DateOnly(2026, 8, 6);

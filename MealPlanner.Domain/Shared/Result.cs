@@ -29,7 +29,7 @@ public class Result<TValue> : Result
 
     public TValue Value => IsSuccess 
         ? _value! 
-        : throw new InvalidOperationException("Nie można pobrać wartości z wyniku będącego porażką.");
+        : throw new InvalidOperationException("Can not retrieve value from a failure!");
 
     protected internal Result(TValue? value, bool isSuccess, IEnumerable<Error> errors) 
         : base(isSuccess, errors)

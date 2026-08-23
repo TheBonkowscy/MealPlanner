@@ -22,8 +22,8 @@ public class RecipeStep
     public static Result<RecipeStep> Create(int order, string instruction)
     {
         var errors = new List<Error>();
-        errors.AddRule(ValidateOrder(order), DomainErrors.RecipeStep.InvalidOrder(order));
-        errors.AddRule(ValidateInstruction(instruction), DomainErrors.RecipeStep.InvalidInstruction(instruction));
+        errors.AddRule(ValidateOrder(order), DomainErrors.RecipeStep.InvalidOrder(order))
+            .AddRule(ValidateInstruction(instruction), DomainErrors.RecipeStep.InvalidInstruction(instruction));
 
         return errors.Count > 0 ? Result.Failure<RecipeStep>(errors) : Result.Success(new RecipeStep(order, instruction));
     }

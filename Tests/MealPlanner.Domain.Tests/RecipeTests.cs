@@ -18,7 +18,7 @@ public class RecipeTests
     
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
-    public void Create_WithoutName_ThrowsException(string invalidName)
+    public void Create_WithoutName_Fails(string invalidName)
     {   
         // Act
         var result = Recipe.Create(invalidName, 1, [SharedIngredient], SharedSteps);
@@ -30,7 +30,7 @@ public class RecipeTests
     }
 
     [Fact]
-    public void Create_WithEmptyIngredients_ThrowsException()
+    public void Create_WithEmptyIngredients_Fails()
     {
         // Act
         var result = Recipe.Create(Name, 1, [], SharedSteps);
@@ -42,7 +42,7 @@ public class RecipeTests
     }
 
     [Fact]
-    public void Create_WithEmptySteps_ThrowsException()
+    public void Create_WithEmptySteps_Fails()
     {
         // Act
         var result = Recipe.Create(Name, 1,  [SharedIngredient], []);
@@ -56,7 +56,7 @@ public class RecipeTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Create_WithInvalidServings_ThrowsException(int invalidServings)
+    public void Create_WithInvalidServings_Fails(int invalidServings)
     {
         // Act
         var result = Recipe.Create(Name, invalidServings, [SharedIngredient], SharedSteps);
@@ -103,7 +103,7 @@ public class RecipeTests
     }
 
     [Fact]
-    public void UpdateStep_Throws_WhenStepWasNotFound()
+    public void UpdateStep_Fails_WhenStepWasNotFound()
     {
         // Arrange
         var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps).Value;

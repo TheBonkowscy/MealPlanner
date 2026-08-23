@@ -27,7 +27,7 @@ public class RecipeIngredientDeleterTests
     }
 
     [Fact]
-    public async Task DeleteIngredient_Throws_WhenRecipeWasNotFound()
+    public async Task DeleteIngredient_Fails_WhenRecipeWasNotFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();
@@ -44,7 +44,7 @@ public class RecipeIngredientDeleterTests
     }
 
     [Fact]
-    public async Task DeleteIngredient_Throws_WhenIngredientWasNotFound()
+    public async Task DeleteIngredient_Fails_WhenIngredientWasNotFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();
@@ -62,7 +62,7 @@ public class RecipeIngredientDeleterTests
     }
 
     [Fact]
-    public async Task DeleteIngredient_Throws_WhenMeasureUnitDoesNotMatch()
+    public async Task DeleteIngredient_Fails_WhenMeasureUnitDoesNotMatch()
     {
         // Arrange
         var recipe = TestRecipes.Create();

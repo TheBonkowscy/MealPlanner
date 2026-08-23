@@ -11,7 +11,7 @@ public class RecipeStepTests
     
     [Theory]
     [ClassData(typeof(NegativeNumbersTestDataProvider))]
-    public void Create_WithNegativeOrder_Throws(int invalidOrder)
+    public void Create_WithNegativeOrder_Fails(int invalidOrder)
     {
         // Act
         var result = RecipeStep.Create(invalidOrder, Instructions);
@@ -24,7 +24,7 @@ public class RecipeStepTests
     
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
-    public void Create_WithEmptyInstructions_Throws(string instructions)
+    public void Create_WithEmptyInstructions_Fails(string instructions)
     {
         // Act
         var result = RecipeStep.Create(1, instructions);
@@ -53,7 +53,7 @@ public class RecipeStepTests
 
     [Theory]
     [ClassData(typeof(NegativeNumbersTestDataProvider))]
-    public void UpdateOrder_WithNegativeOrder_Throws(int newOrder)
+    public void UpdateOrder_WithNegativeOrder_Fails(int newOrder)
     {
         // Arrange
         var step = RecipeStep.Create(3, Instructions).Value;
@@ -85,7 +85,7 @@ public class RecipeStepTests
 
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
-    public void UpdateInstructions_WithEmptyInstructions_Throws(string newInstructions)
+    public void UpdateInstructions_WithEmptyInstructions_Fails(string newInstructions)
     {
         // Arrange
         var step = RecipeStep.Create(1, Instructions).Value;
