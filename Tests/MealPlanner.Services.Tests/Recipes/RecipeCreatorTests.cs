@@ -58,7 +58,8 @@ public class RecipeCreatorTests
     {
         // Arrange
         var request = NewRequest();
-        request.Ingredients.Add(new AddIngredientRequest(Random.Shared.Next(100, 1000), 1, nameof(MeasureUnit.Bottle)));
+        var missingId = Random.Shared.Next(100, 1000);
+        request.Ingredients.Add(new AddIngredientRequest(missingId, 1, nameof(MeasureUnit.Bottle)));
         
         // Act
         var result = await _sut.Create(request, CancellationToken.None);
@@ -66,7 +67,7 @@ public class RecipeCreatorTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Ingredient.DoesNotExist);
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Ingredient.DoesNotExist(missingId));
     }
     
     [Fact]

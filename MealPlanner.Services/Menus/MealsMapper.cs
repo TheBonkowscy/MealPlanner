@@ -1,5 +1,4 @@
-﻿using MealPlanner.Domain;
-using MealPlanner.Domain.Menus.Actions;
+﻿using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Domain.Shared;
 using MealPlanner.Persistence;
 using MealPlanner.Shared.Menus.Requests;
@@ -24,9 +23,8 @@ public class MealsMapper(MealPlannerDbContext ctx) : IMapMeals
         
         if (matchingRecipes.Count != incomingRecipesIds.Count)
         {
-            var missingIds = incomingRecipesIds.Except(matchingRecipes.Select(x => x.Id));
-            // TODO: figure out how to pass ids and contextual items to error
-            return Result.Failure<List<AddMealAction>>(ServiceErrors.Meal.MissingRecipesById);
+            var missingIds = incomingRecipesIds.Except(matchingRecipes.Select(x => x.Id)).ToArray();
+            return Result.Failure<List<AddMealAction>>(ServiceErrors.Meal.MissingRecipesById(missingIds));
         }
 
         var recipesById = matchingRecipes

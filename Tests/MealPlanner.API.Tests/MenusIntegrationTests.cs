@@ -1,7 +1,6 @@
 using System.Net;
 using AwesomeAssertions;
 using MealPlanner.API.Tests.Shared;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Domain.Recipes;
@@ -223,11 +222,11 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
 
         // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.Conflict); // TODO: fix in the future
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
-    public async Task Put_ReturnsBadRequest_WhenRouteDateDoesNotMatchRequestBodyDate()
+    public async Task Put_ReturnsNotFound_WhenRouteDateDoesNotMatchRequestBodyDate()
     {
         // Arrange
         List<AddMealRequest> meals = [new(PreExistingRecipe.Id, 1, 1)];
@@ -237,7 +236,7 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
 
         // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.Conflict);  // TODO: fix in the future
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Theory]

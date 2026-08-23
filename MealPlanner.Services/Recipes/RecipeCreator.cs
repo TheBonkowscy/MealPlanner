@@ -59,9 +59,8 @@ public class RecipeCreator(MealPlannerDbContext ctx,
         
         if (matchingIngredients.Count != incomingIngredientsIds.Count || incomingIngredientsIds.Count == 0)
         {
-            var missingIds = incomingIngredientsIds.Except(matchingIngredients.Select(x => x.Id));
-            // TODO: figure out how to pass ids and contextual items to error
-            return Result.Failure<List<AddIngredientAction>>(ServiceErrors.Ingredient.DoesNotExist);
+            var missingIds = incomingIngredientsIds.Except(matchingIngredients.Select(x => x.Id)).ToArray();
+            return Result.Failure<List<AddIngredientAction>>(ServiceErrors.Ingredient.DoesNotExist(missingIds));
         }
         
         var ingredientsToMap = matchingIngredients.ToDictionary(x => x, 

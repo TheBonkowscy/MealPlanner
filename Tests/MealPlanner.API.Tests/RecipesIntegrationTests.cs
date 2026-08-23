@@ -94,7 +94,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var result = await Client.PostAsJsonAsync(Constants.RecipesRoute, request);
         
         // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.Conflict); // TODO: fix in the future
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -285,7 +285,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{999}", request);
         
         // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.Conflict); // TODO: fix in the future
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     private static CreateRecipeRequest CreateNewRecipeRequest(string recipeName, Ingredient ingredient) =>

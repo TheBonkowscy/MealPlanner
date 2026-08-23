@@ -81,7 +81,8 @@ public class MenuCreatorTests
     public async Task Create_ThrowsWhenMealDoesNotExist()
     {
         // Arrange
-        var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), [new AddMealRequest(999, 2, 1)]);
+        const int missingRecipeId = 999;
+        var request = new CreateMenuRequest(DateOnly.FromDateTime(DateTime.Today), [new AddMealRequest(missingRecipeId, 2, 1)]);
         
         // Act
         var result = await _sut.Create(request, CancellationToken.None);
@@ -89,7 +90,7 @@ public class MenuCreatorTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Meal.MissingRecipesById);
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Meal.MissingRecipesById(missingRecipeId));
     }
 
     [Fact]
