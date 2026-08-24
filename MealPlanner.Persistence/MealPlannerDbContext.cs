@@ -1,5 +1,4 @@
-﻿using MealPlanner.Domain;
-using MealPlanner.Domain.Ingredients;
+﻿using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence.Seeders;
@@ -27,9 +26,6 @@ public class MealPlannerDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(MealPlannerDbContext).Assembly);
         modelBuilder.HasPostgresEnum<MeasureUnit>();
-        
-        // Custom table names for entities without configuration
-        modelBuilder.Entity<RecipeStep>().ToTable("RecipeSteps");
     }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
