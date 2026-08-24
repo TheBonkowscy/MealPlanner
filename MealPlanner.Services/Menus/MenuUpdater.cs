@@ -41,8 +41,9 @@ public class MenuUpdater(MealPlannerDbContext ctx,
         {
             return Result.Failure<UpdateMenuResponse>(mappedMeals.Error);
         }
-        
-        var errorsOnAdd = mappedMeals.Value.Select(menu.AddMeal).AllErrors();
+
+        var errorsOnAdd = mappedMeals.Value.OrderBy(x => x.Order)
+            .Select(menu.AddMeal).AllErrors();
         if (errorsOnAdd.Count != 0)
         {
             return Result.Failure<UpdateMenuResponse>(errorsOnAdd);
