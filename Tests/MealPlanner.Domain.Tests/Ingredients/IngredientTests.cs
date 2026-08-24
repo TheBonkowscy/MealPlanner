@@ -1,8 +1,6 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
-using MealPlanner.Domain.Ingredients.Exceptions;
-using MealPlanner.Tests.Shared;
-using MealPlanner.Tests.Shared.Factories;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Tests.Shared.Helpers;
 
 namespace MealPlanner.Domain.Tests.Ingredients;
@@ -14,25 +12,27 @@ public class IngredientTests
     
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
-    public void Create_WithEmptyName_Throws(string ingredientName)
+    public void Create_WithEmptyName_Fails(string ingredientName)
     {
         // Act
-        Action<string, List<MeasureUnit>> create = (name, units) => Ingredient.Create(name, units);
+        var result = Ingredient.Create(ingredientName, Units);
         
         // Assert
-        create.Invoking(c => c.Invoke(ingredientName, Units))
-            .Should().Throw<MissingIngredientNameException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.InvalidName(ingredientName));
     }
     
     [Fact]
-    public void Create_WithEmptyUnits_Throws()
+    public void Create_WithEmptyUnits_Fails()
     {
         // Act
-        Action<string, List<MeasureUnit>> create = (name, units) => Ingredient.Create(name, units);
+        var result = Ingredient.Create(Name, []);
         
         // Assert
-        create.Invoking(c => c.Invoke(Name, []))
-            .Should().Throw<MissingMeasureUnitsException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.MissingMeasureUnits(Name));
     }
     
     [Fact]
@@ -43,8 +43,9 @@ public class IngredientTests
         
         // Assert
         result.Should().NotBeNull();
-        result.Name.Should().Be(Name);
-        result.ApplicableUnits.Should().BeEquivalentTo(Units);
+        result.IsFailure.Should().BeFalse();
+        result.Value.Name.Should().Be(Name);
+        result.Value.ApplicableUnits.Should().BeEquivalentTo(Units);
     }
     
     [Theory]
@@ -55,7 +56,7 @@ public class IngredientTests
         var ingredient = Ingredient.Create(Name, Units);
         
         // Act
-        var result = ingredient.IsApplicableUnit(unit);
+        var result = ingredient.Value.IsApplicableUnit(unit);
         
         // Assert
         result.Should().Be(expectedResult);

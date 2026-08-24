@@ -63,4 +63,91 @@
     <data name="Slice2" xml:space="preserve">
         <value>slice(s)</value>
     </data>
+    <data name="MissingMealRecipesById" xml:space="preserve">
+        <value>Could not find meals by IDs: {0}</value>
+    </data>
+    <data name="MealDetailsMissing" xml:space="preserve">
+        <value>Could not find meal details</value>
+    </data>
+    <data name="MenuDoesNotExist" xml:space="preserve">
+        <value>Menu for {0} does not exist</value>
+    </data>
+    <data name="MenuAlreadyExists" xml:space="preserve">
+        <value>There is already a menu for {0}</value>
+    </data>
+    <data name="InvalidMealsInMenu" xml:space="preserve">
+        <value>Please provide correct number of meals</value>
+    </data>
+    <data name="RecipeDoesNotExist" xml:space="preserve">
+        <value>Could not find the specified recipe</value>
+    </data>
+    <data name="RecipeAlreadyExists" xml:space="preserve">
+        <value>There is already a recipe with this name</value>
+    </data>
+    <data name="InvalidRecipeIngredients" xml:space="preserve">
+        <value>Please provide correct number of ingredients with appropriate quantities</value>
+    </data>
+    <data name="IngredientDoesNotExist" xml:space="preserve">
+        <value>Could not find ingredients with the following IDs: {0}</value>
+    </data>
+    <data name="InvalidIngredientQuantity" xml:space="preserve">
+        <value>Quantity {0} is invalid for ingredient {1}</value>
+    </data>
+    <data name="IngredientUnitNotApplicable" xml:space="preserve">
+        <value>Ingredient {0} can not be measured using {1}</value>
+    </data>
+    <data name="InvalidIngredientName" xml:space="preserve">
+        <value>Please provide the correct ingredient name</value>
+    </data>
+    <data name="MissingIngredientMeasureUnits" xml:space="preserve">
+        <value>Please specify measure units for the {0} ingredient</value>
+    </data>
+    <data name="InvalidRecipeName" xml:space="preserve">
+        <value>Please provide the correct recipe name</value>
+    </data>
+    <data name="InvalidRecipeServings" xml:space="preserve">
+        <value>Please provide the correct number of servings the recipe yields</value>
+    </data>
+    <data name="InvalidRecipeSteps" xml:space="preserve">
+        <value>Please provide steps for this recipe</value>
+    </data>
+    <data name="RecipeIsNull" xml:space="preserve">
+        <value>Please specify the valid recipe</value>
+    </data>
+    <data name="InvalidRecipeStepOrder" xml:space="preserve">
+        <value>Order {0} is invalid for the recipe step</value>
+    </data>
+    <data name="InvalidRecipeStepInstruction" xml:space="preserve">
+        <value>Please provide the correct instructions for the recipe step</value>
+    </data>
+    <data name="RecipeStepNotFound" xml:space="preserve">
+        <value>Could not find the recipe step</value>
+    </data>
+    <data name="InvalidMealOrder" xml:space="preserve">
+        <value>Order {0} is invalid for the meal</value>
+    </data>
+    <data name="InvalidMealServings" xml:space="preserve">
+        <value>Meal can not have {0} servings</value>
+    </data>
+    <data name="MealAlreadyExistsAtPosition" xml:space="preserve">
+        <value>There is already a meal at the position #{0}</value>
+    </data>
+    <data name="MealAlreadyPresentInTheMenu" xml:space="preserve">
+        <value>The meal {0} is already present in the menu</value>
+    </data>
+    <data name="MenuIsNull" xml:space="preserve">
+        <value>Please specify the valid menu</value>
+    </data>
+    <data name="InvalidMealOrderInMenu" xml:space="preserve">
+        <value>Order {0} is invalid for the meal in the menu</value>
+    </data>
+    <data name="MenuDateUnset" xml:space="preserve">
+        <value>Please provide the date for menu</value>
+    </data>
+    <data name="MenuDateTooFarInThePast" xml:space="preserve">
+        <value>The date for menu is too far in the past</value>
+    </data>
+    <data name="MenuDateTooFarInTheFuture" xml:space="preserve">
+        <value>The date for menu is too far in the future</value>
+    </data>
 </root>

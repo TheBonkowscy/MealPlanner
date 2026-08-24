@@ -6,29 +6,29 @@
 @inject NavigationManager Navigation
 @inject IFindMenus MenuFinder
 
-<MudThemeProvider />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" 
-                       Color="Color.Inherit" 
-                       Edge="Edge.Start" 
-                       OnClick="@(_ => DrawerToggle())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="@(_ => DrawerToggle())"/>
         <MudSpacer/>
         <MudText Typo="Typo.h5">@AppBarService.Title</MudText>
-    
+
         <MudSpacer/>
-        
+
         @foreach (var action in AppBarService.Actions)
         {
             <MudTooltip Text="@action.Tooltip">
                 <MudIconButton
                     Color="@action.Color"
                     Icon="@action.Icon"
-                    OnClick="@action.OnClick" />
+                    OnClick="@action.OnClick"/>
             </MudTooltip>
         }
 
@@ -36,14 +36,14 @@
             <MudIconButton
                 Color="Color.Inherit"
                 Icon="@Icons.Material.Filled.Today"
-                OnClick="GoToToday" />
+                OnClick="GoToToday"/>
         </MudTooltip>
     </MudAppBar>
 
     <MudDrawer @bind-Open="@_drawerOpen">
         <NavMenu/>
     </MudDrawer>
-    
+
     <MudMainContent>
         @Body
     </MudMainContent>
@@ -71,8 +71,9 @@
     private async Task GoToToday()
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
-        
+
         var exists = await MenuFinder.GetToday(_cts.Token);
         Navigation.NavigateTo(exists is not null ? RoutingConstants.Menus.DetailsForDate(today) : RoutingConstants.Menus.CreateForDate(today));
     }
+
 }

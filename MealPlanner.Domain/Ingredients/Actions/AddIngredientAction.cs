@@ -1,4 +1,4 @@
-﻿using MealPlanner.Domain.Ingredients.Exceptions;
+﻿using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Ingredients.Actions;
 
@@ -15,20 +15,22 @@ public class AddIngredientAction
         // Prevent creating without validation
     }
     
-    public static AddIngredientAction Create(Ingredient ingredient, decimal quantity, MeasureUnit unit)
+    public static Result<AddIngredientAction> Create(Ingredient ingredient, decimal quantity, MeasureUnit unit)
     {
-        if (!ingredient.IsApplicableUnit(unit))
-        {
-            throw new InvalidOperationException("Ingredient does not support the specified unit");
-        }
+        var errors = new List<Error>();
+        errors.AddRule(ingredient.IsApplicableUnit(unit), DomainErrors.Ingredient.UnitNotApplicable(unit, ingredient.Name))
+            .AddRule(quantity > 0, DomainErrors.Ingredient.InvalidQuantity(quantity, ingredient.Name));
 
-        InvalidIngredientQuantityException.ThrowIfQuantityIsInvalid(quantity);
+        if (errors.Count != 0)
+        {
+            return Result.Failure<AddIngredientAction>(errors);
+        }
         
-        return new AddIngredientAction
+        return Result.Success(new AddIngredientAction
         {
             Ingredient = ingredient,
             Quantity = quantity,
             Unit = unit
-        };
+        });
     }
 }

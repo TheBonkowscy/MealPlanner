@@ -1,12 +1,13 @@
-﻿using MealPlanner.Persistence;
-using MealPlanner.Services.Recipes.Exceptions;
+﻿using MealPlanner.Domain.Shared;
+using MealPlanner.Persistence;
+using MealPlanner.Services.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Recipes.Ingredients;
 
 public interface IDeleteRecipeIngredient
 {
-    Task DeleteIngredient(int recipeId,
+    Task<Result> DeleteIngredient(int recipeId,
         int ingredientId,
         string measureUnit,
         CancellationToken cancellationToken);
@@ -15,7 +16,7 @@ public interface IDeleteRecipeIngredient
 public class RecipeIngredientDeleter(MealPlannerDbContext ctx,
     MeasureUnitMapper measureUnitMapper) : IDeleteRecipeIngredient
 {
-    public async Task DeleteIngredient(int recipeId,
+    public async Task<Result> DeleteIngredient(int recipeId,
         int ingredientId,
         string measureUnit,
         CancellationToken cancellationToken)
@@ -26,16 +27,17 @@ public class RecipeIngredientDeleter(MealPlannerDbContext ctx,
 
         if (recipe is null)
         {
-            throw new RecipeDoesNotExistException();
+            return Result.Failure(ServiceErrors.Recipe.DoesNotExist);
         }
         
         var ingredient = recipe.GetIngredient(ingredientId, measureUnitMapper.Map(measureUnit));
         if (ingredient is null)
         {
-            throw new IngredientDoesNotExistException();
+            return Result.Failure(ServiceErrors.Recipe.InvalidIngredients);
         }
 
         recipe.RemoveIngredient(ingredient);
         await ctx.SaveChangesAsync(cancellationToken);
+        return Result.Success();
     }
 }

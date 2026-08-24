@@ -1,6 +1,5 @@
-﻿using MealPlanner.Domain.Menus.Exceptions;
-using MealPlanner.Domain.Recipes;
-using MealPlanner.Domain.Recipes.Exceptions;
+﻿using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Menus.Actions;
 
@@ -16,17 +15,22 @@ public class AddMealAction
     }
 
 
-    public static AddMealAction Create(Recipe recipe, int order, int servings)
+    public static Result<AddMealAction> Create(Recipe? recipe, int order, int servings)
     {
-        MissingRecipeException.ThrowIfRecipeIsNull(recipe);
-        InvalidMealOrderException.ThrowIfOrderIsInvalid(order);
-        InvalidNumberOfMealServingsException.ThrowIfServingsIsInvalid(servings);
+        var errors = new List<Error>();
+        errors.AddRule(recipe is not null, DomainErrors.Recipe.IsNull)
+            .AddRule(order > 0, DomainErrors.Meal.InvalidOrder(order))
+            .AddRule(servings > 0, DomainErrors.Meal.InvalidServings(servings));
+        if (errors.Count != 0)
+        {
+            return Result.Failure<AddMealAction>(errors);
+        }
 
-        return new AddMealAction()
+        return Result.Success(new AddMealAction
         {
             Order = order,
-            Recipe = recipe,
+            Recipe = recipe!,
             Servings = servings
-        };
+        });
     }
 }

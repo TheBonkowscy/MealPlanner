@@ -1,6 +1,6 @@
-﻿using MealPlanner.Domain.Recipes.Exceptions;
+﻿using MealPlanner.Domain.Shared;
 
-namespace MealPlanner.Domain;
+namespace MealPlanner.Domain.Recipes;
 
 public class RecipeStep
 {
@@ -19,27 +19,36 @@ public class RecipeStep
         Instructions = instructions;
     }
 
-    public static RecipeStep Create(int order, string instruction)
+    public static Result<RecipeStep> Create(int order, string instruction)
     {
-        ValidateOrderAndThrow(order);
-        ValidateInstructionAndThrow(instruction);
+        var errors = new List<Error>();
+        errors.AddRule(ValidateOrder(order), DomainErrors.RecipeStep.InvalidOrder(order))
+            .AddRule(ValidateInstruction(instruction), DomainErrors.RecipeStep.InvalidInstruction(instruction));
 
-        return new RecipeStep(order, instruction);
+        return errors.Count > 0 ? Result.Failure<RecipeStep>(errors) : Result.Success(new RecipeStep(order, instruction));
     }
 
-    private static void ValidateOrderAndThrow(int order) => InvalidStepOrderException.ThrowIfOrderIsInvalid(order);
+    private static bool ValidateOrder(int order) => order > 0;
 
-    private static void ValidateInstructionAndThrow(string instruction) => MissingInstructionsException.ThrowIfInstructionsAreInvalid(instruction);
+    private static bool ValidateInstruction(string instructions) => !string.IsNullOrWhiteSpace(instructions);
 
-    public void UpdateOrder(int newOrder)
+    public Result UpdateOrder(int newOrder)
     {
-        ValidateOrderAndThrow(newOrder);
+        if (!ValidateOrder(newOrder))
+        {
+            return Result.Failure(DomainErrors.RecipeStep.InvalidOrder(newOrder));
+        }
         Order = newOrder;
+        return Result.Success();
     }
 
-    public void UpdateInstructions(string newInstructions)
+    public Result UpdateInstructions(string newInstructions)
     {
-        ValidateInstructionAndThrow(newInstructions);
+        if (!ValidateInstruction(newInstructions))
+        {
+            return Result.Failure(DomainErrors.RecipeStep.InvalidInstruction(newInstructions));
+        }
         Instructions = newInstructions;
+        return Result.Success();
     }
 }

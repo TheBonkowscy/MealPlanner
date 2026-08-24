@@ -1,5 +1,6 @@
-﻿using MealPlanner.Persistence;
-using MealPlanner.Services.Menus.Exceptions;
+﻿using MealPlanner.Domain.Shared;
+using MealPlanner.Persistence;
+using MealPlanner.Services.Shared;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -8,17 +9,17 @@ namespace MealPlanner.Services.Menus;
 
 public interface IUpdateMenu
 {
-    Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken);
+    Task<Result<UpdateMenuResponse>> Update(UpdateMenuRequest request, CancellationToken cancellationToken);
 }
 
 public class MenuUpdater(MealPlannerDbContext ctx,
     IMapMeals mealsMapper) : IUpdateMenu
 {
-    public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
+    public async Task<Result<UpdateMenuResponse>> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
     {
         if (request.Meals is { Count: 0 })
         {
-            throw new MissingMealsException();
+            return Result.Failure<UpdateMenuResponse>(ServiceErrors.Menu.InvalidMeals);
         }
         
         var menu = await ctx.Menus
@@ -27,7 +28,7 @@ public class MenuUpdater(MealPlannerDbContext ctx,
             .FirstOrDefaultAsync(x => x.Date == request.Date, cancellationToken);
         if (menu is null)
         {
-            throw new MenuDoesNotExistException(request.Date);
+            return Result.Failure<UpdateMenuResponse>(ServiceErrors.Menu.DoesNotExist(request.Date));
         }
 
         // 1. Remove all meals - this will work for now, revisit this when the meal model is extended
@@ -36,10 +37,19 @@ public class MenuUpdater(MealPlannerDbContext ctx,
         
         // 2. Add new meals
         var mappedMeals = await mealsMapper.MapMeals(request.Meals, cancellationToken);
-        mappedMeals.ForEach(menu.AddMeal);
+        if (mappedMeals.IsFailure)
+        {
+            return Result.Failure<UpdateMenuResponse>(mappedMeals.Error);
+        }
+
+        var errorsOnAdd = mappedMeals.Value.OrderBy(x => x.Order)
+            .Select(menu.AddMeal).AllErrors();
+        if (errorsOnAdd.Count != 0)
+        {
+            return Result.Failure<UpdateMenuResponse>(errorsOnAdd);
+        }
         
         await ctx.SaveChangesAsync(cancellationToken);
-
-        return new UpdateMenuResponse(menu.Date);
+        return Result.Success(new UpdateMenuResponse(menu.Date));
     }
 }

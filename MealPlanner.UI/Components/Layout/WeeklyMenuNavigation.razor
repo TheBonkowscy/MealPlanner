@@ -15,7 +15,7 @@
                      Expanded="@IsExpanded(week)"
                      ExpandedChanged="@(() => SelectWeek(week))"
                      Class="@GetWeekTitleClass(week)">
-            
+
             @if (IsExpanded(week))
             {
                 <MudNavMenu Class="ml-4">
@@ -33,7 +33,7 @@
                                     Icon="@Icons.Material.Filled.Add"
                                     Size="Size.Small"
                                     Color="Color.Primary"
-                                    OnClick="@(() => OnMenuCreating(day.Day))" />
+                                    OnClick="@(() => OnMenuCreating(day.Day))"/>
                             }
                             else
                             {
@@ -44,7 +44,7 @@
                                     Icon="@(IsToday(day.Day) ? Icons.Material.Filled.Today : Icons.Material.Filled.Assignment)"
                                     Size="Size.Small"
                                     Color="Color.Primary"
-                                    OnClick="@(() => OnViewMenu(day.Day))" />
+                                    OnClick="@(() => OnViewMenu(day.Day))"/>
                             }
 
                         </div>
@@ -56,20 +56,15 @@
 </MudNavMenu>
 
 @code {
-    [Parameter]
-    public EventCallback<DateOnly> CreateMenu { get; set; }
-    
-    [Parameter]
-    public EventCallback<DateOnly> EditMenu { get; set; }
-    
-    [Parameter]
-    public EventCallback<DateOnly> ViewMenu { get; set; }
+    [Parameter] public EventCallback<DateOnly> CreateMenu { get; set; }
 
-    [Parameter]
-    public int? SelectedWeek { get; set; }
+    [Parameter] public EventCallback<DateOnly> EditMenu { get; set; }
 
-    [Parameter]
-    public EventCallback<int> SelectedWeekChanged { get; set; }
+    [Parameter] public EventCallback<DateOnly> ViewMenu { get; set; }
+
+    [Parameter] public int? SelectedWeek { get; set; }
+
+    [Parameter] public EventCallback<int> SelectedWeekChanged { get; set; }
 
     private readonly CancellationTokenSource _cts = new();
     private readonly CultureInfo _culture = new("pl-PL");
@@ -87,7 +82,7 @@
 
     private void HandleMenuChanged()
     {
-        _ = InvokeAsync(async() =>
+        _ = InvokeAsync(async () =>
         {
             await RenderMenu();
             StateHasChanged();
@@ -115,7 +110,7 @@
 
         // Default selection to current week if none specified
         if (SelectedWeek.HasValue) return;
-        
+
         var currentWeek = _weeks.FirstOrDefault(w => w.Current);
         if (currentWeek != null)
         {
@@ -126,13 +121,13 @@
     private static DateOnly FindDayOfTheWeekWithDate(DateOnly date, DayOfWeek dayOfWeek) =>
         DateOnly.FromDateTime(
             ISOWeek.ToDateTime(
-                ISOWeek.GetYear(date), 
-                ISOWeek.GetWeekOfYear(date), 
+                ISOWeek.GetYear(date),
+                ISOWeek.GetWeekOfYear(date),
                 dayOfWeek));
 
     private static List<CalendarWeek> BuildWeeksForRange(
-        DateOnly start, 
-        DateOnly end, 
+        DateOnly start,
+        DateOnly end,
         Dictionary<DateOnly, ExistingMenuListItem> existingMenus)
     {
         var weeks = new List<CalendarWeek>();
@@ -140,9 +135,9 @@
         // Find Monday of the starting date's week
         var currentMonday = DateOnly.FromDateTime(
             ISOWeek.ToDateTime(
-                ISOWeek.GetYear(start), 
-                ISOWeek.GetWeekOfYear(start), 
-                DayOfWeek.Monday)); 
+                ISOWeek.GetYear(start),
+                ISOWeek.GetWeekOfYear(start),
+                DayOfWeek.Monday));
 
         var time = TimeOnly.FromDateTime(DateTime.Today);
         while (currentMonday <= end)
@@ -196,7 +191,7 @@
     {
         return day == DateOnly.FromDateTime(DateTime.Today) ? "today-day" : string.Empty;
     }
-    
+
     private async Task OnMenuCreating(DateOnly day)
     {
         // Execute parameter callback for parent listeners
@@ -208,7 +203,7 @@
         // Perform navigation
         Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(day));
     }
-    
+
     private async Task OnViewMenu(DateOnly day)
     {
         // Execute parameter callback for parent listeners
@@ -220,17 +215,18 @@
         // Perform navigation
         Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(day));
     }
-    
+
     private static bool IsToday(DateOnly date)
     {
-        return date == Today; 
+        return date == Today;
     }
 
     public void Dispose()
     {
         MenuStateService.OnMenuChanged -= HandleMenuChanged;
-        
+
         _cts.Cancel();
         _cts.Dispose();
     }
+
 }

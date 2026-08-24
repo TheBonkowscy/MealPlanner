@@ -1,10 +1,9 @@
 ﻿using AwesomeAssertions;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
-using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Services.Recipes.Steps;
+using MealPlanner.Services.Shared;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared.Factories;
 using Microsoft.Extensions.Localization;
@@ -30,19 +29,19 @@ public class RecipeStepCreatorTests
     }
 
     [Fact]
-    public async Task CreateStep_Throws_WhenRecipeWasNotFound()
+    public async Task CreateStep_Fails_WhenRecipeWasNotFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();
         var request = new CreateRecipeStepRequest(2, "Instructions for step #2"); 
         
         // Act
-        var updateStep = () => _sut.CreateStep(recipe.Id, request, CancellationToken.None);
+        var result = await _sut.CreateStep(recipe.Id, request, CancellationToken.None);
         
         // Assert
-        await updateStep.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<RecipeDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Recipe.DoesNotExist);
     }
     
     [Fact]
@@ -54,9 +53,11 @@ public class RecipeStepCreatorTests
         var request = new CreateRecipeStepRequest(1, "New First Step"); 
     
         // Act
-        await _sut.CreateStep(recipe.Id, request, CancellationToken.None);
+        var result = await _sut.CreateStep(recipe.Id, request, CancellationToken.None);
     
         // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
         recipe.Steps.Should().HaveCount(2);
         recipe.Steps.First(s => s.Order == 1).Instructions.Should().Be("New First Step");
         recipe.Steps.Select(s => s.Order).Should().BeEquivalentTo([1, 2], options => options.WithStrictOrdering());
@@ -77,7 +78,9 @@ public class RecipeStepCreatorTests
         var result = await _sut.CreateStep(recipe.Id, request, CancellationToken.None);
         
         // Assert
-        var stepResponse = result.Steps.First(x => x.Order == newOrder);
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        var stepResponse = result.Value.Steps.First(x => x.Order == newOrder);
         stepResponse.Instructions.Should().Be(newInstructions);
     }
 }

@@ -14,7 +14,7 @@ public class IngredientsIntegrationTests(MealPlannerWebApplicationFactory factor
     public async Task Get_ReturnsAllIngredients()
     {
         // Arrange
-        await AddIngredientToDatabase(Ingredient.Create("Flour", [MeasureUnit.GlassCup, MeasureUnit.Gram, MeasureUnit.Tablespoon]));
+        await AddIngredientToDatabase(Ingredient.Create("Flour", [MeasureUnit.GlassCup, MeasureUnit.Gram, MeasureUnit.Tablespoon]).Value);
         
         // Act
         var result = await Client.GetAsync(Constants.IngredientsRoute);

@@ -1,10 +1,10 @@
 ﻿using AwesomeAssertions;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
-using MealPlanner.Services.Recipes.Exceptions;
 using MealPlanner.Services.Recipes.Steps;
+using MealPlanner.Services.Shared;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared.Factories;
 using Microsoft.Extensions.Localization;
@@ -30,7 +30,7 @@ public class RecipeStepUpdaterTests
     }
 
     [Fact]
-    public async Task UpdateStep_Throws_WhenRecipeWasNotFound()
+    public async Task UpdateStep_Fails_WhenRecipeWasNotFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();
@@ -38,16 +38,16 @@ public class RecipeStepUpdaterTests
         var request = new UpdateRecipeStepRequest(step.Id,  step.Order, step.Instructions); 
         
         // Act
-        var updateStep = () => _sut.UpdateStep(recipe.Id, step.Id, request, CancellationToken.None);
+        var result = await _sut.UpdateStep(recipe.Id, step.Id, request, CancellationToken.None);
         
         // Assert
-        await updateStep.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<RecipeDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Recipe.DoesNotExist);
     }
 
     [Fact]
-    public async Task UpdateStep_Throws_WhenStepWasNotFound()
+    public async Task UpdateStep_Fails_WhenStepWasNotFound()
     {
         // Arrange
         var recipe = TestRecipes.Create();
@@ -56,13 +56,12 @@ public class RecipeStepUpdaterTests
         var request = new UpdateRecipeStepRequest(999,  step.Order, step.Instructions); 
         
         // Act
-        var updateStep = () => _sut.UpdateStep(recipe.Id, request.Id, request, CancellationToken.None);
+        var result = await _sut.UpdateStep(recipe.Id, request.Id, request, CancellationToken.None);
         
         // Assert
-        await updateStep.Invoking(x => x.Invoke())
-            .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Recipe step could not be found");
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipeStep.NotFound);
     }
 
     [Fact]
@@ -78,7 +77,9 @@ public class RecipeStepUpdaterTests
         var result = await _sut.UpdateStep(recipe.Id, request.Id, request, CancellationToken.None);
         
         // Assert
-        var stepResponse = result.Steps.First(x => x.Id == step.Id);
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        var stepResponse = result.Value.Steps.First(x => x.Id == step.Id);
         stepResponse.Instructions.Should().Be(request.Instructions);
     }
 }

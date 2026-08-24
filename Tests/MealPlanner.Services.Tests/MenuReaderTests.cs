@@ -15,24 +15,23 @@ public class MenuReaderTests
 {
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
 
-    private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly MenuReader _sut;
 
     private static readonly List<Menu> _menus = [];
     public MenuReaderTests()
     {
         _menus.Clear();
-        _ctx = new Mock<MealPlannerDbContext>();
-        _ctx.Setup(x => x.Menus).ReturnsDbSet(_menus);
-        _ctx.Setup(x => x.Menus.AddAsync(It.IsAny<Menu>(), It.IsAny<CancellationToken>())).Callback<Menu, CancellationToken>((menu, _) =>
+        var ctx = new Mock<MealPlannerDbContext>();
+        ctx.Setup(x => x.Menus).ReturnsDbSet(_menus);
+        ctx.Setup(x => x.Menus.AddAsync(It.IsAny<Menu>(), It.IsAny<CancellationToken>())).Callback<Menu, CancellationToken>((menu, _) =>
         {
             RandomId.Set(menu);
             _menus.Add(menu);
         });
         
-        _ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
+        ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
         
-        _sut = new MenuReader(_ctx.Object);
+        _sut = new MenuReader(ctx.Object);
     }
     
     [Fact]
@@ -141,7 +140,7 @@ public class MenuReaderTests
     {
         // Arrange
         var menuWithMeals = CreateAndSaveMenu(Today);
-        menuWithMeals.AddMeal(AddMealAction.Create(TestRecipes.Create("Pizza"), 2, 1));
+        menuWithMeals.AddMeal(AddMealAction.Create(TestRecipes.Create("Pizza"), 2, 1).Value);
         
         var menuWithoutMeals = CreateAndSaveMenu(Today.AddDays(1));
         

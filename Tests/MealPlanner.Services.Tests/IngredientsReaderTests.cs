@@ -3,7 +3,6 @@ using MealPlanner.Domain.Ingredients;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Ingredients;
 using MealPlanner.Services.Recipes;
-using MealPlanner.Shared.Ingredients;
 using MealPlanner.Shared.Shared;
 using MealPlanner.Tests.Shared;
 using Microsoft.Extensions.Localization;
@@ -15,39 +14,38 @@ namespace MealPlanner.Services.Tests;
 public class IngredientsReaderTests
 {
     private readonly Mock<IStringLocalizer<Translations>> _localiser;
-    private readonly Mock<MealPlannerDbContext> _ctx;
     private readonly IngredientReader _sut;
     private readonly List<Ingredient> _ingredients = [];
 
     public IngredientsReaderTests()
     {
         _localiser = new Mock<IStringLocalizer<Translations>>();
-        _ctx = new Mock<MealPlannerDbContext>();
-        _ctx.Setup(x => x.Ingredients).ReturnsDbSet(_ingredients);
-        _sut = new IngredientReader(_ctx.Object, new MeasureUnitMapper(_localiser.Object));
+        var ctx = new Mock<MealPlannerDbContext>();
+        ctx.Setup(x => x.Ingredients).ReturnsDbSet(_ingredients);
+        _sut = new IngredientReader(ctx.Object, new MeasureUnitMapper(_localiser.Object));
     }
 
     [Fact]
     public async Task Get_ReturnsAllIngredients()
     {
         // Arrange
-        const string flour = "Flour";
-        var ingredient1 = Ingredient.Create(flour, [MeasureUnit.Gram, MeasureUnit.Tablespoon, MeasureUnit.GlassCup]);
-        const string milk = "Milk";
-        var ingredient2 = Ingredient.Create(milk, [MeasureUnit.Liter, MeasureUnit.Milliliter]);
-        RandomId.Set(ingredient1, ingredient2);
-        _ingredients.AddRange(ingredient1, ingredient2);
+        const string flourName = "Flour";
+        var flour = Ingredient.Create(flourName, [MeasureUnit.Gram, MeasureUnit.Tablespoon, MeasureUnit.GlassCup]).Value;
+        const string milkName = "Milk";
+        var milk = Ingredient.Create(milkName, [MeasureUnit.Liter, MeasureUnit.Milliliter]).Value;
+        RandomId.Set(flour, milk);
+        _ingredients.AddRange(flour, milk);
 
         // Act
         var result = await _sut.Get(CancellationToken.None);
 
         // Assert
         result.Ingredients.Should().HaveCount(2);
-        var flourResponse = result.Ingredients.First(x => x.Name == flour);
-        var milkResponse = result.Ingredients.First(x => x.Name == milk);
+        var flourResponse = result.Ingredients.First(x => x.Name == flourName);
+        var milkResponse = result.Ingredients.First(x => x.Name == milkName);
         
-        flourResponse.ApplicableUnits.Should().BeEquivalentTo(ToResponse(ingredient1.ApplicableUnits));
-        milkResponse.ApplicableUnits.Should().BeEquivalentTo(ToResponse(ingredient2.ApplicableUnits));
+        flourResponse.ApplicableUnits.Should().BeEquivalentTo(ToResponse(flour.ApplicableUnits));
+        milkResponse.ApplicableUnits.Should().BeEquivalentTo(ToResponse(milk.ApplicableUnits));
     }
 
 

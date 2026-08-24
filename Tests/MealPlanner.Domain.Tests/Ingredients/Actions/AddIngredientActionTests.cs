@@ -1,8 +1,7 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Ingredients.Actions;
-using MealPlanner.Domain.Ingredients.Exceptions;
-using MealPlanner.Tests.Shared;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests.Ingredients.Actions;
@@ -12,33 +11,34 @@ public class AddIngredientActionTests
     private const decimal SharedExpectedQuantity = 0.75m;
     
     [Fact]
-    public void Create_WithNotApplicableUnit_Throws()
+    public void Create_WithNotApplicableUnit_Fails()
     {
         // Arrange
         var ingredientToAdd = TestInitialData.CupsOfFlour();
+        var missingUnit = MeasureUnit.Kilogram;
         
         // Act
-        Action<Ingredient, decimal, MeasureUnit> create = (ingredient, quantity, unit) =>
-            AddIngredientAction.Create(ingredient, quantity, unit);
+        var result = AddIngredientAction.Create(ingredientToAdd, SharedExpectedQuantity, missingUnit);
         
         // Assert
-        create.Invoking(x => x.Invoke(ingredientToAdd, SharedExpectedQuantity, MeasureUnit.Kilogram))
-            .Should().Throw<InvalidOperationException>("Ingredient does not support the specified unit");
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.UnitNotApplicable(missingUnit, ingredientToAdd.Name));
     }
     
     [Fact]
-    public void Create_WithNegativeQuantity_Throws()
+    public void Create_WithNegativeQuantity_Fails()
     {
         // Arrange
         var ingredientToAdd = TestInitialData.CupsOfFlour();
         
         // Act
-        Action<Ingredient, decimal, MeasureUnit> create = (ingredient, quantity, unit) =>
-            AddIngredientAction.Create(ingredient, quantity, unit);
+        var result = AddIngredientAction.Create(ingredientToAdd, -SharedExpectedQuantity, MeasureUnit.GlassCup);
         
         // Assert
-        create.Invoking(x => x.Invoke(ingredientToAdd, -SharedExpectedQuantity, MeasureUnit.GlassCup))
-            .Should().Throw<InvalidIngredientQuantityException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.InvalidQuantity(-SharedExpectedQuantity, ingredientToAdd.Name));
     }
     
     [Fact]
@@ -53,8 +53,10 @@ public class AddIngredientActionTests
         
         // Assert
         result.Should().NotBeNull();
-        result.Ingredient.Should().Be(ingredientToAdd);
-        result.Quantity.Should().Be(SharedExpectedQuantity);
-        result.Unit.Should().Be(expectedUnit);
+        result.IsFailure.Should().BeFalse();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Ingredient.Should().Be(ingredientToAdd);
+        result.Value.Quantity.Should().Be(SharedExpectedQuantity);
+        result.Value.Unit.Should().Be(expectedUnit);
     }
 }

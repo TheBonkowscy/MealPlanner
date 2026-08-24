@@ -21,20 +21,20 @@
     <MudText Typo="Typo.h5" Class="mb-4">Posiłki zaplanowane na ten dzień</MudText>
 
     <MudDropContainer @ref="_container"
-                      T="MealDto" 
-                      Items="_meals" 
-                      ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)" 
-                      ItemDropped="ItemDropped" 
+                      T="MealDto"
+                      Items="_meals"
+                      ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)"
+                      ItemDropped="ItemDropped"
                       Class="d-flex flex-column flex-grow-1">
         <ChildContent>
-            <MudDropZone T="MealDto" 
-                         Identifier="DayMenuZone" 
-                         AllowReorder="true" 
+            <MudDropZone T="MealDto"
+                         Identifier="DayMenuZone"
+                         AllowReorder="true"
                          Class="rounded mud-background-gray pa-4 min-height-200">
                 <ItemRenderer>
                     <MudPaper Class="pa-3 my-2 d-flex justify-space-between align-center" Elevation="2">
                         <div class="d-flex align-center gap-3 flex-grow-1">
-                            <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="mr-3 cursor-grab" />
+                            <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="mr-3 cursor-grab"/>
                             <MudText Typo="Typo.body1">@context.Name</MudText>
                         </div>
                         <div class="d-flex align-center gap-3">
@@ -43,11 +43,11 @@
                                              Min="1"
                                              Step="1"
                                              Variant="Variant.Outlined"
-                                             Margin="Margin.Dense" />
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
-                                           Color="Color.Error" 
-                                           Size="Size.Small" 
-                                           OnClick="@(() => RemoveMeal(context))" />
+                                             Margin="Margin.Dense"/>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Error"
+                                           Size="Size.Small"
+                                           OnClick="@(() => RemoveMeal(context))"/>
                         </div>
                     </MudPaper>
                 </ItemRenderer>
@@ -65,8 +65,8 @@
                          ResetValueOnSelected="true"
                          AdornmentIcon="@Icons.Material.Filled.Search"
                          AdornmentColor="Color.Primary"
-                         DebounceInterval="300" 
-                         MinCharacters="2" />
+                         DebounceInterval="300"
+                         MinCharacters="2"/>
     </MudPaper>
 
     <MudButton Variant="Variant.Filled"
@@ -86,30 +86,27 @@
     private RecipeByIdDto? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
 
-    protected override async Task OnParametersSetAsync()
+    protected override Task OnParametersSetAsync()
     {
         _meals.Clear();
-        
+
         var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u002B";
         AppBarService.SetTitle(formattedTitle);
+        return Task.CompletedTask;
     }
 
     private void ItemDropped(MudItemDropInfo<MealDto> dropItem)
     {
-        if (dropItem?.Item is null) return;
+        if (dropItem.Item is null) return;
 
-        // 1. Usuwamy przeciągnięty element
         _meals.Remove(dropItem.Item);
 
-        // 2. Wyznaczamy i zabezpieczamy indeks docelowy
         var targetIndex = dropItem.IndexInZone;
         if (targetIndex < 0) targetIndex = 0;
         if (targetIndex > _meals.Count) targetIndex = _meals.Count;
 
-        // 3. Wstawiamy go na właściwą pozycję
         _meals.Insert(targetIndex, dropItem.Item);
 
-        // 4. Odświeżamy indeksy Order
         for (var i = 0; i < _meals.Count; i++)
         {
             _meals[i].Order = i;
@@ -117,17 +114,17 @@
 
         _container?.Refresh();
     }
-    
-    private async Task<IEnumerable<RecipeByIdDto>> SearchRecipesAsync(string query, CancellationToken token) => 
-        string.IsNullOrWhiteSpace(query) 
-            ? [] 
+
+    private async Task<IEnumerable<RecipeByIdDto>> SearchRecipesAsync(string query, CancellationToken token) =>
+        string.IsNullOrWhiteSpace(query)
+            ? []
             : MealMapper.MapMeals(await FindRecipes.Get(query, token));
 
     private void OnMealSelected(RecipeByIdDto selectedMeal)
     {
         _meals.Add(new MealDto
         {
-            Id = selectedMeal.Id, 
+            Id = selectedMeal.Id,
             Name = selectedMeal.Name,
             Order = _meals.Count
         });
@@ -143,6 +140,7 @@
         {
             _meals[i].Order = i;
         }
+
         _container?.Refresh();
     }
 
@@ -158,10 +156,16 @@
 
         var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), meals);
         var response = await CreateMenus.CreateMenu(request, _cts.Token);
-        Snackbar.Add("Utworzono nowe menu!", Severity.Success);
-        
-        MenuStateService.NotifyMenuChanged();
-        Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Date));
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Utworzono nowe menu!", Severity.Success);
+            MenuStateService.NotifyMenuChanged();
+            Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Value!.Date));
+        }
+        else
+        {
+            Snackbar.Add(response.Error!.Message, Severity.Error);
+        }
     }
 
     public void Dispose()
@@ -170,4 +174,5 @@
         _cts.Dispose();
         AppBarService.ClearActions();
     }
+
 }

@@ -1,6 +1,6 @@
 using MealPlanner.Domain.Menus.Actions;
-using MealPlanner.Domain.Menus.Exceptions;
 using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Menus;
 
@@ -34,43 +34,61 @@ public class Menu
         Meals = meals;
     }
     
-    public void AddMeal(AddMealAction action) => TryAddMeal(action.Order, action.Recipe, action.Servings);
+    public Result AddMeal(AddMealAction action) => TryAddMeal(action.Order, action.Recipe, action.Servings);
 
-    private void TryAddMeal(int order, Recipe recipe, int servings)
+    private Result TryAddMeal(int order, Recipe recipe, int servings)
     {
-        ValidateOrderAndThrow(order);
-        ValidateRecipeAndThrow(recipe);
-        var item = Meal.Create(this, recipe, order, servings);
-        _meals.Add(item);
+        var errors = new List<Error>();
+        errors.AddRange(ValidateOrder(order).Errors);
+        errors.AddRange(ValidateRecipe(recipe).Errors);
+        
+        if (errors.Count != 0)
+        {
+            return Result.Failure(errors);
+        }
+        
+        var meal = Meal.Create(this, recipe, order, servings);
+        if (meal.IsFailure)
+        {
+            return meal;
+        }
+        _meals.Add(meal.Value);
+        return Result.Success();
     }
 
-    private void ValidateOrderAndThrow(int order)
+    private Result ValidateOrder(int order)
     {
-        InvalidMealOrderException.ThrowIfExceedsNumberOfMeals(order, _meals.Count);
+        var errors = new List<Error>();
+        errors.AddRule(!(order > _meals.Count + 1 && _meals.Count != 0), DomainErrors.Menu.InvalidMealOrder);
 
         var mealAtIndex = GetRecipe(order);
-        MealExistsAtPositionException.ThrowIfExists(mealAtIndex, order);
+        errors.AddRule(mealAtIndex is null, DomainErrors.Meal.AlreadyExistsAtPosition(order));
+
+        return errors.Count != 0 ? Result.Failure(errors) : Result.Success();
     }
     
     public Recipe? GetRecipe(int order) => _meals.FirstOrDefault(x => x.Order == order)?.Recipe;
 
-    private void ValidateRecipeAndThrow(Recipe recipe)
-    {
-        if (HasRecipe(recipe))
-        {
-            throw new MealAlreadyPresentInTheDayException(recipe.Name, Date);
-        }
-    }
+    private Result ValidateRecipe(Recipe recipe) => HasRecipe(recipe) ? Result.Failure(DomainErrors.Meal.AlreadyPresentInTheDay(recipe.Name)) : Result.Success();
 
     private bool HasRecipe(Recipe recipe) => _meals.Any(x => x.Recipe.Equals(recipe));
     
-    public static Menu Create(DateOnly date, List<AddMealAction> mealsToAdd)
+    public static Result<Menu> Create(DateOnly date, List<AddMealAction> mealsToAdd)
     {
-        DateOutOfRangeException.ThrowIfNotInRange(date);
+        var errors = new List<Error>();
+        DateOnly[] invalidDates = [DateOnly.MinValue, DateOnly.MaxValue];
+        errors.AddRule(!invalidDates.Contains(date), DomainErrors.Menu.DateIsUnset)
+            .AddRule(date >= MinDateInThePast, DomainErrors.Menu.DateTooFarInThePast)
+            .AddRule(DateOnly.FromDateTime(DateTime.UtcNow).AddYears(100) >= date, DomainErrors.Menu.DateTooFarInTheFuture);
+
+        if (errors.Count != 0)
+        {
+            return Result.Failure<Menu>(errors);
+        }
         
         var menu = new Menu(date);
-        mealsToAdd.ForEach(menu.AddMeal);
-        return menu;
+        errors.AddRange(mealsToAdd.Select(menu.AddMeal).AllErrors());
+        return errors.Count != 0 ? Result.Failure<Menu>(errors) : Result.Success(menu);
     }
 
     public void RemoveAllItems()

@@ -35,7 +35,7 @@ namespace MealPlanner.Services {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MealPlanner.Services.Resources.Translations", typeof(Translations).Assembly);
@@ -50,7 +50,7 @@ namespace MealPlanner.Services {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -62,7 +62,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to bottle(s).
         /// </summary>
-        public static string Bottle {
+        internal static string Bottle {
             get {
                 return ResourceManager.GetString("Bottle", resourceCulture);
             }
@@ -71,7 +71,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to can(s).
         /// </summary>
-        public static string Can {
+        internal static string Can {
             get {
                 return ResourceManager.GetString("Can", resourceCulture);
             }
@@ -80,7 +80,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to glass cup(s).
         /// </summary>
-        public static string GlassCup {
+        internal static string GlassCup {
             get {
                 return ResourceManager.GetString("GlassCup", resourceCulture);
             }
@@ -89,16 +89,142 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to g.
         /// </summary>
-        public static string Gram {
+        internal static string Gram {
             get {
                 return ResourceManager.GetString("Gram", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find ingredients with the following IDs: {0}.
+        /// </summary>
+        internal static string IngredientDoesNotExist {
+            get {
+                return ResourceManager.GetString("IngredientDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ingredient {0} can not be measured using {1}.
+        /// </summary>
+        internal static string IngredientUnitNotApplicable {
+            get {
+                return ResourceManager.GetString("IngredientUnitNotApplicable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide the correct ingredient name.
+        /// </summary>
+        internal static string InvalidIngredientName {
+            get {
+                return ResourceManager.GetString("InvalidIngredientName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quantity {0} is invalid for ingredient {1}.
+        /// </summary>
+        internal static string InvalidIngredientQuantity {
+            get {
+                return ResourceManager.GetString("InvalidIngredientQuantity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order {0} is invalid for the meal.
+        /// </summary>
+        internal static string InvalidMealOrder {
+            get {
+                return ResourceManager.GetString("InvalidMealOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order {0} is invalid for the meal in the menu.
+        /// </summary>
+        internal static string InvalidMealOrderInMenu {
+            get {
+                return ResourceManager.GetString("InvalidMealOrderInMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Meal can not have {0} servings.
+        /// </summary>
+        internal static string InvalidMealServings {
+            get {
+                return ResourceManager.GetString("InvalidMealServings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide correct number of meals.
+        /// </summary>
+        internal static string InvalidMealsInMenu {
+            get {
+                return ResourceManager.GetString("InvalidMealsInMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide correct number of ingredients with appropriate quantities.
+        /// </summary>
+        internal static string InvalidRecipeIngredients {
+            get {
+                return ResourceManager.GetString("InvalidRecipeIngredients", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide the correct recipe name.
+        /// </summary>
+        internal static string InvalidRecipeName {
+            get {
+                return ResourceManager.GetString("InvalidRecipeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide the correct number of servings the recipe yields.
+        /// </summary>
+        internal static string InvalidRecipeServings {
+            get {
+                return ResourceManager.GetString("InvalidRecipeServings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide the correct instructions for the recipe step.
+        /// </summary>
+        internal static string InvalidRecipeStepInstruction {
+            get {
+                return ResourceManager.GetString("InvalidRecipeStepInstruction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order {0} is invalid for the recipe step.
+        /// </summary>
+        internal static string InvalidRecipeStepOrder {
+            get {
+                return ResourceManager.GetString("InvalidRecipeStepOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide steps for this recipe.
+        /// </summary>
+        internal static string InvalidRecipeSteps {
+            get {
+                return ResourceManager.GetString("InvalidRecipeSteps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to kg.
         /// </summary>
-        public static string Kilogram {
+        internal static string Kilogram {
             get {
                 return ResourceManager.GetString("Kilogram", resourceCulture);
             }
@@ -107,16 +233,97 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to l.
         /// </summary>
-        public static string Liter {
+        internal static string Liter {
             get {
                 return ResourceManager.GetString("Liter", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is already a meal at the position #{0}.
+        /// </summary>
+        internal static string MealAlreadyExistsAtPosition {
+            get {
+                return ResourceManager.GetString("MealAlreadyExistsAtPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The meal {0} is already present in the menu.
+        /// </summary>
+        internal static string MealAlreadyPresentInTheMenu {
+            get {
+                return ResourceManager.GetString("MealAlreadyPresentInTheMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find meal details.
+        /// </summary>
+        internal static string MealDetailsMissing {
+            get {
+                return ResourceManager.GetString("MealDetailsMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is already a menu for {0}.
+        /// </summary>
+        internal static string MenuAlreadyExists {
+            get {
+                return ResourceManager.GetString("MenuAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The date for menu is too far in the future.
+        /// </summary>
+        internal static string MenuDateTooFarInTheFuture {
+            get {
+                return ResourceManager.GetString("MenuDateTooFarInTheFuture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The date for menu is too far in the past.
+        /// </summary>
+        internal static string MenuDateTooFarInThePast {
+            get {
+                return ResourceManager.GetString("MenuDateTooFarInThePast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide the date for menu.
+        /// </summary>
+        internal static string MenuDateUnset {
+            get {
+                return ResourceManager.GetString("MenuDateUnset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Menu for {0} does not exist.
+        /// </summary>
+        internal static string MenuDoesNotExist {
+            get {
+                return ResourceManager.GetString("MenuDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please specify the valid menu.
+        /// </summary>
+        internal static string MenuIsNull {
+            get {
+                return ResourceManager.GetString("MenuIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to mg.
         /// </summary>
-        public static string Milligram {
+        internal static string Milligram {
             get {
                 return ResourceManager.GetString("Milligram", resourceCulture);
             }
@@ -125,16 +332,34 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to ml.
         /// </summary>
-        public static string Milliliter {
+        internal static string Milliliter {
             get {
                 return ResourceManager.GetString("Milliliter", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please specify measure units for the {0} ingredient.
+        /// </summary>
+        internal static string MissingIngredientMeasureUnits {
+            get {
+                return ResourceManager.GetString("MissingIngredientMeasureUnits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find meals by IDs: {0}.
+        /// </summary>
+        internal static string MissingMealRecipesById {
+            get {
+                return ResourceManager.GetString("MissingMealRecipesById", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to package(s).
         /// </summary>
-        public static string Package {
+        internal static string Package {
             get {
                 return ResourceManager.GetString("Package", resourceCulture);
             }
@@ -143,7 +368,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to pc(s).
         /// </summary>
-        public static string Piece {
+        internal static string Piece {
             get {
                 return ResourceManager.GetString("Piece", resourceCulture);
             }
@@ -152,16 +377,52 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to pinch(es).
         /// </summary>
-        public static string Pinch {
+        internal static string Pinch {
             get {
                 return ResourceManager.GetString("Pinch", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is already a recipe with this name.
+        /// </summary>
+        internal static string RecipeAlreadyExists {
+            get {
+                return ResourceManager.GetString("RecipeAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find the specified recipe.
+        /// </summary>
+        internal static string RecipeDoesNotExist {
+            get {
+                return ResourceManager.GetString("RecipeDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please specify the valid recipe.
+        /// </summary>
+        internal static string RecipeIsNull {
+            get {
+                return ResourceManager.GetString("RecipeIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find the recipe step.
+        /// </summary>
+        internal static string RecipeStepNotFound {
+            get {
+                return ResourceManager.GetString("RecipeStepNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to slice(s).
         /// </summary>
-        public static string Slice1 {
+        internal static string Slice1 {
             get {
                 return ResourceManager.GetString("Slice1", resourceCulture);
             }
@@ -170,7 +431,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to slice(s).
         /// </summary>
-        public static string Slice2 {
+        internal static string Slice2 {
             get {
                 return ResourceManager.GetString("Slice2", resourceCulture);
             }
@@ -179,7 +440,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to tbsp.
         /// </summary>
-        public static string Tablespoon {
+        internal static string Tablespoon {
             get {
                 return ResourceManager.GetString("Tablespoon", resourceCulture);
             }
@@ -188,7 +449,7 @@ namespace MealPlanner.Services {
         /// <summary>
         ///   Looks up a localized string similar to tsp.
         /// </summary>
-        public static string Teaspoon {
+        internal static string Teaspoon {
             get {
                 return ResourceManager.GetString("Teaspoon", resourceCulture);
             }

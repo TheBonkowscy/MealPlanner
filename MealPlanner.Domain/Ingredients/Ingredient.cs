@@ -1,4 +1,4 @@
-﻿using MealPlanner.Domain.Ingredients.Exceptions;
+﻿using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Ingredients;
 
@@ -21,21 +21,25 @@ public class Ingredient
         ApplicableUnits = applicableUnits;
     }
 
-    public static Ingredient Create(string name, List<MeasureUnit> applicableUnits)
+    public static Result<Ingredient> Create(string name, List<MeasureUnit> applicableUnits)
     {
-        MissingIngredientNameException.ThrowIfNameIsInvalid(name);
-        ValidateUnitsAndThrow(applicableUnits);
+        var errors = new List<Error>();
+        errors.AddRule(!string.IsNullOrWhiteSpace(name), DomainErrors.Ingredient.InvalidName(name))
+            .AddRule(applicableUnits.Count > 0, DomainErrors.Ingredient.MissingMeasureUnits(name));
 
-        return new Ingredient(name, applicableUnits);
+        return errors.Count > 0 ? Result.Failure<Ingredient>(errors) : Result.Success(new Ingredient(name, applicableUnits));
     }
-
-    private static void ValidateUnitsAndThrow(List<MeasureUnit> applicableUnits) => MissingMeasureUnitsException.ThrowIfEmpty(applicableUnits);
 
     public bool IsApplicableUnit(MeasureUnit unit) => ApplicableUnits.Any(x => x == unit);
 
-    public void UpdateApplicableUnits(List<MeasureUnit> applicableUnits)
+    public Result UpdateApplicableUnits(List<MeasureUnit> applicableUnits)
     {
-        ValidateUnitsAndThrow(applicableUnits);
+        if (applicableUnits.Count > 0)
+        {
+            return Result.Failure(DomainErrors.Ingredient.MissingMeasureUnits(Name));
+        }
+        
         ApplicableUnits = applicableUnits;
+        return Result.Success();
     }
 }

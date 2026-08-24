@@ -8,23 +8,24 @@ namespace MealPlanner.Domain.Tests.Ingredients;
 public class UsedIngredientTests
 {
     private const string IngredientName = "Flour";
-    private static readonly Ingredient Ingredient = Ingredient.Create(IngredientName, [MeasureUnit.GlassCup]);
+    private static readonly Ingredient Ingredient = Ingredient.Create(IngredientName, [MeasureUnit.GlassCup]).Value;
 
     [Fact]
     public void Create_FromAction_Succeeds()
     {
         // Arrange
         var recipe = TestRecipes.Create("Test Recipe");
-        var action = AddIngredientAction.Create(Ingredient, 0.75m, MeasureUnit.GlassCup);
+        var action = AddIngredientAction.Create(Ingredient, 0.75m, MeasureUnit.GlassCup).Value;
         
         // Act
         var result = UsedIngredient.Create(recipe, action);
         
         // Assert
         result.Should().NotBeNull();
-        result.Recipe.Should().Be(recipe);
-        result.Ingredient.Should().Be(action.Ingredient);
-        result.Unit.Should().Be(action.Unit);
-        result.Quantity.Should().Be(action.Quantity);
+        result.IsFailure.Should().BeFalse();
+        result.Value.Recipe.Should().Be(recipe);
+        result.Value.Ingredient.Should().Be(action.Ingredient);
+        result.Value.Unit.Should().Be(action.Unit);
+        result.Value.Quantity.Should().Be(action.Quantity);
     }
 }

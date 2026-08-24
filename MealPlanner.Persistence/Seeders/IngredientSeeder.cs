@@ -7,7 +7,7 @@ internal static class IngredientSeeder
 {
     internal static async Task SeedAsync(DbContext context, CancellationToken cancellationToken)
     {
-        var seedData = InitialData.Ingredients();
+        var seedData = InitialData.Ingredients().Select(x => x.Value).ToArray();
         var allLowercaseNames = seedData.Select(i => i.Name.ToLower()).Distinct().ToList();
         var existingIngredients = await GetExistingIngredientsAsync(context, allLowercaseNames, cancellationToken);
 
@@ -44,7 +44,7 @@ internal static class IngredientSeeder
 
     internal static void Seed(DbContext context)
     {
-        var seedData = InitialData.Ingredients();
+        var seedData = InitialData.Ingredients().Select(x => x.Value).ToArray();
         var allLowercaseNames = seedData.Select(i => i.Name.ToLower()).Distinct().ToList();
         var existingIngredients = GetExistingIngredients(context, allLowercaseNames, CancellationToken.None);
 

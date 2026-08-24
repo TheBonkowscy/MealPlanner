@@ -10,6 +10,6 @@ public static class TestIngredients
         name ??= $"Ingredient_{Guid.NewGuid().ToString()}";
         units ??= [.. Enum.GetValues<MeasureUnit>()];
         
-        return Ingredient.Create(name, units);
+        return Ingredient.Create(name, units).Value;
     }
 }

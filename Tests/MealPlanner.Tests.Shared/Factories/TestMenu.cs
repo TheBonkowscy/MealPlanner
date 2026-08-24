@@ -11,8 +11,5 @@ public static class TestMenu
         return Create(date, [addIngredients]);
     }
 
-    public static Menu Create(DateOnly date, List<AddMealAction> mealsToAdd)
-    {
-        return Menu.Create(date, mealsToAdd);
-    }
+    public static Menu Create(DateOnly date, List<AddMealAction> mealsToAdd) => Menu.Create(date, mealsToAdd).Value;
 }

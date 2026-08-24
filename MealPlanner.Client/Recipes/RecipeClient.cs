@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Json;
 using Flurl;
+using MealPlanner.Client.Extensions;
+using MealPlanner.Client.Models;
 using MealPlanner.Shared.Ingredients;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Recipes.Requests;
@@ -53,17 +55,11 @@ internal class RecipeClient(HttpClient httpClient) :
         return GetIngredientsResponse.Empty;
     }
 
-    public async Task<CreateRecipeResponse> CreateRecipe(CreateRecipeRequest createRecipeRequest, CancellationToken cancellationToken)
+    public async Task<ApiResult<CreateRecipeResponse>> CreateRecipe(CreateRecipeRequest createRecipeRequest, CancellationToken cancellationToken)
     {
         var response = await httpClient.PostAsJsonAsync(Constants.RecipesRoute, createRecipeRequest, options: null,
             cancellationToken);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<CreateRecipeResponse>(cancellationToken);
-        }
-
-        throw new Exception("Unable to create recipe");   // TODO: concrete types?
+        return await response.ToApiResult<CreateRecipeResponse>(cancellationToken);
     }
 
     public async Task<bool> Delete(int id, CancellationToken cancellationToken)
@@ -73,32 +69,22 @@ internal class RecipeClient(HttpClient httpClient) :
         return result.IsSuccessStatusCode;
     }
 
-    public async Task<GetRecipeDetailsResponse> UpdateRecipe(int id, UpdateRecipeRequest updateRecipeRequest, CancellationToken cancellationToken)
+    public async Task<ApiResult<GetRecipeDetailsResponse>> UpdateRecipe(int id, UpdateRecipeRequest updateRecipeRequest, CancellationToken cancellationToken)
     {
         var endpoint = Constants.RecipesRoute.AppendPathSegment(id);
         var response =
             await httpClient.PutAsJsonAsync(endpoint, updateRecipeRequest, options: null, cancellationToken);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>(cancellationToken);
-        }
-
-        throw new Exception("Unable to update recipe");   // TODO: concrete types?
+        return await response.ToApiResult<GetRecipeDetailsResponse>(cancellationToken);
     }
 
-    public async Task<GetRecipeDetailsResponse> AddIngredientToRecipe(int id, UpdateRecipeIngredientRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<GetRecipeDetailsResponse>> AddIngredientToRecipe(int id, UpdateRecipeIngredientRequest request, CancellationToken cancellationToken)
     {
         var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/ingredients/").AppendPathSegment(request.Id);
-        var response =
-            await httpClient.PutAsJsonAsync(endpoint, request, options: null, cancellationToken);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>(cancellationToken);
-        }
-
-        throw new Exception("Unable to update ingredients for this recipe");   // TODO: concrete types?
+        var response = await httpClient.PutAsJsonAsync(endpoint,
+            request,
+            options: null,
+            cancellationToken);
+        return await response.ToApiResult<GetRecipeDetailsResponse>(cancellationToken);
     }
 
     public async Task DeleteIngredientFromRecipe(int id, DeleteRecipeIngredientRequest deleteRecipeIngredientRequest,
@@ -120,30 +106,18 @@ internal class RecipeClient(HttpClient httpClient) :
         throw new Exception("Unable to delete ingredients from this recipe");   // TODO: concrete types?
     }
 
-    public async Task<GetRecipeDetailsResponse> AddStep(int id, AddRecipeStepRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<GetRecipeDetailsResponse>> AddStep(int id, AddRecipeStepRequest request, CancellationToken cancellationToken)
     {
         var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/steps/");
         var response = await httpClient.PostAsJsonAsync(endpoint, request, options: null, cancellationToken);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>(cancellationToken);
-        }
-
-        throw new Exception("Unable to add recipe step");   // TODO: concrete types?
+        return await response.ToApiResult<GetRecipeDetailsResponse>(cancellationToken);
     }
 
-    public async Task<GetRecipeDetailsResponse> UpdateStep(int id, UpdateRecipeStepRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<GetRecipeDetailsResponse>> UpdateStep(int id, UpdateRecipeStepRequest request, CancellationToken cancellationToken)
     {
         var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/steps/").AppendPathSegment(request.Id);
         var response = await httpClient.PutAsJsonAsync(endpoint, request, options: null, cancellationToken);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>(cancellationToken);
-        }
-
-        throw new Exception("Unable to update recipe step");   // TODO: concrete types?
+        return await response.ToApiResult<GetRecipeDetailsResponse>(cancellationToken);
     }
 
     public async Task DeleteStep(int id, int stepId, CancellationToken cancellationToken)

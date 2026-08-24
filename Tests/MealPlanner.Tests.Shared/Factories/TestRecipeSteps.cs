@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Domain;
+using MealPlanner.Domain.Recipes;
 
 namespace MealPlanner.Tests.Shared.Factories;
 
@@ -9,7 +10,7 @@ public static class TestRecipeSteps
         order ??= 1;
         instructions ??= $"Instruction_{Guid.NewGuid().ToString()}";
 
-        return RecipeStep.Create(order.Value, instructions);
+        return RecipeStep.Create(order.Value, instructions).Value;
     }
     
 }

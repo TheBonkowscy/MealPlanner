@@ -1,10 +1,9 @@
 ﻿using AwesomeAssertions;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Recipes;
-using MealPlanner.Domain.Recipes.Exceptions;
+using MealPlanner.Domain.Shared;
 using MealPlanner.Persistence;
 using MealPlanner.Services.Recipes;
-using MealPlanner.Services.Recipes.Exceptions;
+using MealPlanner.Services.Shared;
 using MealPlanner.Shared.Recipes.Requests;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
@@ -17,7 +16,6 @@ namespace MealPlanner.Services.Tests.Recipes;
 
 public class RecipeUpdaterTests
 {
-    private readonly Mock<IStringLocalizer<Translations>> _localizer = new();
     private readonly RecipeUpdater _sut;
 
     private static readonly Recipe PreExistingRecipe = TestRecipes.Create("PreExistingRecipe");
@@ -36,48 +34,54 @@ public class RecipeUpdaterTests
         _recipes.Add(PreExistingRecipe);
         
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
-        _sut = new RecipeUpdater(ctx.Object, new RecipeMapper(new MeasureUnitMapper(_localizer.Object)));
+        _sut = new RecipeUpdater(ctx.Object, new RecipeMapper(new MeasureUnitMapper(new Mock<IStringLocalizer<Translations>>().Object)));
     }
     
     [Fact]
-    public async Task Update_Throws_WhenRecipeDoesNotExist()
+    public async Task Update_Fails_WhenRecipeDoesNotExist()
     {
         // Arrange
         var request = new UpdateRecipeRequest(Guid.NewGuid().ToString(), 1);
         
         // Act
-        var result = () => _sut.Update(999, request, CancellationToken.None);
+        var result = await _sut.Update(999, request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<RecipeDoesNotExistException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Recipe.DoesNotExist);
     }
     
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
-    public async Task Update_Throws_WhenNameIsInvalid(string name)
+    public async Task Update_Fails_WhenNameIsInvalid(string name)
     {
         // Arrange
         var request = new UpdateRecipeRequest(name, 1);
         
         // Act
-        var result = () => _sut.Update(PreExistingRecipe.Id, request, CancellationToken.None);
+        var result = await _sut.Update(PreExistingRecipe.Id, request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<MissingRecipeNameException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidName(name));
     }
     
     [Theory]
     [ClassData(typeof(NegativeNumbersTestDataProvider))]
-    public async Task Update_Throws_WhenServingsAreOutOfRange(int servings)
+    public async Task Update_Fails_WhenServingsAreOutOfRange(int servings)
     {
         // Arrange
         var request = new UpdateRecipeRequest(Guid.NewGuid().ToString(), servings);
         
         // Act
-        var result = () => _sut.Update(PreExistingRecipe.Id, request, CancellationToken.None);
+        var result = await _sut.Update(PreExistingRecipe.Id, request, CancellationToken.None);
         
         // Assert
-        await result.Should().ThrowAsync<InvalidNumberOfServingsException>();
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidServings(servings));
     }
     
     [Fact]
@@ -91,7 +95,8 @@ public class RecipeUpdaterTests
         
         // Assert
         result.Should().NotBeNull();
-        result.Name.Should().Be(request.Name);
-        result.Servings.Should().Be(request.Servings);
+        result.IsFailure.Should().BeFalse();
+        result.Value.Name.Should().Be(request.Name);
+        result.Value.Servings.Should().Be(request.Servings);
     }
 }

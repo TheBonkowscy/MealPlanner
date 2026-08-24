@@ -1,6 +1,5 @@
-﻿using MealPlanner.Domain.Menus.Exceptions;
-using MealPlanner.Domain.Recipes;
-using MealPlanner.Domain.Recipes.Exceptions;
+﻿using MealPlanner.Domain.Recipes;
+using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Menus;
 
@@ -30,13 +29,13 @@ public class Meal
         Servings = servings;
     }
 
-    public static Meal Create(Menu menu, Recipe recipe, int order, int servings)
+    public static Result<Meal> Create(Menu? menu, Recipe? recipe, int order, int servings)
     {
-        MissingMenuException.ThrowIfMenuIsNull(menu);
-        MissingRecipeException.ThrowIfRecipeIsNull(recipe);
-        InvalidMealOrderException.ThrowIfOrderIsInvalid(order);
-        InvalidNumberOfMealServingsException.ThrowIfServingsIsInvalid(servings);
-        
-        return new Meal(menu, recipe, order, servings);
+        var errors = new List<Error>();
+        errors.AddRule(menu is not null, DomainErrors.Menu.IsNull)
+            .AddRule(recipe is not null, DomainErrors.Recipe.IsNull)
+            .AddRule(order >= Menu.MinOrder, DomainErrors.Meal.InvalidOrder(order))
+            .AddRule(servings >= 1, DomainErrors.Meal.InvalidServings(servings));
+        return errors.Count != 0 ? Result.Failure<Meal>(errors) : Result.Success(new Meal(menu, recipe, order, servings));
     }
 }
