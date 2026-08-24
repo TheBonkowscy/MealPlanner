@@ -111,6 +111,6 @@ public class MenuCreatorTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Menu.AlreadyExists);
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Menu.AlreadyExists(conflictingRequest.Date));
     }
 }

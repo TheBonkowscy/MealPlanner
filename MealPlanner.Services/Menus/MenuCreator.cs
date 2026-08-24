@@ -21,7 +21,7 @@ public class MenuCreator(MealPlannerDbContext ctx,
         var menuAlreadyExists = await ctx.Menus.AnyAsync(x => x.Date == createMenuRequest.Date, ct);
         if (menuAlreadyExists)
         {
-            return Result.Failure<CreateMenuResponse>(ServiceErrors.Menu.AlreadyExists);
+            return Result.Failure<CreateMenuResponse>(ServiceErrors.Menu.AlreadyExists(createMenuRequest.Date));
         }
 
         if (createMenuRequest.Meals is { Count: 0 })

@@ -83,7 +83,7 @@ public class MenuUpdaterTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Menu.DoesNotExist);
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Menu.DoesNotExist(request.Date));
 
         _ctx.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }

@@ -56,7 +56,91 @@
     <data name="Slice2" xml:space="preserve">
         <value>plast.</value>
     </data>
-    <data name="MissingRecipesById" xml:space="preserve">
-        <value>Nie odnaleziono przepisów o podanych ID: {0}</value>
+    <data name="IngredientDoesNotExist" xml:space="preserve">
+        <value>Nie odnaleziono składników o ID: {0}</value>
+    </data>
+    <data name="IngredientUnitNotApplicable" xml:space="preserve">
+        <value>Składnik {0} nie może być mierzony miarą {1}</value>
+    </data>
+    <data name="InvalidIngredientName" xml:space="preserve">
+        <value>Podaj prawidłową nazwę składnika</value>
+    </data>
+    <data name="InvalidIngredientQuantity" xml:space="preserve">
+        <value>Ilość {0} jest nieprawidłowa dla składnika {1}</value>
+    </data>
+    <data name="InvalidMealOrder" xml:space="preserve">
+        <value>Kolejność {0} jest nieprawidłowa dla posiłku</value>
+    </data>
+    <data name="InvalidMealOrderInMenu" xml:space="preserve">
+        <value>Kolejność {0} jest nieprawidłowa dla posiłku w menu</value>
+    </data>
+    <data name="InvalidMealServings" xml:space="preserve">
+        <value>Posiłek nie może mieć {0} porcji</value>
+    </data>
+    <data name="InvalidMealsInMenu" xml:space="preserve">
+        <value>Liczba posiłków jest nieprawidłowa</value>
+    </data>
+    <data name="InvalidRecipeIngredients" xml:space="preserve">
+        <value>Podaj składniki i ich prawidłową liczbę</value>
+    </data>
+    <data name="InvalidRecipeName" xml:space="preserve">
+        <value>Podaj prawidłową nazwę przepisu</value>
+    </data>
+    <data name="InvalidRecipeServings" xml:space="preserve">
+        <value>Podaj prawidłową liczbę porcji jakie daje przepis</value>
+    </data>
+    <data name="InvalidRecipeStepInstruction" xml:space="preserve">
+        <value>Podaj prawidłowe instrukcje dla kroku przepisu</value>
+    </data>
+    <data name="InvalidRecipeStepOrder" xml:space="preserve">
+        <value>Kolejność {0} jest nieprawidłowa dla kroku przepisu</value>
+    </data>
+    <data name="InvalidRecipeSteps" xml:space="preserve">
+        <value>Podaj kroki przepisu</value>
+    </data>
+    <data name="MealAlreadyExistsAtPosition" xml:space="preserve">
+        <value>Na pozycji #{0} znajduje się już posiłek</value>
+    </data>
+    <data name="MealAlreadyPresentInTheMenu" xml:space="preserve">
+        <value>Posiłek {0} został już dodany do menu</value>
+    </data>
+    <data name="MealDetailsMissing" xml:space="preserve">
+        <value>Nie znaleziono szczegółów posiłku</value>
+    </data>
+    <data name="MenuAlreadyExists" xml:space="preserve">
+        <value>Menu na {0} już istnieje</value>
+    </data>
+    <data name="MenuDateTooFarInTheFuture" xml:space="preserve">
+        <value>Data dla menu jest zbyt daleko w przyszłości</value>
+    </data>
+    <data name="MenuDateTooFarInThePast" xml:space="preserve">
+        <value>Data dla menu jest zbyt daleko w przeszłości</value>
+    </data>
+    <data name="MenuDateUnset" xml:space="preserve">
+        <value>Podaj prawidłową datę dla menu</value>
+    </data>
+    <data name="MenuDoesNotExist" xml:space="preserve">
+        <value>Menu na dzień {0} nie istnieje</value>
+    </data>
+    <data name="MenuIsNull" xml:space="preserve">
+        <value>Podaj prawidłowe menu</value>
+    </data>
+    <data name="MissingIngredientMeasureUnits" xml:space="preserve">
+        <value>Podaj jednostki miary dla składnika {0}</value>
+    </data>
+    <data name="MissingMealRecipesById" xml:space="preserve">
+        <value>Nie odnaleziono składników o ID: {0}</value>
+    </data>
+    <data name="RecipeAlreadyExists" xml:space="preserve">
+        <value>Przepis o tej nazwie już istnieje</value>
+    </data>
+    <data name="RecipeDoesNotExist" xml:space="preserve">
+        <value>Nie odnaleziono wskazanego przepisu</value>
+    </data>
+    <data name="RecipeIsNull" xml:space="preserve">
+        <value>Podaj prawidłowy przepis</value>
+    </data>
+    <data name="RecipeStepNotFound" xml:space="preserve">
+        <value>Krok przepisu nie został odnaleziony</value>
     </data>
 </root>

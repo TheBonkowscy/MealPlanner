@@ -23,7 +23,7 @@ public class AddIngredientActionTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.UnitNotApplicable(missingUnit));
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.UnitNotApplicable(missingUnit, ingredientToAdd.Name));
     }
     
     [Fact]
@@ -38,7 +38,7 @@ public class AddIngredientActionTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.InvalidQuantity(-SharedExpectedQuantity));
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.InvalidQuantity(-SharedExpectedQuantity, ingredientToAdd.Name));
     }
     
     [Fact]

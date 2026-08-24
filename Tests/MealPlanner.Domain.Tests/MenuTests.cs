@@ -75,7 +75,7 @@ public class MenuTests
         
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Meal.AlreadyExistsAtPosition);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Meal.AlreadyExistsAtPosition(order));
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class MenuTests
         
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Meal.AlreadyPresentInTheDay);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Meal.AlreadyPresentInTheDay(thirdMeal.Recipe.Name));
     }
 
     [Fact]

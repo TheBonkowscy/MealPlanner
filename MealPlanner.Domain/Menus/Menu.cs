@@ -62,14 +62,14 @@ public class Menu
         errors.AddRule(!(order > _meals.Count + 1 && _meals.Count != 0), DomainErrors.Menu.InvalidMealOrder);
 
         var mealAtIndex = GetRecipe(order);
-        errors.AddRule(mealAtIndex is null, DomainErrors.Meal.AlreadyExistsAtPosition);
+        errors.AddRule(mealAtIndex is null, DomainErrors.Meal.AlreadyExistsAtPosition(order));
 
         return errors.Count != 0 ? Result.Failure(errors) : Result.Success();
     }
     
     public Recipe? GetRecipe(int order) => _meals.FirstOrDefault(x => x.Order == order)?.Recipe;
 
-    private Result ValidateRecipe(Recipe recipe) => HasRecipe(recipe) ? Result.Failure(DomainErrors.Meal.AlreadyPresentInTheDay) : Result.Success();
+    private Result ValidateRecipe(Recipe recipe) => HasRecipe(recipe) ? Result.Failure(DomainErrors.Meal.AlreadyPresentInTheDay(recipe.Name)) : Result.Success();
 
     private bool HasRecipe(Recipe recipe) => _meals.Any(x => x.Recipe.Equals(recipe));
     

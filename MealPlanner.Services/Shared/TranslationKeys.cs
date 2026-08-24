@@ -4,26 +4,26 @@ public static class TranslationKeys
 {
     public static class Meal
     {
-        public const string MissingRecipesById = nameof(MissingRecipesById);
-        public const string DetailsMissing = nameof(DetailsMissing);
+        public const string MissingMealRecipesById = nameof(MissingMealRecipesById);
+        public const string MealDetailsMissing = nameof(MealDetailsMissing);
     }
 
     public static class Menu
     {
-        public const string DoesNotExist = nameof(DoesNotExist);
-        public const string AlreadyExists = nameof(AlreadyExists);
-        public const string InvalidMeals = nameof(InvalidMeals);
+        public const string MenuDoesNotExist = nameof(MenuDoesNotExist);
+        public const string MenuAlreadyExists = nameof(MenuAlreadyExists);
+        public const string InvalidMealsInMenu = nameof(InvalidMealsInMenu);
     }
 
     public static class Recipe
     {
-        public const string DoesNotExist = nameof(DoesNotExist);
-        public const string AlreadyExists = nameof(AlreadyExists);
-        public const string InvalidIngredients = nameof(InvalidIngredients);
+        public const string RecipeDoesNotExist = nameof(RecipeDoesNotExist);
+        public const string RecipeAlreadyExists = nameof(RecipeAlreadyExists);
+        public const string InvalidRecipeIngredients = nameof(InvalidRecipeIngredients);
     }
 
     public static class Ingredient
     {
-        public const string DoesNotExist = nameof(DoesNotExist);
+        public const string IngredientDoesNotExist = nameof(IngredientDoesNotExist);
     }
 }

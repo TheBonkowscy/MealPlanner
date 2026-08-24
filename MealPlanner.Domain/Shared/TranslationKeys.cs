@@ -4,42 +4,42 @@ public static class TranslationKeys
 {
     public static class Ingredient
     {
-        public const string InvalidQuantity = nameof(InvalidQuantity);
-        public const string UnitNotApplicable = nameof(UnitNotApplicable);
-        public const string InvalidName = nameof(InvalidName);
-        public const string MissingMeasureUnits = nameof(MissingMeasureUnits);
+        public const string InvalidIngredientQuantity = nameof(InvalidIngredientQuantity);
+        public const string IngredientUnitNotApplicable = nameof(IngredientUnitNotApplicable);
+        public const string InvalidIngredientName = nameof(InvalidIngredientName);
+        public const string MissingIngredientMeasureUnits = nameof(MissingIngredientMeasureUnits);
     }
 
     public static class Recipe
     {
-        public const string InvalidName = nameof(InvalidName);
-        public const string InvalidServings = nameof(InvalidServings);
-        public const string InvalidIngredients = nameof(InvalidIngredients);
-        public const string InvalidSteps = nameof(InvalidSteps);
-        public const string IsNull = "RecipeIsNull";
+        public const string InvalidRecipeName = nameof(InvalidRecipeName);
+        public const string InvalidRecipeServings = nameof(InvalidRecipeServings);
+        public const string InvalidRecipeIngredients = nameof(InvalidRecipeIngredients);
+        public const string InvalidRecipeSteps = nameof(InvalidRecipeSteps);
+        public const string RecipeIsNull = nameof(RecipeIsNull);
     }
 
     public static class RecipeStep
     {
-        public const string InvalidOrder = nameof(InvalidOrder);
-        public const string InvalidInstruction = nameof(InvalidInstruction);
-        public const string NotFound = "RecipeStepNotFound";
+        public const string InvalidRecipeStepOrder = nameof(InvalidRecipeStepOrder);
+        public const string InvalidRecipeStepInstruction = nameof(InvalidRecipeStepInstruction);
+        public const string RecipeStepNotFound = nameof(RecipeStepNotFound);
     }
 
     public static class Meal
     {
-        public const string InvalidOrder = nameof(InvalidOrder);
-        public const string InvalidServings = nameof(InvalidServings);
-        public const string AlreadyExistsAtPosition = nameof(AlreadyExistsAtPosition);
-        public const string AlreadyPresentInTheDay = nameof(AlreadyPresentInTheDay);
+        public const string InvalidMealOrder = nameof(InvalidMealOrder);
+        public const string InvalidMealServings = nameof(InvalidMealServings);
+        public const string MealAlreadyExistsAtPosition = nameof(MealAlreadyExistsAtPosition);
+        public const string MealAlreadyPresentInTheDay = nameof(MealAlreadyPresentInTheDay);
     }
 
     public static class Menu
     {
-        public const string IsNull = "MenuIsNull";
-        public const string InvalidMealOrder = nameof(InvalidMealOrder);
-        public const string DateUnset = nameof(DateUnset);
-        public const string DateTooFarInThePast = nameof(DateTooFarInThePast);
-        public const string DateTooFarInTheFuture = nameof(DateTooFarInTheFuture);
+        public const string MenuIsNull = nameof(MenuIsNull);
+        public const string InvalidMealOrderInMenu = nameof(InvalidMealOrderInMenu);
+        public const string MenuDateUnset = nameof(MenuDateUnset);
+        public const string MenuDateTooFarInThePast = nameof(MenuDateTooFarInThePast);
+        public const string MenuDateTooFarInTheFuture = nameof(MenuDateTooFarInTheFuture);
     }
 }

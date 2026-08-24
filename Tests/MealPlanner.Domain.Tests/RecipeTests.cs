@@ -38,7 +38,7 @@ public class RecipeTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidIngredients);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Recipe.InvalidRecipeIngredients);
     }
 
     [Fact]

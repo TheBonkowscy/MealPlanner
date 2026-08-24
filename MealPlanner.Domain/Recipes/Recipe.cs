@@ -51,7 +51,7 @@ public class Recipe
         var errors = new List<Error>();
         errors.AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName(name))
             .AddRule(ValidateServings(servings), DomainErrors.Recipe.InvalidServings(servings))
-            .AddRule(ValidateIngredients(ingredientsToAdd), DomainErrors.Recipe.InvalidIngredients)
+            .AddRule(ValidateIngredients(ingredientsToAdd), DomainErrors.Recipe.InvalidRecipeIngredients)
             .AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps);
 
         if (errors.Count > 0)

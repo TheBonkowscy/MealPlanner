@@ -32,7 +32,7 @@ public class IngredientTests
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.MissingMeasureUnits);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Ingredient.MissingMeasureUnits(Name));
     }
     
     [Fact]

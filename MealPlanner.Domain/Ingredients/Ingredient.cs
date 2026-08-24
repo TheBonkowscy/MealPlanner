@@ -25,7 +25,7 @@ public class Ingredient
     {
         var errors = new List<Error>();
         errors.AddRule(!string.IsNullOrWhiteSpace(name), DomainErrors.Ingredient.InvalidName(name))
-            .AddRule(applicableUnits.Count > 0, DomainErrors.Ingredient.MissingMeasureUnits);
+            .AddRule(applicableUnits.Count > 0, DomainErrors.Ingredient.MissingMeasureUnits(name));
 
         return errors.Count > 0 ? Result.Failure<Ingredient>(errors) : Result.Success(new Ingredient(name, applicableUnits));
     }
@@ -36,7 +36,7 @@ public class Ingredient
     {
         if (applicableUnits.Count > 0)
         {
-            return Result.Failure(DomainErrors.Ingredient.MissingMeasureUnits);
+            return Result.Failure(DomainErrors.Ingredient.MissingMeasureUnits(Name));
         }
         
         ApplicableUnits = applicableUnits;

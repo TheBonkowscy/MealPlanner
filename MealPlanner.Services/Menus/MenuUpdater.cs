@@ -28,7 +28,7 @@ public class MenuUpdater(MealPlannerDbContext ctx,
             .FirstOrDefaultAsync(x => x.Date == request.Date, cancellationToken);
         if (menu is null)
         {
-            return Result.Failure<UpdateMenuResponse>(ServiceErrors.Menu.DoesNotExist);
+            return Result.Failure<UpdateMenuResponse>(ServiceErrors.Menu.DoesNotExist(request.Date));
         }
 
         // 1. Remove all meals - this will work for now, revisit this when the meal model is extended
