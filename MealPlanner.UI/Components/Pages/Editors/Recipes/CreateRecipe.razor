@@ -316,10 +316,15 @@
 
         var request = new CreateRecipeRequest(_recipeName, _servings, finalIngredients, finalSteps);
         var response = await RecipeCreator.CreateRecipe(request, _cts.Token);
-
-        Snackbar.Add("Pomyślnie dodano nowy przepis!", Severity.Success);
-
-         Navigation.NavigateTo(RoutingConstants.Recipes.DetailsFor(response.Id));
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Pomyślnie dodano nowy przepis!", Severity.Success);
+            Navigation.NavigateTo(RoutingConstants.Recipes.DetailsFor(response.Value!.Id));
+        }
+        else
+        {
+            Snackbar.Add(response.Error!.Message, Severity.Error);
+        }
     }
 
     public void Dispose()

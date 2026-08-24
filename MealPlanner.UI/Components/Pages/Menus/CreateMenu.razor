@@ -86,30 +86,27 @@
     private RecipeByIdDto? _selectedMeal;
     private readonly CancellationTokenSource _cts = new();
 
-    protected override async Task OnParametersSetAsync()
+    protected override Task OnParametersSetAsync()
     {
         _meals.Clear();
 
         var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u002B";
         AppBarService.SetTitle(formattedTitle);
+        return Task.CompletedTask;
     }
 
     private void ItemDropped(MudItemDropInfo<MealDto> dropItem)
     {
-        if (dropItem?.Item is null) return;
+        if (dropItem.Item is null) return;
 
-        // 1. Usuwamy przeciągnięty element
         _meals.Remove(dropItem.Item);
 
-        // 2. Wyznaczamy i zabezpieczamy indeks docelowy
         var targetIndex = dropItem.IndexInZone;
         if (targetIndex < 0) targetIndex = 0;
         if (targetIndex > _meals.Count) targetIndex = _meals.Count;
 
-        // 3. Wstawiamy go na właściwą pozycję
         _meals.Insert(targetIndex, dropItem.Item);
 
-        // 4. Odświeżamy indeksy Order
         for (var i = 0; i < _meals.Count; i++)
         {
             _meals[i].Order = i;
@@ -159,10 +156,16 @@
 
         var request = new CreateMenuRequest(DateOnly.FromDateTime(Date), meals);
         var response = await CreateMenus.CreateMenu(request, _cts.Token);
-        Snackbar.Add("Utworzono nowe menu!", Severity.Success);
-
-        MenuStateService.NotifyMenuChanged();
-        Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Date));
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Utworzono nowe menu!", Severity.Success);
+            MenuStateService.NotifyMenuChanged();
+            Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Value!.Date));
+        }
+        else
+        {
+            Snackbar.Add(response.Error!.Message, Severity.Error);
+        }
     }
 
     public void Dispose()

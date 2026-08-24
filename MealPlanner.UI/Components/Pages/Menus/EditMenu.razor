@@ -128,18 +128,14 @@
     {
         if (dropItem?.Item is null) return;
 
-        // 1. Usuwamy przeciągnięty element
         _meals.Remove(dropItem.Item);
 
-        // 2. Wyznaczamy i zabezpieczamy indeks docelowy
         var targetIndex = dropItem.IndexInZone;
         if (targetIndex < 0) targetIndex = 0;
         if (targetIndex > _meals.Count) targetIndex = _meals.Count;
 
-        // 3. Wstawiamy go na właściwą pozycję
         _meals.Insert(targetIndex, dropItem.Item);
 
-        // 4. Odświeżamy indeksy Order
         for (var i = 0; i < _meals.Count; i++)
         {
             _meals[i].Order = i;
@@ -187,9 +183,15 @@
         var orderedMeals = _meals.Select(x => new AddMealRequest(x.Id, x.Order + 1, x.Servings)).ToList();
         var request = new UpdateMenuRequest(DateOnly.FromDateTime(Date), orderedMeals);
         var response = await MenusUpdater.Update(request, _cts.Token);
-        Snackbar.Add("Pomyślnie edytowano menu!", Severity.Success);
-        
-        Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Date));
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Pomyślnie edytowano menu!", Severity.Success);
+            Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Value!.Date));
+        }
+        else
+        {
+            Snackbar.Add(response.Error!.Message, Severity.Error);
+        }
     }
     
     private async Task<List<MealDto>> FetchMenuForDateAsync(DateTime date)

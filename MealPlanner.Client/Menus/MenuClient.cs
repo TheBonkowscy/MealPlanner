@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Json;
 using Flurl;
+using MealPlanner.Client.Extensions;
+using MealPlanner.Client.Models;
 using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
@@ -8,17 +10,13 @@ namespace MealPlanner.Client.Menus;
 
 internal class MenuClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IUpdateMenus, IDeleteMenus
 {
-    public async Task<CreateMenuResponse> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
+    public async Task<ApiResult<CreateMenuResponse>> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
     {
-        var response = await httpClient.PostAsJsonAsync(Constants.MenusRoute, createMenuRequest, options: null,
+        var response = await httpClient.PostAsJsonAsync(Constants.MenusRoute,
+            createMenuRequest,
+            options: null,
             cancellationToken);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<CreateMenuResponse>(cancellationToken);
-        }
-
-        throw new Exception("Unable to create menu");   // TODO: concrete types?
+        return await response.ToApiResult<CreateMenuResponse>(cancellationToken);
     }
 
     public async Task<GetMenuResponse?> Get(int id, CancellationToken cancellationToken)
@@ -73,17 +71,12 @@ internal class MenuClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IUp
         return GetExistingMenusResponse.Empty;
     }
 
-    public async Task<UpdateMenuResponse> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<UpdateMenuResponse>> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
     {
         var response = await httpClient.PutAsJsonAsync(AppendDateToBaseUri(request.Date.ToString("yyyy-MM-dd")), request, options: null,
             cancellationToken);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<UpdateMenuResponse>(cancellationToken);
-        }
-
-        throw new Exception("Unable to update menu");   // TODO: concrete types?
+        return await response.ToApiResult<UpdateMenuResponse>(cancellationToken);
     }
 
     public async Task<bool> Delete(DateOnly date, CancellationToken cancellationToken)
