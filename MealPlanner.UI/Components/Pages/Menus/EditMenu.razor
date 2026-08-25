@@ -5,6 +5,7 @@
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Models.Editors
 @using MealPlanner.UI.Services
+@using Microsoft.Extensions.Localization
 @inherits ComponentBase
 @implements IDisposable
 @inject IUpdateMenus MenusUpdater
@@ -16,11 +17,10 @@
 @inject AppBarService AppBarService
 @inject MealMapper MealMapper
 @inject IDialogService DialogService
-
-<h3>@($"Edycja menu na dzień {Date:dd.MM.yyyy}")</h3>
+@inject IStringLocalizer<Translations> L
 
 <MudPaper Class="pa-6 ma-4" Elevation="3">
-    <MudText Typo="Typo.h5" Class="mb-4">Przeciągnij, aby zmienić kolejność posiłków</MudText>
+    <MudText Typo="Typo.h5" Class="mb-4">@L[TranslationKeys.MenuEditor.MenuEditorDragToReorderTitle]</MudText>
 
     <MudDropContainer @ref="_container"
                       T="MealDto" 
@@ -41,7 +41,7 @@
                         </div>
                         <div class="d-flex align-center gap-3">
                             <MudNumericField @bind-Value="context.Servings"
-                                             Label="Liczba porcji"
+                                             Label="@L[TranslationKeys.MenuEditor.MenuEditorNumberOfServingsTitle]"
                                              Min="1"
                                              Step="1"
                                              Variant="Variant.Outlined"
@@ -58,9 +58,9 @@
     </MudDropContainer>
 
     <MudPaper Class="pa-4 mt-4 mud-theme-light" Elevation="1">
-        <MudText Typo="Typo.subtitle2" Class="mb-2">Dodaj nowy posiłek do menu:</MudText>
+        <MudText Typo="Typo.subtitle2" Class="mb-2">@L[TranslationKeys.MenuEditor.MenuEditorAddMealToMenuTitle]</MudText>
         <MudAutocomplete T="RecipeByIdDto"
-                         Label="Szukaj potrawy..."
+                         Label="@L[TranslationKeys.MenuEditor.MenuEditorSearchForMealTitle]"
                          Value="_selectedMeal"
                          ValueChanged="OnMealSelected"
                          SearchFunc="SearchRecipesAsync"
@@ -76,7 +76,7 @@
                StartIcon="@Icons.Material.Filled.Save"
                Class="mt-6" 
                OnClick="SaveMenuAsync">
-        Zapisz zmiany
+        @L[TranslationKeys.MenuEditor.MenuEditorSaveChangesButtonTitle]
     </MudButton>
 </MudPaper>
 
@@ -92,7 +92,7 @@
     {
         _meals.Clear();
         
-        var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u270F";
+        var formattedTitle = $"{L[TranslationKeys.MenuEditor.MenuEditorWeekNameApplicationTitle]} {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \u270F";
         AppBarService.SetTitle(formattedTitle);
     
         _meals = await FetchMenuForDateAsync(Date);
@@ -100,14 +100,14 @@
         AppBarService.SetActions(new AppBarAction
         {
             Icon = Icons.Material.Filled.Undo,
-            Tooltip = "Powrót do szczegółów",
+            Tooltip = L[TranslationKeys.MenuEditor.MenuEditorBackToDetailsActionTitle],
             OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(DateOnly.FromDateTime(Date))))
         });
         
         AppBarService.SetActions(new AppBarAction
         {
             Icon = Icons.Material.Filled.Delete,
-            Tooltip = "Usuń menu",
+            Tooltip = L[TranslationKeys.MenuEditor.MenuEditorDeleteMenuActionTitle],
             Color = Color.Error,
             OnClick = EventCallback.Factory.Create(this, ConfirmAndDeleteAsync)
         });
@@ -181,7 +181,7 @@
     {
         if (!_meals.Any())
         {
-            Snackbar.Add("Dodaj co najmniej jeden posiłek!", Severity.Warning);
+            Snackbar.Add(L[TranslationKeys.MenuEditor.MenuEditorValidationMealsError], Severity.Warning);
             return;
         }
 
@@ -190,7 +190,7 @@
         var response = await MenusUpdater.Update(request, _cts.Token);
         if (response.IsSuccess)
         {
-            Snackbar.Add("Pomyślnie edytowano menu!", Severity.Success);
+            Snackbar.Add(L[TranslationKeys.MenuEditor.MenuEditorMenuEditedSuccessfullyTitle], Severity.Success);
             Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(response.Value!.Date));
         }
         else

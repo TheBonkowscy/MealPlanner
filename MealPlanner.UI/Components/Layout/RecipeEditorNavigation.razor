@@ -1,16 +1,18 @@
 ﻿@using MealPlanner.UI.Models
+@using Microsoft.Extensions.Localization
 @implements IDisposable
 
 @inject NavigationManager Navigation
+@inject IStringLocalizer<Translations> L
 
 <MudNavMenu>
     <MudNavGroup 
-        Title="Recipe Editor"
+        Title="@L[TranslationKeys.RecipeEditorNavigation.RecipeEditorNavigationTitle]"
         Expanded="@IsActiveEditorCategory(EditorCategory.Recipes)"
         Class="@GetActiveEditorCategoryClass(EditorCategory.Recipes)">
         <MudNavMenu Class="ml-4">
             <div class="d-flex align-center justify-space-between @GetActiveEditorClass(RecipeEditorNavigationLink.List)">
-                <MudNavLink Href="@(RoutingConstants.Editors.Recipe.List)">List</MudNavLink>
+                <MudNavLink Href="@(RoutingConstants.Editors.Recipe.List)">@L[TranslationKeys.RecipeEditorNavigation.RecipeListLinkTitle]</MudNavLink>
                 <MudIconButton
                     Icon="@Icons.Material.Filled.List"
                     Size="Size.Small"
@@ -18,7 +20,7 @@
                     OnClick="@(() => Navigation.NavigateTo(RoutingConstants.Editors.Recipe.List))" />
             </div>
             <div class="d-flex align-center justify-space-between @GetActiveEditorClass(RecipeEditorNavigationLink.Create)">
-                <MudNavLink Href="@(RoutingConstants.Editors.Recipe.Create)">Create</MudNavLink>
+                <MudNavLink Href="@(RoutingConstants.Editors.Recipe.Create)">@L[TranslationKeys.RecipeEditorNavigation.RecipeCreateLinkTitle]</MudNavLink>
                 <MudIconButton
                     Icon="@Icons.Material.Filled.Add"
                     Size="Size.Small"

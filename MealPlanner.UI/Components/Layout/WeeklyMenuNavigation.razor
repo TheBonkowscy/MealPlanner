@@ -2,16 +2,18 @@
 @using MealPlanner.Shared.Menus.Responses
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
+@using Microsoft.Extensions.Localization
 
 @implements IDisposable
 @inject IFindMenus FindMenus
 @inject NavigationManager Navigation
 @inject IMenuStateService MenuStateService
+@inject IStringLocalizer<Translations> L
 
 <MudNavMenu>
     @foreach (var week in _weeks)
     {
-        <MudNavGroup Title="@($"Week {week.WeekNumber} of {week.Year}")"
+        <MudNavGroup Title="@(L[TranslationKeys.WeeklyMenuNavigation.WeeklyMenuNavigationTitle, week.WeekNumber, week.Year])"
                      Expanded="@IsExpanded(week)"
                      ExpandedChanged="@(() => SelectWeek(week))"
                      Class="@GetWeekTitleClass(week)">
