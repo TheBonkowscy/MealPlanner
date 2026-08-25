@@ -23,7 +23,7 @@ public class RecipeReader(MealPlannerDbContext ctx, RecipeMapper recipeMapper) :
         }
 
         var result = await dbQuery.ToListAsync(cancellationToken);
-        return new GetRecipesResponse(result.Select(x => new RecipeListItemResponse(x.Id, x.Name)));
+        return new GetRecipesResponse(result.Select(x => new RecipeListItemResponse(x.Id, x.Name, x.Servings)));
     }
 
     public async Task<GetRecipeDetailsResponse?> Get(int id, CancellationToken cancellationToken = default)

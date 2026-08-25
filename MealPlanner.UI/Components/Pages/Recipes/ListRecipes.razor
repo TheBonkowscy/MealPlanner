@@ -1,0 +1,156 @@
+﻿@page "/recipes"
+@using MealPlanner.Client.Recipes
+@using MealPlanner.Shared.Recipes.Responses
+@implements IDisposable
+@inject IFindRecipes RecipeFinder
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudGrid Class="mb-4" AlignItems="Center">
+        <MudItem xs="12" sm="8" md="9">
+            <MudTextField T="string"
+                          Value="_searchQuery"
+                          ValueChanged="OnSearchQueryChanged"
+                          Label="Szukaj przepisu..."
+                          Variant="Variant.Outlined"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          AdornmentColor="Color.Primary"
+                          DebounceInterval="300"
+                          Immediate="true"
+                          Clearable="true"
+                          OnClearButtonClick="ClearSearch" />
+        </MudItem>
+        <MudItem xs="12" sm="4" md="3" Class="d-flex justify-end align-center">
+            <MudText Class="mr-2" Typo="Typo.body2">Widok:</MudText>
+            <MudToggleIconButton @bind-Toggled="_isGridView"
+                                 Icon="@Icons.Material.Filled.List"
+                                 ToggledIcon="@Icons.Material.Filled.GridView"
+                                 Color="Color.Primary"
+                                 ToggledColor="Color.Primary"
+                                 Title="Przełącz na kafelki"
+                                 ToggledTitle="Przełącz na listę"/>
+        </MudItem>
+    </MudGrid>
+
+    @if (_loading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
+    }
+    else if (!_recipes.Any())
+    {
+        <MudAlert Severity="Severity.Info" Class="mt-4">Brak przepisów do wyświetlenia.</MudAlert>
+    }
+    else
+    {
+        @if (_isGridView)
+        {
+            <MudGrid>
+                @foreach (var recipe in _recipes)
+                {
+                    <MudItem xs="12" sm="6" md="4" Class="d-flex">
+                        <MudCard Elevation="2" Class="d-flex flex-column h-100 flex-grow-1">
+                            <MudCardMedia Image="https://placehold.co/600x400/orange/white?text=Przepis" Height="180" Title="@recipe.Name" />
+
+                            <MudCardContent Style="display: flex; flex-direction: column; flex-grow: 1;">
+                                <MudText Typo="Typo.h6" Class="mb-2">@recipe.Name</MudText>
+
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-3">
+                                    <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Default" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2">
+                                        Porcje: <b>@recipe.Servings</b>
+                                    </MudText>
+                                </MudStack>
+
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary" Style="margin-bottom: auto;">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                </MudText>
+                            </MudCardContent>
+
+                            <MudCardActions Class="pt-0">
+                                <MudButton Variant="Variant.Text" Color="Color.Primary">Zobacz przepis</MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+        else
+        {
+            <MudPaper Elevation="2">
+                <MudList T="RecipeListItemResponse">
+                    @foreach (var recipe in _recipes)
+                    {
+                        <MudListItem Icon="@Icons.Material.Filled.RestaurantMenu">
+                            <div class="d-flex justify-space-between align-center w-100">
+                                <div>
+                                    <MudText Typo="Typo.subtitle1"><b>@recipe.Name</b></MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+                                    </MudText>
+                                </div>
+                                <MudChip T="string" Icon="@Icons.Material.Filled.People" Color="Color.Default"
+                                         Size="Size.Small" Class="ml-4">
+                                    @recipe.Servings porcji
+                                </MudChip>
+                            </div>
+                        </MudListItem>
+                        <MudDivider/>
+                    }
+                </MudList>
+            </MudPaper>
+        }
+    }
+</MudContainer>
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+    private IEnumerable<RecipeListItemResponse> _recipes = new List<RecipeListItemResponse>();
+    private string _searchQuery = string.Empty;
+    private bool _isGridView = true;
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRecipesAsync();
+    }
+
+    private async Task LoadRecipesAsync()
+    {
+        _loading = true;
+        try
+        {
+            var response = await RecipeFinder.Get(_searchQuery, _cts.Token);
+            _recipes = response.Recipes;
+        }
+        catch (Exception ex)
+        {
+            _recipes = [];
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task ClearSearch()
+    {
+        _searchQuery = string.Empty;
+        await LoadRecipesAsync();
+    }
+
+    private async Task OnSearchQueryChanged(string query)
+    {
+        _searchQuery = query;
+        await LoadRecipesAsync();
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+        Snackbar?.Dispose();
+    }
+
+}
