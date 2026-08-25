@@ -27,9 +27,9 @@ public static class RoutingConstants
             private const string BaseRecipePath = "/recipes";
             private const string BaseEditorPath = BasePath + BaseRecipePath;
             
-            public const string List = BasePath + BaseRecipePath;
-            public const string Create = BasePath + BaseRecipePath + "/create";
-            public const string Edit = BasePath + BaseRecipePath + "/edit";
+            public const string List = BaseRecipePath;
+            public const string Create = BaseEditorPath + "/create";
+            public const string Edit = BaseEditorPath + "/edit";
             
             public static bool IsList(string relativePath) => relativePath == List;
             public static bool IsCreate(string relativePath) => relativePath == Create;
