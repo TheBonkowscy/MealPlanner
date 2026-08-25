@@ -1,6 +1,7 @@
 using System.Globalization;
 using MealPlanner.Client;
 using MealPlanner.Client.Configuration;
+using MealPlanner.Client.Handlers;
 using MealPlanner.UI.Components;
 using MealPlanner.UI.Services;
 using Microsoft.AspNetCore.Localization;
@@ -24,6 +25,7 @@ builder.Services.AddSingleton<MealMapper>();
 
 // TODO: Shared localizations library?
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddTransient<AcceptLanguageHeaderHandler>();
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {

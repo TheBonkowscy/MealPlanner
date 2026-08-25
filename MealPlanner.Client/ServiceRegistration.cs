@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Client.Configuration;
+using MealPlanner.Client.Handlers;
 using MealPlanner.Client.Menus;
 using MealPlanner.Client.Recipes;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,17 +14,27 @@ public static class ServiceRegistration
         public IServiceCollection AddMealPlannerClient()
         {
             
-            services.AddHttpClient<IFindMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<ICreateMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<IUpdateMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<IDeleteMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IFindMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            services.AddHttpClient<ICreateMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            services.AddHttpClient<IUpdateMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            services.AddHttpClient<IDeleteMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
             
-            services.AddHttpClient<IFindRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<ICreateRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<IUpdateRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
-            services.AddHttpClient<IDeleteRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IFindRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            services.AddHttpClient<ICreateRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            services.AddHttpClient<IUpdateRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            services.AddHttpClient<IDeleteRecipes, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
             
-            services.AddHttpClient<IFindIngredients, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient());
+            services.AddHttpClient<IFindIngredients, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            
             return services;
         }    
         
