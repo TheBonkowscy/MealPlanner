@@ -53,7 +53,7 @@
                         <MudAutocomplete T="PredefinedProductDto"
                                          Label="Szukaj składnika..."
                                          Value="@context.SelectedProduct"
-                                         ValueChanged="@(product => OnProductChanged(context, product))"
+                                         ValueChanged="@(product => OnProductChangedAsync(context, product))"
                                          SearchFunc="SearchIngredientsAsync"
                                          ToStringFunc="@(p => p?.Name)"
                                          Disabled="@context.IsPersisted"
@@ -68,6 +68,7 @@
                                          MinCharacters="0" />
 
                         <MudNumericField @bind-Value="context.Quantity"
+                                         @bind-Value:after="@(() => AutoSaveIngredientAsync(context))"
                                          Label="Ilość"
                                          Min="0.01m"
                                          Step="0.1m"
@@ -77,7 +78,7 @@
                         <MudSelect T="MeasureUnitDto"
                                    Label="Jednostka"
                                    Value="@context.SelectedUnit"
-                                   ValueChanged="@(unit => OnUnitChanged(context, unit))"
+                                   ValueChanged="@(unit => OnUnitChangedAsync(context, unit))"
                                    ToStringFunc="@(u => u?.DisplayName)"
                                    Disabled="@(context.IsPersisted || !GetAvailableUnits(context).Any())"
                                    Variant="Variant.Outlined"
@@ -90,12 +91,16 @@
                         </MudSelect>
 
                         <MudSpacer />
-
-                        <MudIconButton Icon="@Icons.Material.Filled.Save"
-                                       Color="Color.Success"
-                                       Size="Size.Small"
-                                       OnClick="@(() => SaveIngredientAsync(context))" />
-
+                        
+                        @if (context.IsPersisted)
+                        {
+                            <MudTooltip Text="Składnik zapisany">
+                                <MudIcon Icon="@Icons.Material.Outlined.CheckCircle"
+                                         Color="Color.Success"
+                                         Size="Size.Medium" />
+                            </MudTooltip>
+                        }
+                        
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                        Color="Color.Error"
                                        Size="Size.Small"
@@ -254,11 +259,10 @@
         Navigation.NavigateTo(RoutingConstants.Recipes.DetailsFor(RecipeId));
     }
 
-    private async Task SaveIngredientAsync(IngredientDto item)
+    private async Task AutoSaveIngredientAsync(IngredientDto item)
     {
         if (item.SelectedProduct == null || item.SelectedUnit == null)
         {
-            Snackbar.Add("Wybierz produkt i jednostkę przed zapisem", Severity.Warning);
             return;
         }
 
@@ -304,18 +308,22 @@
             .Where(u => !usedUnitValuesInOtherRows.Contains(u.UnderlyingValue));
     }
 
-    private void OnProductChanged(IngredientDto item, PredefinedProductDto? product)
+    private async Task OnProductChangedAsync(IngredientDto item, PredefinedProductDto? product)
     {
         item.SelectedProduct = product;
         item.Id = product?.Id ?? 0;
-        item.SelectedUnit = GetAvailableUnits(item).FirstOrDefault();
+        item.SelectedUnit = null;
         _ingredientsContainer?.Refresh();
+        
+        await AutoSaveIngredientAsync(item);
     }
     
-    private void OnUnitChanged(IngredientDto item, MeasureUnitDto? unit)
+    private async Task OnUnitChangedAsync(IngredientDto item, MeasureUnitDto? unit)
     {
         item.SelectedUnit = unit;
         _ingredientsContainer?.Refresh();
+
+        await AutoSaveIngredientAsync(item);
     }
 
     private void IngredientDropped(MudItemDropInfo<IngredientDto> dropItem)
@@ -358,23 +366,17 @@
 
     private async Task StepDropped(MudItemDropInfo<StepDto> dropItem)
     {
-        if (dropItem?.Item is null) return;
+        if (dropItem.Item is null) return;
 
-        // 1. Wyciągamy przeciągnięty krok
         var itemToMove = dropItem.Item;
         _steps.Remove(itemToMove);
 
-        // 2. Wstawiamy go na nową pozycję wskazaną przez MudDropZone
         var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _steps.Count);
         _steps.Insert(targetIndex, itemToMove);
 
-        // 3. Przeliczamy lokalnie `Order` (1..N) dla wszystkich elementów w nowej kolejności
         ReindexSteps();
-
-        // Odświeżamy MudDropContainer natychmiast, aby UI i widok były w 100% spójne
         _stepsContainer?.Refresh();
 
-        // 4. Jeśli krok nie był jeszcze zapisany w bazie (Id == 0)
         if (itemToMove.Id == 0)
         {
             if (!string.IsNullOrWhiteSpace(itemToMove.Instructions))
@@ -386,11 +388,9 @@
         }
         else
         {
-            // Wysyłamy update z nowym numerem `Order` wyliczonym po przesunięciu
             var updateRequest = new UpdateRecipeStepRequest(itemToMove.Id, itemToMove.Order, itemToMove.Instructions);
             await RecipeUpdater.UpdateStep(RecipeId, updateRequest, _cts.Token);
         
-            // Pobieramy spójne dane z backendu po reindeksacji przez bazę
             await RefreshStepsFromBackendAsync();
         }
     }
@@ -453,7 +453,6 @@
 
     private async Task UpdateOrAddStep(StepDto context)
     {
-        // Nie wywołuj tej metody, jeśli treść instrukcji jest pusta (np. przy świeżo dodanym wierszu w UI)
         if (string.IsNullOrWhiteSpace(context.Instructions))
             return;
 
@@ -468,7 +467,6 @@
             await RecipeUpdater.UpdateStep(RecipeId, request, _cts.Token);
         }
     
-        // Zapisujemy i pobieramy świeży stan, aby nadane przez bazę Id przypisało się do DTO
         await LoadRecipeDataAsync();
         _stepsContainer?.Refresh();
     
