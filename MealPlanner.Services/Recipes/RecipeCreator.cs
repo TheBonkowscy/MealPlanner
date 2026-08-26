@@ -40,7 +40,7 @@ public class RecipeEditor(MealPlannerDbContext ctx,
         }
 
         var preparationsResults = request.Preparations
-            .Select(x => RecipePreparation.Create(x.Details, x.LeadDays, x.Required)).ToList();
+            .Select(x => RecipePreparation.Create(x.Description, x.LeadDays, x.Required)).ToList();
         errors = preparationsResults.AllErrors();
         if (errors.Count != 0)
         {

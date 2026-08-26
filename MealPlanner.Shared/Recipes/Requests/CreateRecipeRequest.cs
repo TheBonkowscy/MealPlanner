@@ -11,4 +11,4 @@ public record AddIngredientRequest(int Id, decimal Quantity, string Unit);
 
 public record AddRecipeStepRequest(int Order, string Instructions);
 
-public record AddRecipePreparationsRequest(string Details, int LeadDays, bool Required);
+public record AddRecipePreparationsRequest(string Description, int LeadDays, bool Required);
