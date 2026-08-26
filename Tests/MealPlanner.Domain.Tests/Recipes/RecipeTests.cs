@@ -219,7 +219,7 @@ public class RecipeTests
         var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, SharedPreparations).Value;
 
         // Act
-        var result = recipe.UpdatePreparations(-3, "Updated description", 2);
+        var result = recipe.UpdatePreparations(-3, "Updated description", 2, true);
 
         // Assert
         result.Should().NotBeNull();
@@ -236,7 +236,7 @@ public class RecipeTests
         const string expectedDescription = "Updated description";
 
         // Act
-        var result = recipe.UpdatePreparations(prepToUpdate.Id, expectedDescription, 2);
+        var result = recipe.UpdatePreparations(prepToUpdate.Id, expectedDescription, 2, !prepToUpdate.Required);
 
         // Assert
         result.Should().NotBeNull();

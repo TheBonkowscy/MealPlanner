@@ -210,7 +210,7 @@ public class Recipe
         }
     }
 
-    public Result UpdatePreparations(int preparationId, string newDescription, int newLeadDays)
+    public Result UpdatePreparations(int preparationId, string newDescription, int newLeadDays, bool required)
     {
         var updatedPrep = _preparations.FirstOrDefault(x => x.Id == preparationId);
         if (updatedPrep is null)
@@ -225,7 +225,14 @@ public class Recipe
         }
 
         var leadDaysUpdated = updatedPrep.UpdateLeadDays(newLeadDays);
-        return leadDaysUpdated.IsFailure ? leadDaysUpdated : Result.Success();
+        if (leadDaysUpdated.IsFailure)
+        {
+            return leadDaysUpdated;
+        }
+
+        updatedPrep.UpdateRequired(required);
+        
+        return Result.Success();
     }
 
     public Result AddPreparations(string description, int leadDays, bool required = false)

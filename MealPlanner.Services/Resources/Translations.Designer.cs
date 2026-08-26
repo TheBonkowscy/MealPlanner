@@ -114,6 +114,15 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please provide the correct preparation description.
+        /// </summary>
+        internal static string InvalidDescription {
+            get {
+                return ResourceManager.GetString("InvalidDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please provide the correct ingredient name.
         /// </summary>
         internal static string InvalidIngredientName {
@@ -128,6 +137,15 @@ namespace MealPlanner.Services {
         internal static string InvalidIngredientQuantity {
             get {
                 return ResourceManager.GetString("InvalidIngredientQuantity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide the correct number of days ahead for preparations.
+        /// </summary>
+        internal static string InvalidLeadDays {
+            get {
+                return ResourceManager.GetString("InvalidLeadDays", resourceCulture);
             }
         }
         
@@ -159,7 +177,7 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please provide correct number of meals.
+        ///   Looks up a localized string similar to Please provide the correct number of meals.
         /// </summary>
         internal static string InvalidMealsInMenu {
             get {
@@ -168,7 +186,16 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please provide correct number of ingredients with appropriate quantities.
+        ///   Looks up a localized string similar to Please provide the details of ahead of cooking preparations.
+        /// </summary>
+        internal static string InvalidPreparations {
+            get {
+                return ResourceManager.GetString("InvalidPreparations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide the correct number of ingredients with appropriate quantities.
         /// </summary>
         internal static string InvalidRecipeIngredients {
             get {

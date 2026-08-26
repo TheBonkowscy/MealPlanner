@@ -61,4 +61,6 @@ public class RecipePreparation
         LeadDays = newLeadDays;
         return Result.Success();
     }
+
+    public void UpdateRequired(bool required) => Required = required;
 }

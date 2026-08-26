@@ -34,9 +34,9 @@ public static class ServiceRegistration
         services.AddTransient<IUpdateRecipeStep, RecipeStepUpdater>();
         services.AddTransient<IDeleteRecipeStep, RecipeStepDeleter>();
         
-        services.AddTransient<ICreateRecipePreparationsInfo, RecipePreparationsInfoCreator>();
-        services.AddTransient<IUpdateRecipePreparationsInfo, RecipePreparationsInfoUpdater>();
-        services.AddTransient<IDeleteRecipePreparationsInfo, RecipePreparationsInfoDeleter>();
+        services.AddTransient<ICreateRecipePreparations, RecipePreparationsCreator>();
+        services.AddTransient<IUpdateRecipePreparations, RecipePreparationsUpdater>();
+        services.AddTransient<IDeleteRecipePreparations, RecipePreparationsDeleter>();
         
         services.AddSingleton<RecipeMapper>();
         
