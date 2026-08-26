@@ -1,10 +1,13 @@
 ﻿using System.Net;
+using MealPlanner.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace MealPlanner.API;
 
-public class GlobalExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
+public class GlobalExceptionHandler(IProblemDetailsService problemDetailsService,
+    IStringLocalizer<Translations> localizer) : IExceptionHandler
 {
     private record Error(HttpStatusCode StatusCode, string Message)
     {

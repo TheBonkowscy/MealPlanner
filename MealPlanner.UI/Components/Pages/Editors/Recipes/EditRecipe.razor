@@ -269,7 +269,7 @@
 
         var request = new UpdateRecipeIngredientRequest(item.Id, item.Quantity, item.SelectedUnit.UnderlyingValue);
         await RecipeUpdater.AddIngredientToRecipe(RecipeId, request, _cts.Token);
-        Snackbar.Add(@L[TranslationKeys.RecipeEditor.RecipeEditorIngredientSavedTitle], Severity.Success);
+        Snackbar.Add(@L[TranslationKeys.RecipeEditor.RecipeEditorIngredientSavedTitle, item.SelectedProduct.Name], Severity.Success);
         
         item.IsPersisted = true;
         _ingredientsContainer?.Refresh();

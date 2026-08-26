@@ -14,6 +14,8 @@ public static class ServiceRegistration
         public IServiceCollection AddMealPlannerClient()
         {
             
+            services.AddTransient<AcceptLanguageHeaderHandler>();
+            
             services.AddHttpClient<IFindMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())
                 .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
             services.AddHttpClient<ICreateMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())

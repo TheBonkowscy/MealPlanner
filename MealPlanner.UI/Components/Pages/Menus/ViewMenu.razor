@@ -18,9 +18,8 @@
 
 <MudText Typo="Typo.h5">
 
-    @L[TranslationKeys.ViewMenu.ViewMenuMenuForDayTitle, @Date.ToString(
-        "dddd, d MMMM yyyy",
-        _culture)]
+    @L[TranslationKeys.ViewMenu.ViewMenuMenuForDayTitle, 
+        @Date.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentUICulture)]
 
 </MudText>
 
@@ -47,10 +46,6 @@ else
 
 @code {
     [Parameter] public DateTime Date { get; set; }
-
-    private readonly CultureInfo _culture =
-        new("pl-PL");
-
 
     private List<MealDto> _meals = [];
 
