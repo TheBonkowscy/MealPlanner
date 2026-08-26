@@ -8,20 +8,21 @@ using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
 using MealPlanner.Tests.Shared.Helpers;
 
-namespace MealPlanner.Domain.Tests;
+namespace MealPlanner.Domain.Tests.Recipes;
 
 public class RecipeTests
 {
     private const string Name = "Fish and chips";
     private static readonly AddIngredientAction SharedIngredient = TestActions.AddFlour(0.75m, MeasureUnit.GlassCup);
     private static List<RecipeStep> SharedSteps => [RecipeStep.Create(1, "Step 1").Value, RecipeStep.Create(2, "Step 2").Value];
+    private static List<RecipePreparation> SharedPreparations => [RecipePreparation.Create("Test prep", 1, false).Value];
     
     [Theory]
     [ClassData(typeof(EmptyStringTestDataProvider))]
     public void Create_WithoutName_Fails(string invalidName)
     {   
         // Act
-        var result = Recipe.Create(invalidName, 1, [SharedIngredient], SharedSteps);
+        var result = Recipe.Create(invalidName, 1, [SharedIngredient], SharedSteps, SharedPreparations);
         
         // Assert
         result.Should().NotBeNull();
@@ -33,7 +34,7 @@ public class RecipeTests
     public void Create_WithEmptyIngredients_Fails()
     {
         // Act
-        var result = Recipe.Create(Name, 1, [], SharedSteps);
+        var result = Recipe.Create(Name, 1, [], SharedSteps, SharedPreparations);
         
         // Assert
         result.Should().NotBeNull();
@@ -45,7 +46,7 @@ public class RecipeTests
     public void Create_WithEmptySteps_Fails()
     {
         // Act
-        var result = Recipe.Create(Name, 1,  [SharedIngredient], []);
+        var result = Recipe.Create(Name, 1,  [SharedIngredient], [], SharedPreparations);
         
         // Assert
         result.Should().NotBeNull();
@@ -59,7 +60,7 @@ public class RecipeTests
     public void Create_WithInvalidServings_Fails(int invalidServings)
     {
         // Act
-        var result = Recipe.Create(Name, invalidServings, [SharedIngredient], SharedSteps);
+        var result = Recipe.Create(Name, invalidServings, [SharedIngredient], SharedSteps, SharedPreparations);
         
         // Assert
         result.Should().NotBeNull();
@@ -68,10 +69,10 @@ public class RecipeTests
     }
 
     [Fact]
-    public void Create_Succeeds()
+    public void Create_Succeeds_WithEmptyPreparations()
     {
         // Act
-        var result = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps);
+        var result = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, []);
         
         // Assert
         result.Should().NotBeNull();
@@ -80,6 +81,23 @@ public class RecipeTests
         result.Value.Ingredients.Should().HaveCount(1);
         result.Value.Steps.Should().HaveCount(2);
         result.Value.Servings.Should().Be(1);
+        result.Value.Preparations.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Create_Succeeds_WithPreparationsPresent()
+    {
+        // Act
+        var result = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, SharedPreparations);
+        
+        // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        result.Value.Name.Should().Be(Name);
+        result.Value.Ingredients.Should().HaveCount(1);
+        result.Value.Steps.Should().HaveCount(2);
+        result.Value.Servings.Should().Be(1);
+        result.Value.Preparations.Should().HaveCount(1);
     }
 
     [Fact]
@@ -94,7 +112,7 @@ public class RecipeTests
         ];
 
         // Act
-        var result = Recipe.Create(Name, 1, [SharedIngredient], stepsWithGaps);
+        var result = Recipe.Create(Name, 1, [SharedIngredient], stepsWithGaps, SharedPreparations);
 
         // Assert
         result.Should().NotBeNull();
@@ -106,7 +124,7 @@ public class RecipeTests
     public void UpdateStep_Fails_WhenStepWasNotFound()
     {
         // Arrange
-        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps).Value;
+        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, SharedPreparations).Value;
         
         // Act
         var result = recipe.UpdateStep(-1, 1, "Updated instructions");
@@ -140,7 +158,7 @@ public class RecipeTests
     public void AddStep_InsertsStepAndReindexesRest()
     {
         // Arrange
-        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps).Value;
+        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, SharedPreparations).Value;
 
         // Act
         var result = recipe.AddStep(2, "New Step 2");
@@ -157,7 +175,7 @@ public class RecipeTests
     public void AddStep_WithOrderExceedingCount_AppendsToTheEnd()
     {
         // Arrange
-        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps).Value;
+        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, SharedPreparations).Value;
 
         // Act
         var result = recipe.AddStep(99, "Far step");
@@ -181,7 +199,7 @@ public class RecipeTests
             RecipeStep.Create(3, "Step 3").Value
         };
         RandomId.Set([.. steps]);
-        var recipe = Recipe.Create(Name, 1, [SharedIngredient], steps).Value;
+        var recipe = Recipe.Create(Name, 1, [SharedIngredient], steps, SharedPreparations).Value;
         var stepToRemove = recipe.Steps[1];
 
         // Act
@@ -216,7 +234,7 @@ public class RecipeTests
             var steps = Enumerable.Range(1, numberOfSteps)
                 .Select(order => RecipeStep.Create(order, $"Instructions for step #{order}").Value).ToList();
             RandomId.Set([.. steps]);
-            return Recipe.Create($"Recipe_{Guid.NewGuid()}", 1, [SharedIngredient], steps).Value;
+            return Recipe.Create($"Recipe_{Guid.NewGuid()}", 1, [SharedIngredient], steps, SharedPreparations).Value;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

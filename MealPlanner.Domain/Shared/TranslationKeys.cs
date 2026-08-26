@@ -17,6 +17,7 @@ public static class TranslationKeys
         public const string InvalidRecipeIngredients = nameof(InvalidRecipeIngredients);
         public const string InvalidRecipeSteps = nameof(InvalidRecipeSteps);
         public const string RecipeIsNull = nameof(RecipeIsNull);
+        public const string InvalidPreparations = nameof(InvalidPreparations);
     }
 
     public static class RecipeStep
@@ -41,5 +42,11 @@ public static class TranslationKeys
         public const string MenuDateUnset = nameof(MenuDateUnset);
         public const string MenuDateTooFarInThePast = nameof(MenuDateTooFarInThePast);
         public const string MenuDateTooFarInTheFuture = nameof(MenuDateTooFarInTheFuture);
+    }
+
+    public static class RecipePreparation
+    {
+        public const string InvalidDescription = nameof(InvalidDescription);
+        public const string InvalidLeadDays = nameof(InvalidLeadDays);
     }
 }

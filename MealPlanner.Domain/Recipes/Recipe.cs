@@ -28,15 +28,12 @@ public class Recipe
         private set => _steps = [.. value];
     }
 
-    // TODO: update this later down the line!
-    public IReadOnlyList<RecipePreparations> Preparations => [];
-    // TODO: update this later down the line!
-    public class RecipePreparations
+    private List<RecipePreparation> _preparations = [];
+
+    public IReadOnlyList<RecipePreparation> Preparations
     {
-        public int Id { get; set; }
-        public string Description { get; set; }
-        public int LeadDays { get; set; }
-        public bool Required { get; set; }
+        get => [.. _preparations.OrderByDescending(x => x.LeadDays)];
+        private set => _preparations = [.. value];
     }
 
     private Recipe()
@@ -57,13 +54,18 @@ public class Recipe
         // It allows you to create a recipe with no ingredients and add them later.
     }
     
-    public static Result<Recipe> Create(string name, int servings, List<AddIngredientAction> ingredientsToAdd, List<RecipeStep> recipeSteps)
+    public static Result<Recipe> Create(string name,
+        int servings,
+        List<AddIngredientAction> ingredientsToAdd,
+        List<RecipeStep> recipeSteps,
+        List<RecipePreparation> preparations)
     {
-        var errors = new List<Error>();
-        errors.AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName(name))
+        var errors = new List<Error>()
+            .AddRule(ValidateName(name), DomainErrors.Recipe.InvalidName(name))
             .AddRule(ValidateServings(servings), DomainErrors.Recipe.InvalidServings(servings))
             .AddRule(ValidateIngredients(ingredientsToAdd), DomainErrors.Recipe.InvalidRecipeIngredients)
-            .AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps);
+            .AddRule(ValidateRecipeSteps(recipeSteps), DomainErrors.Recipe.InvalidSteps)
+            .AddRule(ValidatePreparations(preparations), DomainErrors.Recipe.InvalidPreparations);
 
         if (errors.Count > 0)
         {
@@ -72,8 +74,15 @@ public class Recipe
         
         var recipe = new Recipe(name, servings);
         errors.AddRange(recipe.AddIngredients(ingredientsToAdd).Errors);
+
+        if (errors.Count > 0)
+        {
+            return Result.Failure<Recipe>(errors);
+        }
+        
         recipe._steps = recipeSteps;
         recipe.ReindexSteps();
+        recipe._preparations = preparations;
         
         return Result.Success(recipe);
     }
@@ -107,6 +116,12 @@ public class Recipe
         
         var uniqueOrdersCount = recipeSteps.Select(x => x.Order).Distinct().Count();
         return uniqueOrdersCount == recipeSteps.Count;
+    }
+
+    private static bool ValidatePreparations(List<RecipePreparation> preparations)
+    {
+        var invalidPreparations = preparations.Where(x => x.LeadDays <= 0);
+        return !invalidPreparations.Any();
     }
 
     public UsedIngredient? GetIngredient(int ingredientId, MeasureUnit requestUnit) =>
