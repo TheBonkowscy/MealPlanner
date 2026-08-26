@@ -393,6 +393,24 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Initial preparation removed.
+        /// </summary>
+        public static string RecipeEditorPreparationRemovedTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorPreparationRemovedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initial preparations details saved.
+        /// </summary>
+        public static string RecipeEditorPreparationSavedTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorPreparationSavedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Recipe added successfully!.
         /// </summary>
         public static string RecipeEditorRecipeAddedConfirmation {

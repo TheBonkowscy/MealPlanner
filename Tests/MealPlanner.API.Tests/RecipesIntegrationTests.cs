@@ -316,7 +316,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var recipe = TestRecipes.Create();
         await AddRecipeToDatabase(recipe);
         var preparation = recipe.Preparations[0];
-        var request = new UpdateRecipePreparationsRequest("Updated prep description", 2, false);
+        var request = new UpdateRecipePreparationsRequest(preparation.Id, "Updated prep description", 2, false);
         
         // Act
         var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/preparations/{preparation.Id}", request);

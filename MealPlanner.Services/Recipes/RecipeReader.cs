@@ -30,7 +30,9 @@ public class RecipeReader(MealPlannerDbContext ctx, RecipeMapper recipeMapper) :
     {
         var recipe = await ctx.Recipes
             .Include(x => x.Ingredients).ThenInclude(x => x.Ingredient)
-            .Include(x => x.Steps).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            .Include(x => x.Steps)
+            .Include(x => x.Preparations)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         return recipe is null ? null : recipeMapper.ToDetails(recipe);
     }

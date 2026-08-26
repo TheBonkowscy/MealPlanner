@@ -35,7 +35,7 @@ public class RecipePreparationsUpdaterTests
         // Arrange
         var recipe = TestRecipes.Create();
         var prep = recipe.Preparations[0];
-        var request = new UpdateRecipePreparationsRequest(prep.Description, prep.LeadDays, prep.Required); 
+        var request = new UpdateRecipePreparationsRequest(prep.Id, prep.Description, prep.LeadDays, prep.Required); 
         
         // Act
         var result = await _sut.UpdatePreparations(recipe.Id, prep.Id, request, CancellationToken.None);
@@ -53,7 +53,7 @@ public class RecipePreparationsUpdaterTests
         var recipe = TestRecipes.Create();
         _recipes.Add(recipe);
         var prep = recipe.Preparations[0];
-        var request = new UpdateRecipePreparationsRequest(prep.Description, prep.LeadDays, prep.Required); 
+        var request = new UpdateRecipePreparationsRequest(999, prep.Description, prep.LeadDays, prep.Required); 
         
         // Act
         var result = await _sut.UpdatePreparations(recipe.Id, 999, request, CancellationToken.None);
@@ -71,7 +71,7 @@ public class RecipePreparationsUpdaterTests
         var recipe = TestRecipes.Create();
         _recipes.Add(recipe);
         var prep = recipe.Preparations[0];
-        var request = new UpdateRecipePreparationsRequest(prep.Description + "a", prep.LeadDays + 1, !prep.Required);
+        var request = new UpdateRecipePreparationsRequest(prep.Id, prep.Description + "a", prep.LeadDays + 1, !prep.Required);
         
         // Act
         var result = await _sut.UpdatePreparations(recipe.Id, prep.Id, request, CancellationToken.None);
