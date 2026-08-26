@@ -89,7 +89,8 @@ public class RecipeReaderTests
         var ingredient = Ingredient.Create("Bacon", [MeasureUnit.Kilogram]).Value;
         var ingredients = AddIngredientAction.Create(ingredient, 1, MeasureUnit.Kilogram).Value;
         var step = RecipeStep.Create(1, "Cook").Value;
-        var recipe = Recipe.Create("Burgers", 1, [ingredients], [step]).Value;
+        var prep = RecipePreparation.Create("Thaw the meat", 1, true).Value;
+        var recipe = Recipe.Create("Burgers", 1, [ingredients], [step], [prep]).Value;
         RandomId.Set(ingredient);
         RandomId.Set(step);
         RandomId.Set(recipe);
@@ -117,5 +118,7 @@ public class RecipeReaderTests
         firstStep.Id.Should().Be(step.Id);
         firstStep.Order.Should().Be(step.Order);
         firstStep.Instructions.Should().Be(step.Instructions);
+        
+        // TODO: add the prep validations
     }
 }

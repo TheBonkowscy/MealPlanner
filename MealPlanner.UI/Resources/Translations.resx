@@ -237,4 +237,10 @@
     <data name="MenuEditorMenuEditedSuccessfullyTitle" xml:space="preserve">
         <value>Menu edited successfully!</value>
     </data>
+    <data name="RecipeEditorPreparationSavedTitle" xml:space="preserve">
+        <value>Initial preparations details saved</value>
+    </data>
+    <data name="RecipeEditorPreparationRemovedTitle" xml:space="preserve">
+        <value>Initial preparation removed</value>
+    </data>
 </root>
