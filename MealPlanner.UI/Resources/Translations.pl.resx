@@ -240,4 +240,16 @@
     <data name="RecipeEditorPreparationRemovedTitle" xml:space="preserve">
         <value>Usunięto przygotowanie wstępne</value>
     </data>
+    <data name="ViewRecipePreparationsSectionTitle" xml:space="preserve">
+        <value>Przygotowania wstępne</value>
+    </data>
+    <data name="ViewRecipeRequiredTitle" xml:space="preserve">
+        <value>Wymagane</value>
+    </data>
+    <data name="ViewRecipeOptionalTitle" xml:space="preserve">
+        <value>Opcjonalne</value>
+    </data>
+    <data name="ViewRecipeLeadDaysTitle" xml:space="preserve">
+        <value>Wyprzedzenie: {0} dni</value>
+    </data>
 </root>

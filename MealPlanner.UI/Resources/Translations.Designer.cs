@@ -636,6 +636,15 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ahead of time prep.: {0} day(s).
+        /// </summary>
+        public static string ViewRecipeLeadDaysTitle {
+            get {
+                return ResourceManager.GetString("ViewRecipeLeadDaysTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loeading....
         /// </summary>
         public static string ViewRecipeLoadingNameTitle {
@@ -663,11 +672,38 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Optional.
+        /// </summary>
+        public static string ViewRecipeOptionalTitle {
+            get {
+                return ResourceManager.GetString("ViewRecipeOptionalTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initial preparations.
+        /// </summary>
+        public static string ViewRecipePreparationsSectionTitle {
+            get {
+                return ResourceManager.GetString("ViewRecipePreparationsSectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cooking steps.
         /// </summary>
         public static string ViewRecipeRecipeStepsSectionTitle {
             get {
                 return ResourceManager.GetString("ViewRecipeRecipeStepsSectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required.
+        /// </summary>
+        public static string ViewRecipeRequiredTitle {
+            get {
+                return ResourceManager.GetString("ViewRecipeRequiredTitle", resourceCulture);
             }
         }
         

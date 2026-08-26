@@ -108,5 +108,9 @@ public static class TranslationKeys
 
         public const string ViewRecipeEditRecipeActionTitle = nameof(ViewRecipeEditRecipeActionTitle);
         public const string ViewRecipeDeleteRecipeActionTitle = nameof(ViewRecipeDeleteRecipeActionTitle);
+        public const string ViewRecipePreparationsSectionTitle = nameof(ViewRecipePreparationsSectionTitle);
+        public const string ViewRecipeRequiredTitle = nameof(ViewRecipeRequiredTitle);
+        public const string ViewRecipeOptionalTitle = nameof(ViewRecipeOptionalTitle);
+        public const string ViewRecipeLeadDaysTitle = nameof(ViewRecipeLeadDaysTitle);
     }
 }

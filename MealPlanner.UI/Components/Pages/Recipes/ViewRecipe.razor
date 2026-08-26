@@ -37,28 +37,61 @@
 
         <MudGrid>
             <MudItem xs="12" md="4">
-                <MudPaper Class="pa-4 mud-background-gray rounded-lg" Elevation="0">
-                    <MudText Typo="Typo.h6" Class="mb-3 d-flex align-center gap-2">
-                        <MudIcon Icon="@Icons.Material.Filled.ShoppingBag" Color="Color.Primary"/>
-                        @L[TranslationKeys.ViewRecipe.ViewRecipeIngredientsSectionTitle]
-                    </MudText>
+                <MudStack Spacing="4">
+                    @if (_preparations.Any())
+                    {
+                        <MudPaper Class="pa-4 mud-background-gray rounded-lg" Elevation="0">
+                            <MudText Typo="Typo.h6" Class="mb-3 d-flex align-center gap-2">
+                                <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Warning"/>
+                                @L[TranslationKeys.ViewRecipe.ViewRecipePreparationsSectionTitle]
+                            </MudText>
 
-                    <MudList T="string" Dense="true">
-                        @foreach (var ingredient in _ingredients)
-                        {
-                            <MudListItem>
-                                <MudCheckBox T="bool"
-                                             @bind-Value="ingredient.IsDone"
-                                             Color="Color.Success"
-                                             Dense="true">
-                                    <span class="@(ingredient.IsDone ? "text-decoration-line-through text-muted" : "")">
-                                        <b>@ingredient.Quantity @ingredient.UnitName</b> – @ingredient.ProductName
-                                    </span>
-                                </MudCheckBox>
-                            </MudListItem>
-                        }
-                    </MudList>
-                </MudPaper>
+                            <MudList T="string" Dense="true">
+                                @foreach (var prep in _preparations)
+                                {
+                                    <MudListItem Class="@(prep.Required ? "border border-solid mud-border-error rounded-lg pa-2 my-1" : "my-1")">
+                                        <MudText>
+                                            @prep.Description
+                                            <MudText Typo="Typo.caption" Class="d-inline-flex align-center gap-1 text-muted">
+                                                <span>
+                                                    @L[TranslationKeys.ViewRecipe.ViewRecipeLeadDaysTitle, prep.LeadDays]
+                                                    @(prep.Required ? $" ({@L[TranslationKeys.ViewRecipe.ViewRecipeRequiredTitle]})" : $" ({@L[TranslationKeys.ViewRecipe.ViewRecipeOptionalTitle]})")
+                                                </span>
+                                                @if (prep.Required)
+                                                {
+                                                    <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Error" Size="Size.Small" />
+                                                }
+                                            </MudText>
+                                        </MudText>
+                                    </MudListItem>
+                                }
+                            </MudList>
+                        </MudPaper>
+                    }
+
+                    <MudPaper Class="pa-4 mud-background-gray rounded-lg" Elevation="0">
+                        <MudText Typo="Typo.h6" Class="mb-3 d-flex align-center gap-2">
+                            <MudIcon Icon="@Icons.Material.Filled.ShoppingBag" Color="Color.Primary"/>
+                            @L[TranslationKeys.ViewRecipe.ViewRecipeIngredientsSectionTitle]
+                        </MudText>
+
+                        <MudList T="string" Dense="true">
+                            @foreach (var ingredient in _ingredients)
+                            {
+                                <MudListItem>
+                                    <MudCheckBox T="bool"
+                                                 @bind-Value="ingredient.IsDone"
+                                                 Color="Color.Success"
+                                                 Dense="true">
+                                        <span class="@(ingredient.IsDone ? "text-decoration-line-through text-muted" : "")">
+                                            <b>@ingredient.Quantity @ingredient.UnitName</b> – @ingredient.ProductName
+                                        </span>
+                                    </MudCheckBox>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudPaper>
+                </MudStack>
             </MudItem>
 
             <MudItem xs="12" md="8">
@@ -144,8 +177,16 @@
     private int? _servings;
     private List<IngredientViewItem> _ingredients = [];
     private List<StepViewItem> _steps = [];
+    private List<PreparationViewItem> _preparations = [];
 
     private readonly CancellationTokenSource _cts = new();
+
+    public class PreparationViewItem
+    {
+        public string Description { get; set; } = string.Empty;
+        public int LeadDays { get; set; }
+        public bool Required { get; set; }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -201,6 +242,18 @@
         _recipeName = response.Name;
         _recipeId = response.Id;
         _servings = response.Servings;
+
+        _preparations =
+        [
+            .. response.Preparations
+                .Select(x => new PreparationViewItem
+                {
+                    Description = x.Description,
+                    LeadDays = x.LeadDays,
+                    Required = x.Required
+                })
+        ];
+
         _ingredients =
         [
             .. response.Ingredients
@@ -260,5 +313,4 @@
         _cts.Dispose();
         AppBarService.ClearActions();
     }
-
 }
