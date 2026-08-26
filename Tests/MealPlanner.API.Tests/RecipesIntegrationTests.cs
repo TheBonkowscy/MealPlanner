@@ -295,7 +295,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var recipe = TestRecipes.Create();
         await AddRecipeToDatabase(recipe);
         const string prepDescription = "Ahead of time prep";
-        var request = new CreateRecipePreparationsInfoRequest(prepDescription, 1, true);
+        var request = new CreateRecipePreparationsRequest(prepDescription, 1, true);
         
         // Act
         var result = await Client.PostAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/preparations", request);
@@ -316,7 +316,7 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var recipe = TestRecipes.Create();
         await AddRecipeToDatabase(recipe);
         var preparation = recipe.Preparations[0];
-        var request = new UpdateRecipePreparationsInfoRequest("Updated prep description", 2, false);
+        var request = new UpdateRecipePreparationsRequest("Updated prep description", 2, false);
         
         // Act
         var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/preparations/{preparation.Id}", request);
@@ -326,8 +326,8 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
         var returnedPrep =  details?.Preparations.First(x => x.Id == preparation.Id);
         returnedPrep.Should().NotBeNull();
-        returnedPrep.LeadDays.Should().Be(1);
-        returnedPrep.Required.Should().BeTrue();
+        returnedPrep.LeadDays.Should().Be(request.LeadDays);
+        returnedPrep.Required.Should().Be(request.Required);
         returnedPrep.Description.Should().Be(request.Description);
     }
 
@@ -350,5 +350,6 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         new(recipeName,
             1,
             [new AddIngredientRequest(ingredient.Id, 1, ingredient.ApplicableUnits.First().ToString())],
-            [new AddRecipeStepRequest(1, "Test")]);
+            [new AddRecipeStepRequest(1, "Test")],
+            [new AddRecipePreparationsRequest("Test", 1, true)]);
 }

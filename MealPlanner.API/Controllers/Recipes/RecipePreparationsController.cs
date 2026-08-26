@@ -10,38 +10,38 @@ namespace MealPlanner.API.Controllers.Recipes;
 [ApiController]
 [Route(Shared.Menus.Constants.RecipePreparationsRoute)]
 public class RecipePreparationsController(
-    ICreateRecipePreparationsInfo recipePreparationsInfoCreator,
-    IUpdateRecipePreparationsInfo recipePreparationsInfoUpdater,
-    IDeleteRecipePreparationsInfo recipePreparationsInfoDeleter,
+    ICreateRecipePreparations recipePreparationsCreator,
+    IUpdateRecipePreparations recipePreparationsUpdater,
+    IDeleteRecipePreparations recipePreparationsDeleter,
     IStringLocalizer<Translations> localizer) : ControllerBase
 {
     [ProducesResponseType(typeof(GetRecipeDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPost]
-    public async Task<IResult> CreatePreparationsInfo(
+    public async Task<IResult> CreatePreparations(
         [FromRoute(Name = "recipeId")] int recipeId,
-        CreateRecipePreparationsInfoRequest request, 
+        CreateRecipePreparationsRequest request, 
         CancellationToken cancellationToken) =>
-        (await recipePreparationsInfoCreator.CreatePreparations(recipeId, request, cancellationToken)).ToHttpResult(localizer);
+        (await recipePreparationsCreator.CreatePreparations(recipeId, request, cancellationToken)).ToHttpResult(localizer);
     
     [ProducesResponseType(typeof(GetRecipeDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPut("{prepInfoId:int}")]
-    public async Task<IResult> UpdateStep(
+    public async Task<IResult> UpdatePreparations(
         [FromRoute(Name = "recipeId")] int recipeId, 
         [FromRoute(Name = "prepInfoId")] int prepInfoId,
-        UpdateRecipePreparationsInfoRequest request, 
+        UpdateRecipePreparationsRequest request, 
         CancellationToken cancellationToken) =>
-        (await recipePreparationsInfoUpdater.UpdatePreparations(recipeId, prepInfoId, request, cancellationToken)).ToHttpResult(localizer);
+        (await recipePreparationsUpdater.UpdatePreparations(recipeId, prepInfoId, request, cancellationToken)).ToHttpResult(localizer);
     
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [HttpDelete("{prepInfoId:int}")]
-    public async Task<IResult> DeletePreparationsInfo(
+    public async Task<IResult> DeletePreparations(
         [FromRoute(Name = "recipeId")] int recipeId,
         [FromRoute(Name = "prepInfoId")] int prepInfoId,
         CancellationToken cancellationToken)
     {
-        await recipePreparationsInfoDeleter.DeletePreparations(recipeId, prepInfoId, cancellationToken);
+        await recipePreparationsDeleter.DeletePreparations(recipeId, prepInfoId, cancellationToken);
         return Results.NoContent();
     }
 }
