@@ -48,5 +48,6 @@ public static class TranslationKeys
     {
         public const string InvalidDescription = nameof(InvalidDescription);
         public const string InvalidLeadDays = nameof(InvalidLeadDays);
+        public const string RecipePreparationNotFound = nameof(RecipePreparationNotFound);
     }
 }

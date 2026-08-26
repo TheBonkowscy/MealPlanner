@@ -66,6 +66,7 @@ public static class DomainErrors
     public static class RecipePreparation
     {
         public static Error InvalidDescription(string description) => Error.Validation(TranslationKeys.RecipePreparation.InvalidDescription, ("Description", description));
-        public static  Error InvalidLeadDays(int leadDays) => Error.Validation(TranslationKeys.RecipePreparation.InvalidLeadDays, ("LeadDays", leadDays));
+        public static Error InvalidLeadDays(int leadDays) => Error.Validation(TranslationKeys.RecipePreparation.InvalidLeadDays, ("LeadDays", leadDays));
+        public static readonly Error NotFound = Error.Validation(TranslationKeys.RecipePreparation.RecipePreparationNotFound);
     }
 }

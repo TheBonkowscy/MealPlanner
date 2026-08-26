@@ -39,4 +39,26 @@ public class RecipePreparation
     {
         return leadDays >= 1;
     }
+
+    public Result UpdateDescription(string newDescription)
+    {
+        if (!ValidateDescription(newDescription))
+        {
+            return Result.Failure(DomainErrors.RecipePreparation.InvalidDescription(newDescription));
+        }
+
+        Description = newDescription;
+        return Result.Success();
+    }
+
+    public Result UpdateLeadDays(int newLeadDays)
+    {
+        if (!ValidateLeadDays(newLeadDays))
+        {
+            return Result.Failure(DomainErrors.RecipePreparation.InvalidLeadDays(newLeadDays));
+        }
+        
+        LeadDays = newLeadDays;
+        return Result.Success();
+    }
 }

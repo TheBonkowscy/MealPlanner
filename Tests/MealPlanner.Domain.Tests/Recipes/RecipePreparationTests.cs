@@ -50,4 +50,68 @@ public class RecipePreparationTests
         result.Value.LeadDays.Should().Be(expectedLeadDays);
         result.Value.Description.Should().Be(Description);
     }
+    
+    [Theory]
+    [ClassData(typeof(NegativeNumbersTestDataProvider))]
+    public void UpdateLeadDays_WithNegative_Fails(int invalidLeadDays)
+    {
+        // Arrange 
+        var prep = RecipePreparation.Create(Description, 1, true).Value;
+        
+        // Act
+        var result = prep.UpdateLeadDays(invalidLeadDays);
+        
+        // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipePreparation.InvalidLeadDays(invalidLeadDays));
+    }
+    
+    [Fact]
+    public void UpdateLeadDays_WithPositive_Succeeds()
+    {
+        // Arrange 
+        const int expectedLeadDays = 15;
+        var prep = RecipePreparation.Create(Description, 1, true).Value;
+        
+        // Act
+        var result = prep.UpdateLeadDays(expectedLeadDays);
+        
+        // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        prep.LeadDays.Should().Be(expectedLeadDays);
+    }
+    
+    [Theory]
+    [ClassData(typeof(EmptyStringTestDataProvider))]
+    public void UpdateDescription_WithEmpty_Fails(string description)
+    {
+        // Arrange 
+        var prep = RecipePreparation.Create(Description, 1, true).Value;
+        
+        // Act
+        var result = prep.UpdateDescription(description);
+        
+        // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipePreparation.InvalidDescription(description));
+    }
+    
+    [Fact]
+    public void UpdateDescription_WithDescription_Succeeds()
+    {
+        // Arrange 
+        const string expectedDescription = "Updated description of the prep";
+        var prep = RecipePreparation.Create(Description, 1, true).Value;
+        
+        // Act
+        var result = prep.UpdateDescription(expectedDescription);
+        
+        // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        prep.Description.Should().Be(expectedDescription);
+    }
 }

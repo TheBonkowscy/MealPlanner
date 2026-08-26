@@ -209,4 +209,36 @@ public class Recipe
             _steps[i].UpdateOrder(i + 1);
         }
     }
+
+    public Result UpdatePreparations(int preparationId, string newDescription, int newLeadDays)
+    {
+        var updatedPrep = _preparations.FirstOrDefault(x => x.Id == preparationId);
+        if (updatedPrep is null)
+        {
+            return Result.Failure(DomainErrors.RecipePreparation.NotFound);
+        }
+
+        var instructionsUpdated = updatedPrep.UpdateDescription(newDescription);
+        if (instructionsUpdated.IsFailure)
+        {
+            return instructionsUpdated;
+        }
+
+        var leadDaysUpdated = updatedPrep.UpdateLeadDays(newLeadDays);
+        return leadDaysUpdated.IsFailure ? leadDaysUpdated : Result.Success();
+    }
+
+    public Result AddPreparations(string description, int leadDays, bool required = false)
+    {
+        var newPrep = RecipePreparation.Create(description, leadDays, required);
+        if (newPrep.IsFailure)
+        {
+            return newPrep;
+        }
+        
+        _preparations.Add(newPrep.Value);
+        return Result.Success();
+    }
+    
+    public void RemovePreparations(RecipePreparation newPrep) => _preparations.Remove(newPrep);
 }

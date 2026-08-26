@@ -212,6 +212,67 @@ public class RecipeTests
         recipe.Steps[1].Instructions.Should().Be("Step 3");
     }
 
+    [Fact]
+    public void UpdatePreparations_WhenPrepNotFound_Fails()
+    {
+        // Arrange
+        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, SharedPreparations).Value;
+
+        // Act
+        var result = recipe.UpdatePreparations(-3, "Updated description", 2);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.RecipePreparation.NotFound);
+    }
+
+    [Fact]
+    public void UpdatePreparations_Succeeds()
+    {
+        // Arrange
+        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, SharedPreparations).Value;
+        var prepToUpdate = recipe.Preparations[0];
+        const string expectedDescription = "Updated description";
+
+        // Act
+        var result = recipe.UpdatePreparations(prepToUpdate.Id, expectedDescription, 2);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        prepToUpdate.Description.Should().Be(expectedDescription);
+    }
+
+    [Fact]
+    public void AddPreparations_Succeeds()
+    {
+        // Arrange
+        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, SharedPreparations).Value;
+
+        // Act
+        var result = recipe.AddPreparations("Updated description", 2);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeFalse();
+        recipe.Preparations.Should().HaveCount(SharedPreparations.Count + 1);
+    }
+
+    [Fact]
+    public void RemovePreparations_Succeeds()
+    {
+        // Arrange
+        var recipe = Recipe.Create(Name, 1, [SharedIngredient], SharedSteps, SharedPreparations).Value;
+        var prepToDelete = recipe.Preparations[0];
+
+        // Act
+        recipe.RemovePreparations(prepToDelete);
+
+        // Assert
+        recipe.Preparations.Should().NotContain(prepToDelete);
+    }
+
     private class RecipeStepOrderingTests : IEnumerable<object[]>
     {
         public IEnumerator<object[]> GetEnumerator()
