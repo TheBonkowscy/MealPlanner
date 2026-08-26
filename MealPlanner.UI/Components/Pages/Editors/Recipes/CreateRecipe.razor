@@ -11,7 +11,7 @@
 @implements IDisposable
 @inject NavigationManager Navigation
 @inject IFindIngredients IngredientsFinder
-@inject ICreateRecipes RecipeCreator
+@inject ICreateRecipes RecipeEditor
 @inject ISnackbar Snackbar
 @inject AppBarService AppBarService
 @inject IStringLocalizer<Translations> L
@@ -20,20 +20,20 @@
 
 <MudPaper Class="pa-6 ma-4" Elevation="3">
     <MudTextField @bind-Value="_recipeName"
-                  Label="@L[TranslationKeys.RecipeEditor.RecipeCreatorNameTextField]"
+                  Label="@L[TranslationKeys.RecipeEditor.RecipeEditorNameTextField]"
                   Variant="Variant.Outlined"
                   Class="mb-6"
                   Required="true"
-                  RequiredError="@L[TranslationKeys.RecipeEditor.RecipeCreatorValidationNameError]" />
+                  RequiredError="@L[TranslationKeys.RecipeEditor.RecipeEditorValidationNameError]" />
     <MudNumericField @bind-Value="_servings"
-                  Label="@L[TranslationKeys.RecipeEditor.RecipeCreatorServingsTextField]"
+                  Label="@L[TranslationKeys.RecipeEditor.RecipeEditorServingsTextField]"
                   Variant="Variant.Outlined"
                   Class="mb-6"
                   Required="true"
                   Min="1"
-                  RequiredError="@L[TranslationKeys.RecipeEditor.RecipeCreatorServingsRequiredError]" />
+                  RequiredError="@L[TranslationKeys.RecipeEditor.RecipeEditorServingsRequiredError]" />
 
-    <MudText Typo="Typo.h6" Class="mb-2">@L[TranslationKeys.RecipeEditor.RecipeCreatorIngredientsSectionTitle]</MudText>
+    <MudText Typo="Typo.h6" Class="mb-2">@L[TranslationKeys.RecipeEditor.RecipeEditorIngredientsSectionTitle]</MudText>
     
     <MudDropContainer @ref="_ingredientsContainer"
                       T="IngredientDto"
@@ -51,7 +51,7 @@
                         <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
 
                         <MudAutocomplete T="PredefinedProductDto"
-                                         Label="@L[TranslationKeys.RecipeEditor.RecipeCreatorIngredientsSearchTitle]"
+                                         Label="@L[TranslationKeys.RecipeEditor.RecipeEditorIngredientsSearchTitle]"
                                          Value="@context.SelectedProduct"
                                          ValueChanged="@(product => OnProductChanged(context, product))"
                                          SearchFunc="SearchIngredientsAsync"
@@ -67,14 +67,14 @@
                                          MinCharacters="0" />
 
                         <MudNumericField @bind-Value="context.Quantity"
-                                         Label="@L[TranslationKeys.RecipeEditor.RecipeCreatorIngredientsQuantityTitle]"
+                                         Label="@L[TranslationKeys.RecipeEditor.RecipeEditorIngredientsQuantityTitle]"
                                          Min="0.01m"
                                          Step="0.1m"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense" />
 
                         <MudSelect T="MeasureUnitDto"
-                                   Label="@L[TranslationKeys.RecipeEditor.RecipeCreatorIngredientsUnitTitle]"
+                                   Label="@L[TranslationKeys.RecipeEditor.RecipeEditorIngredientsUnitTitle]"
                                    Value="@context.SelectedUnit"
                                    ValueChanged="@(unit => OnUnitChanged(context, unit))"
                                    ToStringFunc="@(u => u?.DisplayName)"
@@ -105,12 +105,12 @@
                Variant="Variant.Outlined"
                OnClick="AddIngredient"
                Class="mb-6">
-        @L[TranslationKeys.RecipeEditor.RecipeCreatorIngredientsAddButtonTitle]
+        @L[TranslationKeys.RecipeEditor.RecipeEditorIngredientsAddButtonTitle]
     </MudButton>
 
     <MudDivider Class="my-4" />
 
-    <MudText Typo="Typo.h6" Class="mb-2">@L[TranslationKeys.RecipeEditor.RecipeCreatorRecipeStepsSectionTitle]</MudText>
+    <MudText Typo="Typo.h6" Class="mb-2">@L[TranslationKeys.RecipeEditor.RecipeEditorRecipeStepsSectionTitle]</MudText>
 
     <MudDropContainer @ref="_stepsContainer"
                       T="StepDto"
@@ -130,7 +130,7 @@
                         <MudChip T="string" Color="Color.Primary" Size="Size.Small">Krok @(context.Order + 1)</MudChip>
 
                         <MudTextField @bind-Value="context.Instructions"
-                                      Label="@L[TranslationKeys.RecipeEditor.RecipeCreatorRecipeStepsInstructionTitle]"
+                                      Label="@L[TranslationKeys.RecipeEditor.RecipeEditorRecipeStepsInstructionTitle]"
                                       Lines="2"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
@@ -151,7 +151,7 @@
                Variant="Variant.Outlined"
                OnClick="AddStep"
                Class="mb-6">
-        @L[TranslationKeys.RecipeEditor.RecipeCreatorRecipeStepsAddButtonTitle]
+        @L[TranslationKeys.RecipeEditor.RecipeEditorRecipeStepsAddButtonTitle]
     </MudButton>
 
     <MudDivider Class="my-4" />
@@ -162,7 +162,7 @@
                Size="Size.Large"
                Class="mt-2"
                OnClick="SaveRecipeAsync">
-        @L[TranslationKeys.RecipeEditor.RecipeCreatorCreateRecipeButtonTitle]
+        @L[TranslationKeys.RecipeEditor.RecipeEditorCreateRecipeButtonTitle]
     </MudButton>
 </MudPaper>
 
@@ -181,7 +181,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        AppBarService.SetTitle(L[TranslationKeys.RecipeEditor.RecipeCreatorApplicationTitle]);
+        AppBarService.SetTitle(L[TranslationKeys.RecipeEditor.RecipeEditorApplicationTitle]);
         await LoadPredefinedProductsAsync();
     }
 
@@ -292,19 +292,19 @@
     {
         if (string.IsNullOrWhiteSpace(_recipeName))
         {
-            Snackbar.Add(L[TranslationKeys.RecipeEditor.RecipeCreatorValidationNameError], Severity.Warning);
+            Snackbar.Add(L[TranslationKeys.RecipeEditor.RecipeEditorValidationNameError], Severity.Warning);
             return;
         }
 
         if (!_ingredients.Any() || _ingredients.Any(i => i.SelectedProduct == null || i.SelectedUnit == null))
         {
-            Snackbar.Add(L[TranslationKeys.RecipeEditor.RecipeCreatorValidationIngredientsError], Severity.Warning);
+            Snackbar.Add(L[TranslationKeys.RecipeEditor.RecipeEditorValidationIngredientsError], Severity.Warning);
             return;
         }
 
         if (!_steps.Any() || _steps.Any(s => string.IsNullOrWhiteSpace(s.Instructions)))
         {
-            Snackbar.Add(L[TranslationKeys.RecipeEditor.RecipeCreatorValidationStepsError], Severity.Warning);
+            Snackbar.Add(L[TranslationKeys.RecipeEditor.RecipeEditorValidationStepsError], Severity.Warning);
             return;
         }
 
@@ -318,10 +318,10 @@
         ).ToList();
 
         var request = new CreateRecipeRequest(_recipeName, _servings, finalIngredients, finalSteps);
-        var response = await RecipeCreator.CreateRecipe(request, _cts.Token);
+        var response = await RecipeEditor.CreateRecipe(request, _cts.Token);
         if (response.IsSuccess)
         {
-            Snackbar.Add(L[TranslationKeys.RecipeEditor.RecipeCreatorRecipeAddedConfirmation], Severity.Success);
+            Snackbar.Add(L[TranslationKeys.RecipeEditor.RecipeEditorRecipeAddedConfirmation], Severity.Success);
             Navigation.NavigateTo(RoutingConstants.Recipes.DetailsFor(response.Value!.Id));
         }
         else

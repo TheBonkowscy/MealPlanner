@@ -60,29 +60,11 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dashboard.
-        /// </summary>
-        public static string DashboardName {
-            get {
-                return ResourceManager.GetString("DashboardName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Editors.
-        /// </summary>
-        public static string EditorsGroupTitle {
-            get {
-                return ResourceManager.GetString("EditorsGroupTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Go to today.
         /// </summary>
-        public static string GoToTodayButton {
+        public static string MainLayoutGoToTodayButtonTitle {
             get {
-                return ResourceManager.GetString("GoToTodayButton", resourceCulture);
+                return ResourceManager.GetString("MainLayoutGoToTodayButtonTitle", resourceCulture);
             }
         }
         
@@ -159,6 +141,15 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Menu edited successfully!.
+        /// </summary>
+        public static string MenuEditorMenuEditedSuccessfullyTitle {
+            get {
+                return ResourceManager.GetString("MenuEditorMenuEditedSuccessfullyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Number of portions.
         /// </summary>
         public static string MenuEditorNumberOfServingsTitle {
@@ -204,196 +195,43 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Menus.
+        ///   Looks up a localized string similar to Dashboard.
         /// </summary>
-        public static string MenusGroupTitle {
+        public static string NavMenuDashboardName {
             get {
-                return ResourceManager.GetString("MenusGroupTitle", resourceCulture);
+                return ResourceManager.GetString("NavMenuDashboardName", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create new recipe.
+        ///   Looks up a localized string similar to Editors.
         /// </summary>
-        public static string RecipeCreateLinkTitle {
+        public static string NavMenuEditorsGroupTitle {
             get {
-                return ResourceManager.GetString("RecipeCreateLinkTitle", resourceCulture);
+                return ResourceManager.GetString("NavMenuEditorsGroupTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Menus.
+        /// </summary>
+        public static string NavMenuMenusGroupTitle {
+            get {
+                return ResourceManager.GetString("NavMenuMenusGroupTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recipe editor.
+        /// </summary>
+        public static string RecipeEditor {
+            get {
+                return ResourceManager.GetString("RecipeEditor", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Add new recipe.
-        /// </summary>
-        public static string RecipeCreatorApplicationTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorApplicationTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Add recipe +.
-        /// </summary>
-        public static string RecipeCreatorCreateRecipeButtonTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorCreateRecipeButtonTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Add ingredients.
-        /// </summary>
-        public static string RecipeCreatorIngredientsAddButtonTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorIngredientsAddButtonTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Saved ingredient.
-        /// </summary>
-        public static string RecipeCreatorIngredientSavedIconTooltip {
-            get {
-                return ResourceManager.GetString("RecipeCreatorIngredientSavedIconTooltip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Quantity.
-        /// </summary>
-        public static string RecipeCreatorIngredientsQuantityTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorIngredientsQuantityTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Search for ingredient....
-        /// </summary>
-        public static string RecipeCreatorIngredientsSearchTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorIngredientsSearchTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ingredients.
-        /// </summary>
-        public static string RecipeCreatorIngredientsSectionTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorIngredientsSectionTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Measure units.
-        /// </summary>
-        public static string RecipeCreatorIngredientsUnitTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorIngredientsUnitTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Name is required.
-        /// </summary>
-        public static string RecipeCreatorNameRequiredError {
-            get {
-                return ResourceManager.GetString("RecipeCreatorNameRequiredError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Recipe name.
-        /// </summary>
-        public static string RecipeCreatorNameTextField {
-            get {
-                return ResourceManager.GetString("RecipeCreatorNameTextField", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Recipe added successfully!.
-        /// </summary>
-        public static string RecipeCreatorRecipeAddedConfirmation {
-            get {
-                return ResourceManager.GetString("RecipeCreatorRecipeAddedConfirmation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Add step.
-        /// </summary>
-        public static string RecipeCreatorRecipeStepsAddButtonTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorRecipeStepsAddButtonTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Instructions.
-        /// </summary>
-        public static string RecipeCreatorRecipeStepsInstructionTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorRecipeStepsInstructionTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Recipe steps.
-        /// </summary>
-        public static string RecipeCreatorRecipeStepsSectionTitle {
-            get {
-                return ResourceManager.GetString("RecipeCreatorRecipeStepsSectionTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Number of servings is required.
-        /// </summary>
-        public static string RecipeCreatorServingsRequiredError {
-            get {
-                return ResourceManager.GetString("RecipeCreatorServingsRequiredError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Number of servings.
-        /// </summary>
-        public static string RecipeCreatorServingsTextField {
-            get {
-                return ResourceManager.GetString("RecipeCreatorServingsTextField", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Fill in all the ingredients and their units!.
-        /// </summary>
-        public static string RecipeCreatorValidationIngredientsError {
-            get {
-                return ResourceManager.GetString("RecipeCreatorValidationIngredientsError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please name the recipe!.
-        /// </summary>
-        public static string RecipeCreatorValidationNameError {
-            get {
-                return ResourceManager.GetString("RecipeCreatorValidationNameError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Fill in all the steps!.
-        /// </summary>
-        public static string RecipeCreatorValidationStepsError {
-            get {
-                return ResourceManager.GetString("RecipeCreatorValidationStepsError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Edit recipe.
         /// </summary>
         public static string RecipeEditorApplicationTitle {
             get {
@@ -411,11 +249,29 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add recipe +.
+        /// </summary>
+        public static string RecipeEditorCreateRecipeButtonTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorCreateRecipeButtonTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create a new recipe.
         /// </summary>
         public static string RecipeEditorCreateTitle {
             get {
                 return ResourceManager.GetString("RecipeEditorCreateTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit recipe.
+        /// </summary>
+        public static string RecipeEditorEditApplicationTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorEditApplicationTitle", resourceCulture);
             }
         }
         
@@ -429,11 +285,101 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add ingredients.
+        /// </summary>
+        public static string RecipeEditorIngredientsAddButtonTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorIngredientsAddButtonTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saved ingredient.
+        /// </summary>
+        public static string RecipeEditorIngredientSavedIconTooltip {
+            get {
+                return ResourceManager.GetString("RecipeEditorIngredientSavedIconTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ingredient {0} saved.
         /// </summary>
         public static string RecipeEditorIngredientSavedTitle {
             get {
                 return ResourceManager.GetString("RecipeEditorIngredientSavedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quantity.
+        /// </summary>
+        public static string RecipeEditorIngredientsQuantityTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorIngredientsQuantityTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search for ingredient....
+        /// </summary>
+        public static string RecipeEditorIngredientsSearchTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorIngredientsSearchTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ingredients.
+        /// </summary>
+        public static string RecipeEditorIngredientsSectionTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorIngredientsSectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Measure units.
+        /// </summary>
+        public static string RecipeEditorIngredientsUnitTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorIngredientsUnitTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name is required.
+        /// </summary>
+        public static string RecipeEditorNameRequiredError {
+            get {
+                return ResourceManager.GetString("RecipeEditorNameRequiredError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recipe name.
+        /// </summary>
+        public static string RecipeEditorNameTextField {
+            get {
+                return ResourceManager.GetString("RecipeEditorNameTextField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create new recipe.
+        /// </summary>
+        public static string RecipeEditorNavigationCreateLinkTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorNavigationCreateLinkTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All recipes.
+        /// </summary>
+        public static string RecipeEditorNavigationListLinkTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorNavigationListLinkTitle", resourceCulture);
             }
         }
         
@@ -447,6 +393,60 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Recipe added successfully!.
+        /// </summary>
+        public static string RecipeEditorRecipeAddedConfirmation {
+            get {
+                return ResourceManager.GetString("RecipeEditorRecipeAddedConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add step.
+        /// </summary>
+        public static string RecipeEditorRecipeStepsAddButtonTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorRecipeStepsAddButtonTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Instructions.
+        /// </summary>
+        public static string RecipeEditorRecipeStepsInstructionTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorRecipeStepsInstructionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recipe steps.
+        /// </summary>
+        public static string RecipeEditorRecipeStepsSectionTitle {
+            get {
+                return ResourceManager.GetString("RecipeEditorRecipeStepsSectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of servings is required.
+        /// </summary>
+        public static string RecipeEditorServingsRequiredError {
+            get {
+                return ResourceManager.GetString("RecipeEditorServingsRequiredError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of servings.
+        /// </summary>
+        public static string RecipeEditorServingsTextField {
+            get {
+                return ResourceManager.GetString("RecipeEditorServingsTextField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Step saved successfully!.
         /// </summary>
         public static string RecipeEditorStepSavedTitle {
@@ -456,11 +456,29 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All recipes.
+        ///   Looks up a localized string similar to Fill in all the ingredients and their units!.
         /// </summary>
-        public static string RecipeListLinkTitle {
+        public static string RecipeEditorValidationIngredientsError {
             get {
-                return ResourceManager.GetString("RecipeListLinkTitle", resourceCulture);
+                return ResourceManager.GetString("RecipeEditorValidationIngredientsError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please name the recipe!.
+        /// </summary>
+        public static string RecipeEditorValidationNameError {
+            get {
+                return ResourceManager.GetString("RecipeEditorValidationNameError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fill in all the steps!.
+        /// </summary>
+        public static string RecipeEditorValidationStepsError {
+            get {
+                return ResourceManager.GetString("RecipeEditorValidationStepsError", resourceCulture);
             }
         }
         

@@ -4,21 +4,21 @@ public static class TranslationKeys
 {
     public static class MainLayout
     {
-        public const string GoToTodayButton = nameof(GoToTodayButton);
+        public const string MainLayoutGoToTodayButtonTitle = nameof(MainLayoutGoToTodayButtonTitle);
     }
 
     public static class NavMenu
     {
-        public const string DashboardName = nameof(DashboardName);
-        public const string MenusGroupTitle = nameof(MenusGroupTitle);
-        public const string EditorsGroupTitle = nameof(EditorsGroupTitle);
+        public const string NavMenuDashboardName = nameof(NavMenuDashboardName);
+        public const string NavMenuMenusGroupTitle = nameof(NavMenuMenusGroupTitle);
+        public const string NavMenuEditorsGroupTitle = nameof(NavMenuEditorsGroupTitle);
     }
 
     public static class RecipeEditorNavigation
     {
         public const string RecipeEditorNavigationTitle = nameof(RecipeEditorNavigationTitle);
-        public const string RecipeListLinkTitle = nameof(RecipeListLinkTitle);
-        public const string RecipeCreateLinkTitle = nameof(RecipeCreateLinkTitle);
+        public const string RecipeEditorNavigationListLinkTitle = nameof(RecipeEditorNavigationListLinkTitle);
+        public const string RecipeEditorNavigationCreateLinkTitle = nameof(RecipeEditorNavigationCreateLinkTitle);
     }
 
     public static class WeeklyMenuNavigation
@@ -29,26 +29,25 @@ public static class TranslationKeys
     public static class RecipeEditor
     {
         public const string RecipeEditorCreateTitle = nameof(RecipeEditorCreateTitle);
-        public const string RecipeCreatorNameTextField = nameof(RecipeCreatorNameTextField);
-        public const string RecipeCreatorNameRequiredError = nameof(RecipeCreatorNameRequiredError);
-        public const string RecipeCreatorServingsTextField = nameof(RecipeCreatorServingsTextField);
-        public const string RecipeCreatorServingsRequiredError = nameof(RecipeCreatorServingsRequiredError);
-        public const string RecipeCreatorIngredientsSectionTitle = nameof(RecipeCreatorIngredientsSectionTitle);
-        public const string RecipeCreatorIngredientsSearchTitle = nameof(RecipeCreatorIngredientsSearchTitle);
-        public const string RecipeCreatorIngredientsQuantityTitle = nameof(RecipeCreatorIngredientsQuantityTitle);
-        public const string RecipeCreatorIngredientsUnitTitle = nameof(RecipeCreatorIngredientsUnitTitle);
-        public const string RecipeCreatorIngredientsAddButtonTitle = nameof(RecipeCreatorIngredientsAddButtonTitle);
-        public const string RecipeCreatorRecipeStepsSectionTitle = nameof(RecipeCreatorRecipeStepsSectionTitle);
-        public const string RecipeCreatorRecipeStepsInstructionTitle = nameof(RecipeCreatorRecipeStepsInstructionTitle);
-        public const string RecipeCreatorRecipeStepsAddButtonTitle = nameof(RecipeCreatorRecipeStepsAddButtonTitle);
-        public const string RecipeCreatorCreateRecipeButtonTitle = nameof(RecipeCreatorCreateRecipeButtonTitle);
-        public const string RecipeCreatorApplicationTitle = nameof(RecipeCreatorApplicationTitle);
-        public const string RecipeCreatorValidationNameError = nameof(RecipeCreatorValidationNameError);
-        public const string RecipeCreatorValidationIngredientsError = nameof(RecipeCreatorValidationIngredientsError);
-        public const string RecipeCreatorValidationStepsError = nameof(RecipeCreatorValidationStepsError);
-        public const string RecipeCreatorRecipeAddedConfirmation = nameof(RecipeCreatorRecipeAddedConfirmation);
-        public const string RecipeCreatorIngredientSavedIconTooltip = nameof(RecipeCreatorIngredientSavedIconTooltip);
+        public const string RecipeEditorNameTextField = nameof(RecipeEditorNameTextField);
+        public const string RecipeEditorServingsTextField = nameof(RecipeEditorServingsTextField);
+        public const string RecipeEditorServingsRequiredError = nameof(RecipeEditorServingsRequiredError);
+        public const string RecipeEditorIngredientsSectionTitle = nameof(RecipeEditorIngredientsSectionTitle);
+        public const string RecipeEditorIngredientsSearchTitle = nameof(RecipeEditorIngredientsSearchTitle);
+        public const string RecipeEditorIngredientsQuantityTitle = nameof(RecipeEditorIngredientsQuantityTitle);
+        public const string RecipeEditorIngredientsUnitTitle = nameof(RecipeEditorIngredientsUnitTitle);
+        public const string RecipeEditorIngredientsAddButtonTitle = nameof(RecipeEditorIngredientsAddButtonTitle);
+        public const string RecipeEditorRecipeStepsSectionTitle = nameof(RecipeEditorRecipeStepsSectionTitle);
+        public const string RecipeEditorRecipeStepsInstructionTitle = nameof(RecipeEditorRecipeStepsInstructionTitle);
+        public const string RecipeEditorRecipeStepsAddButtonTitle = nameof(RecipeEditorRecipeStepsAddButtonTitle);
+        public const string RecipeEditorCreateRecipeButtonTitle = nameof(RecipeEditorCreateRecipeButtonTitle);
         public const string RecipeEditorApplicationTitle = nameof(RecipeEditorApplicationTitle);
+        public const string RecipeEditorValidationNameError = nameof(RecipeEditorValidationNameError);
+        public const string RecipeEditorValidationIngredientsError = nameof(RecipeEditorValidationIngredientsError);
+        public const string RecipeEditorValidationStepsError = nameof(RecipeEditorValidationStepsError);
+        public const string RecipeEditorRecipeAddedConfirmation = nameof(RecipeEditorRecipeAddedConfirmation);
+        public const string RecipeEditorIngredientSavedIconTooltip = nameof(RecipeEditorIngredientSavedIconTooltip);
+        public const string RecipeEditorEditApplicationTitle = nameof(RecipeEditorEditApplicationTitle);
         public const string RecipeEditorBasicInfoSavedTitle = nameof(RecipeEditorBasicInfoSavedTitle);
         public const string RecipeEditorIngredientSavedTitle = nameof(RecipeEditorIngredientSavedTitle);
         public const string RecipeEditorStepSavedTitle = nameof(RecipeEditorStepSavedTitle);

@@ -15,7 +15,7 @@ public interface ICreateRecipe
     Task<Result<CreateRecipeResponse>> Create(CreateRecipeRequest request, CancellationToken cancellationToken);
 }
 
-public class RecipeCreator(MealPlannerDbContext ctx, 
+public class RecipeEditor(MealPlannerDbContext ctx, 
     MeasureUnitMapper measureUnitMapper) : ICreateRecipe
 {
     public async Task<Result<CreateRecipeResponse>> Create(CreateRecipeRequest request, CancellationToken cancellationToken)

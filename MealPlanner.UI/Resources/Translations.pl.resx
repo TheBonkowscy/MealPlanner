@@ -18,25 +18,22 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="GoToTodayButton" xml:space="preserve">
+    <data name="MainLayoutGoToTodayButtonTitle" xml:space="preserve">
         <value>Idź do dziś</value>
     </data>
-    <data name="DashboardName" xml:space="preserve">
-        <value>Dashboard</value>
-    </data>
-    <data name="MenusGroupTitle" xml:space="preserve">
+    <data name="NavMenuMenusGroupTitle" xml:space="preserve">
         <value>Menu</value>
     </data>
-    <data name="EditorsGroupTitle" xml:space="preserve">
+    <data name="NavMenuEditorsGroupTitle" xml:space="preserve">
         <value>Edytory</value>
     </data>
     <data name="RecipeEditorNavigationTitle" xml:space="preserve">
         <value>Przepisy</value>
     </data>
-    <data name="RecipeListLinkTitle" xml:space="preserve">
+    <data name="RecipeEditorNavigationListLinkTitle" xml:space="preserve">
         <value>Wszystkie przepisy</value>
     </data>
-    <data name="RecipeCreateLinkTitle" xml:space="preserve">
+    <data name="RecipeEditorNavigationCreateLinkTitle" xml:space="preserve">
         <value>Stwórz nowy</value>
     </data>
     <data name="WeeklyMenuNavigationTitle" xml:space="preserve">
@@ -45,64 +42,64 @@
     <data name="RecipeEditorCreateTitle" xml:space="preserve">
         <value>Tworzenie nowego przepisu</value>
     </data>
-    <data name="RecipeCreatorNameTextField" xml:space="preserve">
+    <data name="RecipeEditorNameTextField" xml:space="preserve">
         <value>Nazwa przepisu</value>
     </data>
-    <data name="RecipeCreatorNameRequiredError" xml:space="preserve">
+    <data name="RecipeEditorNameRequiredError" xml:space="preserve">
         <value>Nazwa jest wymagana</value>
     </data>
-    <data name="RecipeCreatorServingsTextField" xml:space="preserve">
+    <data name="RecipeEditorServingsTextField" xml:space="preserve">
         <value>Liczba porcji</value>
     </data>
-    <data name="RecipeCreatorServingsRequiredError" xml:space="preserve">
+    <data name="RecipeEditorServingsRequiredError" xml:space="preserve">
         <value>Liczba porcji jest wymagana</value>
     </data>
-    <data name="RecipeCreatorIngredientsSectionTitle" xml:space="preserve">
+    <data name="RecipeEditorIngredientsSectionTitle" xml:space="preserve">
         <value>Składniki</value>
     </data>
-    <data name="RecipeCreatorIngredientsSearchTitle" xml:space="preserve">
+    <data name="RecipeEditorIngredientsSearchTitle" xml:space="preserve">
         <value>Szukaj składnika...</value>
     </data>
-    <data name="RecipeCreatorIngredientsQuantityTitle" xml:space="preserve">
+    <data name="RecipeEditorIngredientsQuantityTitle" xml:space="preserve">
         <value>Ilość</value>
     </data>
-    <data name="RecipeCreatorIngredientsUnitTitle" xml:space="preserve">
+    <data name="RecipeEditorIngredientsUnitTitle" xml:space="preserve">
         <value>Jednostka miary</value>
     </data>
-    <data name="RecipeCreatorIngredientsAddButtonTitle" xml:space="preserve">
+    <data name="RecipeEditorIngredientsAddButtonTitle" xml:space="preserve">
         <value>Dodaj składnik</value>
     </data>
-    <data name="RecipeCreatorRecipeStepsSectionTitle" xml:space="preserve">
+    <data name="RecipeEditorRecipeStepsSectionTitle" xml:space="preserve">
         <value>Kroki przepisu</value>
     </data>
-    <data name="RecipeCreatorRecipeStepsInstructionTitle" xml:space="preserve">
+    <data name="RecipeEditorRecipeStepsInstructionTitle" xml:space="preserve">
         <value>Instrukcja</value>
     </data>
-    <data name="RecipeCreatorRecipeStepsAddButtonTitle" xml:space="preserve">
+    <data name="RecipeEditorRecipeStepsAddButtonTitle" xml:space="preserve">
         <value>Dodaj krok</value>
     </data>
-    <data name="RecipeCreatorCreateRecipeButtonTitle" xml:space="preserve">
+    <data name="RecipeEditorCreateRecipeButtonTitle" xml:space="preserve">
         <value>Dodaj przepis +</value>
     </data>
-    <data name="RecipeCreatorApplicationTitle" xml:space="preserve">
+    <data name="RecipeEditorApplicationTitle" xml:space="preserve">
         <value>Dodaj Nowy Przepis</value>
     </data>
-    <data name="RecipeCreatorValidationNameError" xml:space="preserve">
+    <data name="RecipeEditorValidationNameError" xml:space="preserve">
         <value>Podaj nazwę przepisu!</value>
     </data>
-    <data name="RecipeCreatorValidationIngredientsError" xml:space="preserve">
+    <data name="RecipeEditorValidationIngredientsError" xml:space="preserve">
         <value>Uzupełnij wszystkie dodane składniki oraz ich jednostki!</value>
     </data>
-    <data name="RecipeCreatorValidationStepsError" xml:space="preserve">
+    <data name="RecipeEditorValidationStepsError" xml:space="preserve">
         <value>Uzupełnij treść wszystkich kroków!</value>
     </data>
-    <data name="RecipeCreatorRecipeAddedConfirmation" xml:space="preserve">
+    <data name="RecipeEditorRecipeAddedConfirmation" xml:space="preserve">
         <value>Pomyślnie dodano nowy przepis!</value>
     </data>
-    <data name="RecipeCreatorIngredientSavedIconTooltip" xml:space="preserve">
+    <data name="RecipeEditorIngredientSavedIconTooltip" xml:space="preserve">
         <value>Składnik zapisany</value>
     </data>
-    <data name="RecipeEditorApplicationTitle" xml:space="preserve">
+    <data name="RecipeEditor" xml:space="preserve">
         <value>Edycja Przepisu</value>
     </data>
     <data name="RecipeEditorBasicInfoSavedTitle" xml:space="preserve">
@@ -169,7 +166,7 @@
         <value>{0} (Porcje: {1})</value>
     </data>
     <data name="ViewMenuWeekNameApplicationTitle" xml:space="preserve">
-        <value>Title</value>
+        <value>Tydzień</value>
     </data>
     <data name="ViewMenuEditMenuActionTitle" xml:space="preserve">
         <value>Edytuj menu</value>
@@ -230,5 +227,11 @@
     </data>
     <data name="ViewRecipeDeleteRecipeActionTitle" xml:space="preserve">
         <value>Usuń przepis</value>
+    </data>
+    <data name="RecipeEditorEditApplicationTitle" xml:space="preserve">
+        <value>Edycja przepisu</value>
+    </data>
+    <data name="MenuEditorMenuEditedSuccessfullyTitle" xml:space="preserve">
+        <value>Menu edytowane pomyślnie!</value>
     </data>
 </root>

@@ -2,11 +2,11 @@
 @inject IStringLocalizer<Translations> L
 
 <MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All">@L[TranslationKeys.NavMenu.DashboardName]</MudNavLink>
-    <MudNavGroup Title="@L[TranslationKeys.NavMenu.MenusGroupTitle]" Expanded="false">
+    <MudNavLink Href="/" Match="NavLinkMatch.All">@L[TranslationKeys.NavMenu.NavMenuDashboardName]</MudNavLink>
+    <MudNavGroup Title="@L[TranslationKeys.NavMenu.NavMenuMenusGroupTitle]" Expanded="false">
         <WeeklyMenuNavigation />
     </MudNavGroup>
-    <MudNavGroup Title="@L[TranslationKeys.NavMenu.EditorsGroupTitle]" Expanded="false">
+    <MudNavGroup Title="@L[TranslationKeys.NavMenu.NavMenuEditorsGroupTitle]" Expanded="false">
         <RecipeEditorNavigation />
     </MudNavGroup>
 </MudNavMenu>
