@@ -28,6 +28,17 @@ public class Recipe
         private set => _steps = [.. value];
     }
 
+    // TODO: update this later down the line!
+    public IReadOnlyList<RecipePreparations> Preparations => [];
+    // TODO: update this later down the line!
+    public class RecipePreparations
+    {
+        public int Id { get; set; }
+        public string Description { get; set; }
+        public int LeadDays { get; set; }
+        public bool Required { get; set; }
+    }
+
     private Recipe()
     {
         // For EF Core
