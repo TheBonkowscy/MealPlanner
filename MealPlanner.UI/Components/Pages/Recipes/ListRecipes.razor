@@ -1,9 +1,12 @@
 ﻿@page "/recipes"
 @using MealPlanner.Client.Recipes
 @using MealPlanner.Shared.Recipes.Responses
+@using Microsoft.Extensions.Localization
 @implements IDisposable
+@inject NavigationManager Navigation
 @inject IFindRecipes RecipeFinder
 @inject ISnackbar Snackbar
+@inject IStringLocalizer<Translations> L
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <MudGrid Class="mb-4" AlignItems="Center">
@@ -11,7 +14,7 @@
             <MudTextField T="string"
                           Value="_searchQuery"
                           ValueChanged="OnSearchQueryChanged"
-                          Label="Szukaj przepisu..."
+                          Label="@L[TranslationKeys.ViewRecipe.ViewRecipeSearchForRecipeTitle]"
                           Variant="Variant.Outlined"
                           Adornment="Adornment.End"
                           AdornmentIcon="@Icons.Material.Filled.Search"
@@ -28,8 +31,8 @@
                                  ToggledIcon="@Icons.Material.Filled.GridView"
                                  Color="Color.Primary"
                                  ToggledColor="Color.Primary"
-                                 Title="Przełącz na kafelki"
-                                 ToggledTitle="Przełącz na listę"/>
+                                 Title="@L[TranslationKeys.ViewRecipe.ViewRecipeSwitchToTilesButtonTitle]"
+                                 ToggledTitle="@L[TranslationKeys.ViewRecipe.ViewRecipeSwitchToListButtonTitle]"/>
         </MudItem>
     </MudGrid>
 
@@ -39,7 +42,7 @@
     }
     else if (!_recipes.Any())
     {
-        <MudAlert Severity="Severity.Info" Class="mt-4">Brak przepisów do wyświetlenia.</MudAlert>
+        <MudAlert Severity="Severity.Info" Class="mt-4">@L[TranslationKeys.ViewRecipe.NoRecipesToDisplayTitle]</MudAlert>
     }
     else
     {
@@ -58,7 +61,7 @@
                                 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-3">
                                     <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Default" Size="Size.Small" />
                                     <MudText Typo="Typo.body2">
-                                        Porcje: <b>@recipe.Servings</b>
+                                        @L[TranslationKeys.ViewRecipe.ViewRecipeNumberOfPortionsTitle]: <b>@recipe.Servings</b>
                                     </MudText>
                                 </MudStack>
 
@@ -68,7 +71,7 @@
                             </MudCardContent>
 
                             <MudCardActions Class="pt-0">
-                                <MudButton Variant="Variant.Text" Color="Color.Primary">Zobacz przepis</MudButton>
+                                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => Navigation.NavigateTo(RoutingConstants.Recipes.DetailsFor(recipe.Id)))">@L[TranslationKeys.ViewRecipe.ViewRecipeViewDetailsButtonTitle]</MudButton>
                             </MudCardActions>
                         </MudCard>
                     </MudItem>
@@ -91,7 +94,7 @@
                                 </div>
                                 <MudChip T="string" Icon="@Icons.Material.Filled.People" Color="Color.Default"
                                          Size="Size.Small" Class="ml-4">
-                                    @recipe.Servings porcji
+                                    @L[TranslationKeys.ViewRecipe.ViewRecipeNumberOfPortionsTitle]: @recipe.Servings 
                                 </MudChip>
                             </div>
                         </MudListItem>

@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="MainLayoutGoToTodayButtonTitle" xml:space="preserve">
+        <value>Go to today</value>
+    </data>
+    <data name="NavMenuMenusGroupTitle" xml:space="preserve">
+        <value>Menus</value>
+    </data>
+    <data name="NavMenuEditorsGroupTitle" xml:space="preserve">
+        <value>Editors</value>
+    </data>
+    <data name="RecipeEditorNavigationTitle" xml:space="preserve">
+        <value>Recipes</value>
+    </data>
+    <data name="RecipeEditorNavigationListLinkTitle" xml:space="preserve">
+        <value>All recipes</value>
+    </data>
+    <data name="RecipeEditorNavigationCreateLinkTitle" xml:space="preserve">
+        <value>Create new recipe</value>
+    </data>
+    <data name="WeeklyMenuNavigationTitle" xml:space="preserve">
+        <value>Week {0} of {1}</value>
+    </data>
+    <data name="RecipeEditorCreateTitle" xml:space="preserve">
+        <value>Create a new recipe</value>
+    </data>
+    <data name="RecipeEditorNameTextField" xml:space="preserve">
+        <value>Recipe name</value>
+    </data>
+    <data name="RecipeEditorNameRequiredError" xml:space="preserve">
+        <value>Name is required</value>
+    </data>
+    <data name="RecipeEditorServingsTextField" xml:space="preserve">
+        <value>Number of servings</value>
+    </data>
+    <data name="RecipeEditorServingsRequiredError" xml:space="preserve">
+        <value>Number of servings is required</value>
+    </data>
+    <data name="RecipeEditorIngredientsSectionTitle" xml:space="preserve">
+        <value>Ingredients</value>
+    </data>
+    <data name="RecipeEditorIngredientsSearchTitle" xml:space="preserve">
+        <value>Search for ingredient...</value>
+    </data>
+    <data name="RecipeEditorIngredientsQuantityTitle" xml:space="preserve">
+        <value>Quantity</value>
+    </data>
+    <data name="RecipeEditorIngredientsUnitTitle" xml:space="preserve">
+        <value>Measure units</value>
+    </data>
+    <data name="RecipeEditorIngredientsAddButtonTitle" xml:space="preserve">
+        <value>Add ingredients</value>
+    </data>
+    <data name="RecipeEditorRecipeStepsSectionTitle" xml:space="preserve">
+        <value>Recipe steps</value>
+    </data>
+    <data name="RecipeEditorRecipeStepsInstructionTitle" xml:space="preserve">
+        <value>Instructions</value>
+    </data>
+    <data name="RecipeEditorRecipeStepsAddButtonTitle" xml:space="preserve">
+        <value>Add step</value>
+    </data>
+    <data name="RecipeEditorCreateRecipeButtonTitle" xml:space="preserve">
+        <value>Add recipe +</value>
+    </data>
+    <data name="RecipeEditorApplicationTitle" xml:space="preserve">
+        <value>Add new recipe</value>
+    </data>
+    <data name="RecipeEditorValidationNameError" xml:space="preserve">
+        <value>Please name the recipe!</value>
+    </data>
+    <data name="RecipeEditorValidationIngredientsError" xml:space="preserve">
+        <value>Fill in all the ingredients and their units!</value>
+    </data>
+    <data name="RecipeEditorValidationStepsError" xml:space="preserve">
+        <value>Fill in all the steps!</value>
+    </data>
+    <data name="RecipeEditorRecipeAddedConfirmation" xml:space="preserve">
+        <value>Recipe added successfully!</value>
+    </data>
+    <data name="RecipeEditorIngredientSavedIconTooltip" xml:space="preserve">
+        <value>Saved ingredient</value>
+    </data>
+    <data name="RecipeEditorEditApplicationTitle" xml:space="preserve">
+        <value>Edit recipe</value>
+    </data>
+    <data name="RecipeEditorBasicInfoSavedTitle" xml:space="preserve">
+        <value>Basic info saved!</value>
+    </data>
+    <data name="RecipeEditorIngredientSavedTitle" xml:space="preserve">
+        <value>Ingredient {0} saved</value>
+    </data>
+    <data name="RecipeEditorIngredientRemovedTitle" xml:space="preserve">
+        <value>Ingredient removed successfully</value>
+    </data>
+    <data name="RecipeEditorStepSavedTitle" xml:space="preserve">
+        <value>Step saved successfully!</value>
+    </data>
+    <data name="MenuEditorNumberOfServingsTitle" xml:space="preserve">
+        <value>Number of portions</value>
+    </data>
+    <data name="MenuEditorAddMealToMenuTitle" xml:space="preserve">
+        <value>Add new meal to the menu</value>
+    </data>
+    <data name="MenuEditorSearchForMealTitle" xml:space="preserve">
+        <value>Search for meal...</value>
+    </data>
+    <data name="MenuEditorCreateMenuTitle" xml:space="preserve">
+        <value>Create menu</value>
+    </data>
+    <data name="MenuEditorMealsPlannedTitle" xml:space="preserve">
+        <value>Meals planned for this day</value>
+    </data>
+    <data name="MenuEditorWeekNameApplicationTitle" xml:space="preserve">
+        <value>Week</value>
+    </data>
+    <data name="MenuEditorValidationMealsError" xml:space="preserve">
+        <value>Add at least one meal!</value>
+    </data>
+    <data name="MenuEditorMenuCreatedSuccessfullyTitle" xml:space="preserve">
+        <value>Menu created successfully!</value>
+    </data>
+    <data name="MenuEditorDragToReorderTitle" xml:space="preserve">
+        <value>Drag to change the meals' order</value>
+    </data>
+    <data name="MenuEditorSaveChangesButtonTitle" xml:space="preserve">
+        <value>Save changes</value>
+    </data>
+    <data name="MenuEditorBackToDetailsActionTitle" xml:space="preserve">
+        <value>Back to details</value>
+    </data>
+    <data name="MenuEditorDeleteMenuActionTitle" xml:space="preserve">
+        <value>Delete menu</value>
+    </data>
+    <data name="MealEditorMenuEditedSuccessfullyTitle" xml:space="preserve">
+        <value>Menu edited successfully!</value>
+    </data>
+    <data name="ViewMenuMenuForDayTitle" xml:space="preserve">
+        <value>Menu for {0}</value>
+    </data>
+    <data name="ViewMenuNoMealsLine1" xml:space="preserve">
+        <value>No meals for this day</value>
+    </data>
+    <data name="ViewMenuNoMealsLine2" xml:space="preserve">
+        <value>You should eat something.</value>
+    </data>
+    <data name="ViewMenuMealListItemTitle" xml:space="preserve">
+        <value>{0} (yields {1} portions)</value>
+    </data>
+    <data name="ViewMenuWeekNameApplicationTitle" xml:space="preserve">
+        <value>Week</value>
+    </data>
+    <data name="ViewMenuEditMenuActionTitle" xml:space="preserve">
+        <value>Edit menu</value>
+    </data>
+    <data name="ViewMenuDeleteMenuActionTitle" xml:space="preserve">
+        <value>Delete menu</value>
+    </data>
+    <data name="ViewMenuCreateMenuActionTitle" xml:space="preserve">
+        <value>Create menu</value>
+    </data>
+    <data name="ViewRecipeSearchForRecipeTitle" xml:space="preserve">
+        <value>Search for recipe...</value>
+    </data>
+    <data name="ViewRecipeSwitchToTilesButtonTitle" xml:space="preserve">
+        <value>Switch to tiles</value>
+    </data>
+    <data name="ViewRecipeSwitchToListButtonTitle" xml:space="preserve">
+        <value>Switch to list</value>
+    </data>
+    <data name="ViewRecipeNoRecipesToDisplayTitle" xml:space="preserve">
+        <value>No meals to display</value>
+    </data>
+    <data name="ViewRecipeNumberOfPortionsTitle" xml:space="preserve">
+        <value>Portions</value>
+    </data>
+    <data name="ViewRecipeViewDetailsButtonTitle" xml:space="preserve">
+        <value>View recipe</value>
+    </data>
+    <data name="ViewRecipeLoadingNameTitle" xml:space="preserve">
+        <value>Loeading...</value>
+    </data>
+    <data name="ViewRecipeShortSummaryTitle" xml:space="preserve">
+        <value>Ingredients: {0} | Steps: {1} | Portions: {2}</value>
+    </data>
+    <data name="ViewRecipeGoBackButtonTitle" xml:space="preserve">
+        <value>Back</value>
+    </data>
+    <data name="ViewRecipeIngredientsSectionTitle" xml:space="preserve">
+        <value>Ingredients</value>
+    </data>
+    <data name="ViewRecipeRecipeStepsSectionTitle" xml:space="preserve">
+        <value>Cooking steps</value>
+    </data>
+    <data name="ViewRecipeExpandAllStepsTitle" xml:space="preserve">
+        <value>Expand all steps</value>
+    </data>
+    <data name="ViewRecipeCollapseAllStepsTitle" xml:space="preserve">
+        <value>Collapse all steps</value>
+    </data>
+    <data name="ViewRecipeStepNameTitle" xml:space="preserve">
+        <value>Step</value>
+    </data>
+    <data name="ViewRecipeApplicationTitle" xml:space="preserve">
+        <value>Recipe details</value>
+    </data>
+    <data name="ViewRecipeEditRecipeActionTitle" xml:space="preserve">
+        <value>Edit recipe</value>
+    </data>
+    <data name="ViewRecipeDeleteRecipeActionTitle" xml:space="preserve">
+        <value>Delete recipe</value>
+    </data>
+    <data name="NavMenuDashboardName" xml:space="preserve">
+        <value>Dashboard</value>
+    </data>
+    <data name="RecipeEditor" xml:space="preserve">
+        <value>Recipe editor</value>
+    </data>
+    <data name="MenuEditorMenuEditedSuccessfullyTitle" xml:space="preserve">
+        <value>Menu edited successfully!</value>
+    </data>
+</root>

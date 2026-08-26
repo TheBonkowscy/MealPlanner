@@ -10,7 +10,7 @@ namespace MealPlanner.API.Controllers.Recipes;
 [ApiController]
 [Route(Shared.Menus.Constants.RecipesRoute)]
 public class RecipesController(IReadRecipe recipeReader,
-    ICreateRecipe recipeCreator,
+    ICreateRecipe RecipeEditor,
     IDeleteRecipe recipeDeleter,
     IUpdateRecipe recipeUpdater,
     IStringLocalizer<Translations> localizer) : ControllerBase
@@ -28,7 +28,7 @@ public class RecipesController(IReadRecipe recipeReader,
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPost]
     public async Task<IResult> Create([FromBody] CreateRecipeRequest createRecipeRequest, CancellationToken cancellationToken) =>
-        (await recipeCreator.Create(createRecipeRequest, cancellationToken)).ToHttpResult(localizer);
+        (await RecipeEditor.Create(createRecipeRequest, cancellationToken)).ToHttpResult(localizer);
     
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(GetRecipesResponse), StatusCodes.Status200OK)]

@@ -2,6 +2,7 @@
 @using MealPlanner.Client.Recipes
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
+@using Microsoft.Extensions.Localization
 
 @implements IDisposable
 @inject NavigationManager Navigation
@@ -11,23 +12,24 @@
 @inject ISnackbar Snackbar
 @inject IFindRecipes RecipeFinder
 @inject IDeleteRecipes RecipesDeleter
+@inject IStringLocalizer<Translations> L
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
     <MudPaper Class="pa-6 rounded-lg" Elevation="2">
         <div class="d-flex align-center justify-space-between mb-4">
             <div>
                 <MudText Typo="Typo.h4" GutterBottom="true" Color="Color.Primary">
-                    @(_recipeName ?? "Wczytywanie...")
+                    @(_recipeName ?? @L[TranslationKeys.ViewRecipe.ViewRecipeLoadingNameTitle])
                 </MudText>
                 <MudChip T="string" Icon="@Icons.Material.Filled.Restaurant" Color="Color.Secondary" Size="Size.Small">
-                    Składniki: @(_ingredients?.Count ?? 0) | Kroki: @(_steps?.Count ?? 0) | Porcje: @(_servings ?? 0)
+                    @L[TranslationKeys.ViewRecipe.ViewRecipeShortSummaryTitle, _ingredients?.Count ?? 0, _steps?.Count ?? 0, _servings ?? 0]
                 </MudChip>
             </div>
             <MudButton StartIcon="@Icons.Material.Filled.ArrowBack"
                        Variant="Variant.Outlined"
                        Color="Color.Default"
                        OnClick="NavigateBack">
-                Powrót
+                @L[TranslationKeys.ViewRecipe.ViewRecipeGoBackButtonTitle]
             </MudButton>
         </div>
 
@@ -38,7 +40,7 @@
                 <MudPaper Class="pa-4 mud-background-gray rounded-lg" Elevation="0">
                     <MudText Typo="Typo.h6" Class="mb-3 d-flex align-center gap-2">
                         <MudIcon Icon="@Icons.Material.Filled.ShoppingBag" Color="Color.Primary"/>
-                        Składniki
+                        @L[TranslationKeys.ViewRecipe.ViewRecipeIngredientsSectionTitle]
                     </MudText>
 
                     <MudList T="string" Dense="true">
@@ -63,7 +65,7 @@
                 <div class="d-flex align-center justify-space-between mb-2">
                     <MudText Typo="Typo.h6" Class="d-flex align-center gap-2">
                         <MudIcon Icon="@Icons.Material.Filled.FormatListNumbered" Color="Color.Primary"/>
-                        Sposób przygotowania
+                        @L[TranslationKeys.ViewRecipe.ViewRecipeRecipeStepsSectionTitle]
                     </MudText>
 
                     <MudStack Row="true" Spacing="1">
@@ -71,13 +73,13 @@
                                    Variant="Variant.Text"
                                    Color="Color.Primary"
                                    OnClick="ExpandAllSteps">
-                            Rozwiń wszystkie
+                            @L[TranslationKeys.ViewRecipe.ViewRecipeExpandAllStepsTitle]
                         </MudButton>
                         <MudButton Size="Size.Small"
                                    Variant="Variant.Text"
                                    Color="Color.Secondary"
                                    OnClick="CollapseAllSteps">
-                            Zwiń wszystkie
+                            @L[TranslationKeys.ViewRecipe.ViewRecipeCollapseAllStepsTitle]
                         </MudButton>
                     </MudStack>
                 </div>
@@ -98,7 +100,7 @@
                                              Color="@(step.IsCompleted ? Color.Success : Color.Primary)"
                                              Size="Size.Small"
                                              Variant="@(step.IsCompleted ? Variant.Filled : Variant.Outlined)">
-                                        Krok @step.Order
+                                        @L[TranslationKeys.ViewRecipe.ViewRecipeStepNameTitle] @step.Order
                                     </MudChip>
 
                                     <MudText
@@ -149,7 +151,7 @@
     {
         await LoadRecipeAsync();
 
-        AppBarService.SetTitle("Podgląd Przepisu");
+        AppBarService.SetTitle(L[TranslationKeys.ViewRecipe.ViewRecipeApplicationTitle]);
 
         List<AppBarAction> actions = [];
 
@@ -159,14 +161,14 @@
                 new AppBarAction
                 {
                     Icon = Icons.Material.Filled.Edit,
-                    Tooltip = "Edytuj przepis",
+                    Tooltip = L[TranslationKeys.ViewRecipe.ViewRecipeEditRecipeActionTitle],
                     Color = Color.Inherit,
                     OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Editors.Recipe.EditFor(_recipeId.Value)))
                 },
                 new AppBarAction
                 {
                     Icon = Icons.Material.Filled.Delete,
-                    Tooltip = "Usuń przepis",
+                    Tooltip = L[TranslationKeys.ViewRecipe.ViewRecipeDeleteRecipeActionTitle],
                     Color = Color.Error,
                     OnClick = EventCallback.Factory.Create(this, ConfirmAndDeleteAsync)
                 }

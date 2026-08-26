@@ -2,6 +2,7 @@
 @using MealPlanner.Client.Menus
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
+@using Microsoft.Extensions.Localization
 @inherits LayoutComponentBase
 @implements IDisposable
 @inject IFindMenus FindMenus
@@ -12,21 +13,21 @@
 @inject MealMapper MealMapper
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject IStringLocalizer<Translations> L
 
 
 <MudText Typo="Typo.h5">
 
-    Menu na dzień @Date.ToString(
-                      "dddd, d MMMM yyyy",
-                      _culture)
+    @L[TranslationKeys.ViewMenu.ViewMenuMenuForDayTitle, 
+        @Date.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentUICulture)]
 
 </MudText>
 
 @if (!_meals.Any())
 {
     <MudItem>
-        <MudText>Brak posiłków na ten dzień</MudText>
-        <MudText>Może warto coś przekąsić?</MudText>
+        <MudText>@L[TranslationKeys.ViewMenu.ViewMenuNoMealsLine1]</MudText>
+        <MudText>@L[TranslationKeys.ViewMenu.ViewMenuNoMealsLine2]</MudText>
     </MudItem>
 }
 else
@@ -36,7 +37,7 @@ else
         @foreach (var meal in _meals)
         {
             <MudListItem T="string" Value="meal.Name" Href="@(RoutingConstants.Recipes.DetailsFor(meal.Id))">
-                @meal.Name (Porcje: @meal.Servings)
+                @L[TranslationKeys.ViewMenu.ViewMenuMealListItemTitle, @meal.Name, @meal.Servings]
             </MudListItem>
         }
 
@@ -46,10 +47,6 @@ else
 @code {
     [Parameter] public DateTime Date { get; set; }
 
-    private readonly CultureInfo _culture =
-        new("pl-PL");
-
-
     private List<MealDto> _meals = [];
 
     private readonly CancellationTokenSource _cts = new();
@@ -58,7 +55,7 @@ else
     {
         var menuForDay = await FindMenus.Get(Date, _cts.Token);
         
-        var formattedTitle = $"Week {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \U0001F4CB";
+        var formattedTitle = $"{L[TranslationKeys.ViewMenu.ViewMenuWeekNameApplicationTitle]} {ISOWeek.GetWeekOfYear(Date)} • {Date:dddd, d MMMM yyyy} • \U0001F4CB";
         AppBarService.SetTitle(formattedTitle);
 
         List<AppBarAction> actions = [];
@@ -70,14 +67,14 @@ else
                 new AppBarAction
                 {
                     Icon = Icons.Material.Filled.Edit,
-                    Tooltip = "Edytuj menu",
+                    Tooltip = L[TranslationKeys.ViewMenu.ViewMenuEditMenuActionTitle],
                     Color = Color.Inherit,
                     OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(DateOnly.FromDateTime(Date))))
                 },
                 new AppBarAction
                 {
                     Icon = Icons.Material.Filled.Delete,
-                    Tooltip = "Usuń menu",
+                    Tooltip = L[TranslationKeys.ViewMenu.ViewMenuDeleteMenuActionTitle],
                     Color = Color.Error,
                     OnClick = EventCallback.Factory.Create(this, ConfirmAndDeleteAsync)
                 }
@@ -88,7 +85,7 @@ else
             actions.Add(new AppBarAction
             {
                 Icon = Icons.Material.Filled.Add,
-                Tooltip = "Utwórz menu",
+                Tooltip = L[TranslationKeys.ViewMenu.ViewMenuCreateMenuActionTitle],
                 Color = Color.Inherit,
                 OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(DateOnly.FromDateTime(Date))))
             });

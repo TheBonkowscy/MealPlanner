@@ -13,16 +13,16 @@ using Moq.EntityFrameworkCore;
 
 namespace MealPlanner.Services.Tests.Recipes;
 
-public class RecipeCreatorTests
+public class RecipeEditorTests
 {
     private readonly Mock<IStringLocalizer<Translations>> _localizer = new();
-    private readonly RecipeCreator _sut;
+    private readonly RecipeEditor _sut;
 
     private static readonly Ingredient PreExistingIngredient = TestIngredients.Create("PreExistingIngredient");
     private readonly List<Ingredient> _ingredients = [PreExistingIngredient];
     private readonly List<Recipe> _recipes = [];
     
-    public RecipeCreatorTests()
+    public RecipeEditorTests()
     {
         var ctx = new Mock<MealPlannerDbContext>();
         ctx.Setup(x => x.Recipes).ReturnsDbSet(_recipes);
@@ -35,7 +35,7 @@ public class RecipeCreatorTests
         ctx.Setup(x => x.Ingredients).ReturnsDbSet(_ingredients);
         
         ctx.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
-        _sut = new RecipeCreator(ctx.Object, new MeasureUnitMapper(_localizer.Object));
+        _sut = new RecipeEditor(ctx.Object, new MeasureUnitMapper(_localizer.Object));
     }
     
     [Fact]

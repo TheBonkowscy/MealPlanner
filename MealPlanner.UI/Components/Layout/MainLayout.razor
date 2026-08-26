@@ -1,10 +1,13 @@
 ﻿@inherits LayoutComponentBase
 @using MealPlanner.Client.Menus
+@using MealPlanner.UI
 @using MealPlanner.UI.Services
+@using Microsoft.Extensions.Localization
 @implements IDisposable
 @inject AppBarService AppBarService
 @inject NavigationManager Navigation
 @inject IFindMenus MenuFinder
+@inject IStringLocalizer<Translations> L
 
 <MudThemeProvider/>
 <MudPopoverProvider/>
@@ -32,7 +35,7 @@
             </MudTooltip>
         }
 
-        <MudTooltip Text="Go to Today">
+        <MudTooltip Text="@L[TranslationKeys.MainLayout.MainLayoutGoToTodayButtonTitle]">
             <MudIconButton
                 Color="Color.Inherit"
                 Icon="@Icons.Material.Filled.Today"

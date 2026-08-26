@@ -11,50 +11,17 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="GlassCup" xml:space="preserve">
-        <value>Szklanka</value>
-    </data>
     <data name="Bottle" xml:space="preserve">
         <value>but.</value>
     </data>
     <data name="Can" xml:space="preserve">
         <value>pusz.</value>
     </data>
+    <data name="GlassCup" xml:space="preserve">
+        <value>Szklanka</value>
+    </data>
     <data name="Gram" xml:space="preserve">
         <value>g</value>
-    </data>
-    <data name="Kilogram" xml:space="preserve">
-        <value>kg</value>
-    </data>
-    <data name="Liter" xml:space="preserve">
-        <value>l</value>
-    </data>
-    <data name="Milligram" xml:space="preserve">
-        <value>mg</value>
-    </data>
-    <data name="Milliliter" xml:space="preserve">
-        <value>ml</value>
-    </data>
-    <data name="Package" xml:space="preserve">
-        <value>op.</value>
-    </data>
-    <data name="Piece" xml:space="preserve">
-        <value>szt.</value>
-    </data>
-    <data name="Pinch" xml:space="preserve">
-        <value>szcz.</value>
-    </data>
-    <data name="Tablespoon" xml:space="preserve">
-        <value>łyż.</value>
-    </data>
-    <data name="Teaspoon" xml:space="preserve">
-        <value>łyżecz.</value>
-    </data>
-    <data name="Slice1" xml:space="preserve">
-        <value>krom.</value>
-    </data>
-    <data name="Slice2" xml:space="preserve">
-        <value>plast.</value>
     </data>
     <data name="IngredientDoesNotExist" xml:space="preserve">
         <value>Nie odnaleziono składników o ID: {0}</value>
@@ -65,38 +32,44 @@
     <data name="InvalidIngredientName" xml:space="preserve">
         <value>Podaj prawidłową nazwę składnika</value>
     </data>
-    <data name="InvalidIngredientQuantity" xml:space="preserve">
-        <value>Ilość {0} jest nieprawidłowa dla składnika {1}</value>
-    </data>
     <data name="InvalidMealOrder" xml:space="preserve">
         <value>Kolejność {0} jest nieprawidłowa dla posiłku</value>
     </data>
-    <data name="InvalidMealOrderInMenu" xml:space="preserve">
-        <value>Kolejność {0} jest nieprawidłowa dla posiłku w menu</value>
+    <data name="InvalidIngredientQuantity" xml:space="preserve">
+        <value>Ilość {0} jest nieprawidłowa dla składnika {1}</value>
     </data>
     <data name="InvalidMealServings" xml:space="preserve">
         <value>Posiłek nie może mieć {0} porcji</value>
     </data>
-    <data name="InvalidMealsInMenu" xml:space="preserve">
-        <value>Liczba posiłków jest nieprawidłowa</value>
+    <data name="InvalidMealOrderInMenu" xml:space="preserve">
+        <value>Kolejność {0} jest nieprawidłowa dla posiłku w menu</value>
     </data>
     <data name="InvalidRecipeIngredients" xml:space="preserve">
         <value>Podaj składniki i ich prawidłową liczbę</value>
     </data>
-    <data name="InvalidRecipeName" xml:space="preserve">
-        <value>Podaj prawidłową nazwę przepisu</value>
+    <data name="InvalidMealsInMenu" xml:space="preserve">
+        <value>Liczba posiłków jest nieprawidłowa</value>
     </data>
     <data name="InvalidRecipeServings" xml:space="preserve">
         <value>Podaj prawidłową liczbę porcji jakie daje przepis</value>
     </data>
+    <data name="InvalidRecipeName" xml:space="preserve">
+        <value>Podaj prawidłową nazwę przepisu</value>
+    </data>
     <data name="InvalidRecipeStepInstruction" xml:space="preserve">
         <value>Podaj prawidłowe instrukcje dla kroku przepisu</value>
+    </data>
+    <data name="InvalidRecipeSteps" xml:space="preserve">
+        <value>Podaj kroki przepisu</value>
     </data>
     <data name="InvalidRecipeStepOrder" xml:space="preserve">
         <value>Kolejność {0} jest nieprawidłowa dla kroku przepisu</value>
     </data>
-    <data name="InvalidRecipeSteps" xml:space="preserve">
-        <value>Podaj kroki przepisu</value>
+    <data name="Liter" xml:space="preserve">
+        <value>l</value>
+    </data>
+    <data name="Kilogram" xml:space="preserve">
+        <value>kg</value>
     </data>
     <data name="MealAlreadyExistsAtPosition" xml:space="preserve">
         <value>Na pozycji #{0} znajduje się już posiłek</value>
@@ -113,11 +86,11 @@
     <data name="MenuDateTooFarInTheFuture" xml:space="preserve">
         <value>Data dla menu jest zbyt daleko w przyszłości</value>
     </data>
-    <data name="MenuDateTooFarInThePast" xml:space="preserve">
-        <value>Data dla menu jest zbyt daleko w przeszłości</value>
-    </data>
     <data name="MenuDateUnset" xml:space="preserve">
         <value>Podaj prawidłową datę dla menu</value>
+    </data>
+    <data name="MenuDateTooFarInThePast" xml:space="preserve">
+        <value>Data dla menu jest zbyt daleko w przeszłości</value>
     </data>
     <data name="MenuDoesNotExist" xml:space="preserve">
         <value>Menu na dzień {0} nie istnieje</value>
@@ -125,11 +98,26 @@
     <data name="MenuIsNull" xml:space="preserve">
         <value>Podaj prawidłowe menu</value>
     </data>
+    <data name="Milligram" xml:space="preserve">
+        <value>mg</value>
+    </data>
+    <data name="Milliliter" xml:space="preserve">
+        <value>ml</value>
+    </data>
     <data name="MissingIngredientMeasureUnits" xml:space="preserve">
         <value>Podaj jednostki miary dla składnika {0}</value>
     </data>
     <data name="MissingMealRecipesById" xml:space="preserve">
         <value>Nie odnaleziono składników o ID: {0}</value>
+    </data>
+    <data name="Piece" xml:space="preserve">
+        <value>szt.</value>
+    </data>
+    <data name="Package" xml:space="preserve">
+        <value>op.</value>
+    </data>
+    <data name="Pinch" xml:space="preserve">
+        <value>szcz.</value>
     </data>
     <data name="RecipeAlreadyExists" xml:space="preserve">
         <value>Przepis o tej nazwie już istnieje</value>
@@ -137,10 +125,22 @@
     <data name="RecipeDoesNotExist" xml:space="preserve">
         <value>Nie odnaleziono wskazanego przepisu</value>
     </data>
+    <data name="RecipeStepNotFound" xml:space="preserve">
+        <value>Krok przepisu nie został odnaleziony</value>
+    </data>
     <data name="RecipeIsNull" xml:space="preserve">
         <value>Podaj prawidłowy przepis</value>
     </data>
-    <data name="RecipeStepNotFound" xml:space="preserve">
-        <value>Krok przepisu nie został odnaleziony</value>
+    <data name="Slice1" xml:space="preserve">
+        <value>krom.</value>
+    </data>
+    <data name="Slice2" xml:space="preserve">
+        <value>plast.</value>
+    </data>
+    <data name="Tablespoon" xml:space="preserve">
+        <value>łyż.</value>
+    </data>
+    <data name="Teaspoon" xml:space="preserve">
+        <value>łyżecz.</value>
     </data>
 </root>

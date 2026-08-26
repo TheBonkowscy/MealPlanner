@@ -1,10 +1,12 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-    <MudNavGroup Title="Menus" Expanded="false">
+﻿@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Translations> L
+
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">@L[TranslationKeys.NavMenu.NavMenuDashboardName]</MudNavLink>
+    <MudNavGroup Title="@L[TranslationKeys.NavMenu.NavMenuMenusGroupTitle]" Expanded="false">
         <WeeklyMenuNavigation />
     </MudNavGroup>
-    <MudNavGroup Title="Editors" Expanded="false">
+    <MudNavGroup Title="@L[TranslationKeys.NavMenu.NavMenuEditorsGroupTitle]" Expanded="false">
         <RecipeEditorNavigation />
     </MudNavGroup>
-    <MudNavLink Href="/about"  Match="NavLinkMatch.Prefix">About</MudNavLink>
 </MudNavMenu>

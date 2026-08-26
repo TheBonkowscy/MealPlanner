@@ -2,16 +2,18 @@
 @using MealPlanner.Shared.Menus.Responses
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
+@using Microsoft.Extensions.Localization
 
 @implements IDisposable
 @inject IFindMenus FindMenus
 @inject NavigationManager Navigation
 @inject IMenuStateService MenuStateService
+@inject IStringLocalizer<Translations> L
 
 <MudNavMenu>
     @foreach (var week in _weeks)
     {
-        <MudNavGroup Title="@($"Week {week.WeekNumber} of {week.Year}")"
+        <MudNavGroup Title="@(L[TranslationKeys.WeeklyMenuNavigation.WeeklyMenuNavigationTitle, week.WeekNumber, week.Year])"
                      Expanded="@IsExpanded(week)"
                      ExpandedChanged="@(() => SelectWeek(week))"
                      Class="@GetWeekTitleClass(week)">
@@ -27,7 +29,7 @@
                             @if (!_menuExists.GetValueOrDefault(day.Day))
                             {
                                 <MudNavLink Href="@(RoutingConstants.Menus.CreateForDate(day.Day))">
-                                    @day.Day.ToString("dddd, d MMMM yyyy", _culture)
+                                    @day.Day.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentUICulture)
                                 </MudNavLink>
                                 <MudIconButton
                                     Icon="@Icons.Material.Filled.Add"
@@ -38,7 +40,7 @@
                             else
                             {
                                 <MudNavLink Href="@(RoutingConstants.Menus.DetailsForDate(day.Day))">
-                                    @day.Day.ToString("dddd, d MMMM yyyy", _culture)
+                                    @day.Day.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentUICulture)
                                 </MudNavLink>
                                 <MudIconButton
                                     Icon="@(IsToday(day.Day) ? Icons.Material.Filled.Today : Icons.Material.Filled.Assignment)"
@@ -67,7 +69,6 @@
     [Parameter] public EventCallback<int> SelectedWeekChanged { get; set; }
 
     private readonly CancellationTokenSource _cts = new();
-    private readonly CultureInfo _culture = new("pl-PL");
 
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
 
