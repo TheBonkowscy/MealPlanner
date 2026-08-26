@@ -38,18 +38,9 @@ public class RecipeEditor(MealPlannerDbContext ctx,
         {
             return Result.Failure<CreateRecipeResponse>(errors);
         }
-
-        var preparationsResults = request.Preparations
-            .Select(x => RecipePreparation.Create(x.Description, x.LeadDays, x.Required)).ToList();
-        errors = preparationsResults.AllErrors();
-        if (errors.Count != 0)
-        {
-            return Result.Failure<CreateRecipeResponse>(errors);
-        }
             
         var stepsByOrder = stepResults.Select(x => x.Value).OrderBy(x => x.Order).ToList();
-        var preparations = preparationsResults.Select(x => x.Value).ToList();
-        var result = Recipe.Create(request.Name, request.Servings, mappedIngredients.Value, stepsByOrder, preparations);
+        var result = Recipe.Create(request.Name, request.Servings, mappedIngredients.Value, stepsByOrder);
         if (result.IsFailure)
         {
             return Result.Failure<CreateRecipeResponse>(result.Errors);

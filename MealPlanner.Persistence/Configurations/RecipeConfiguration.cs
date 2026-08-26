@@ -19,7 +19,5 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
             .OnDelete(DeleteBehavior.Cascade);
         builder.HasMany(x => x.Steps).WithOne().HasForeignKey("RecipeId")
             .OnDelete(DeleteBehavior.Cascade);
-        builder.HasMany(x => x.Preparations).WithOne().HasForeignKey("RecipeId")
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

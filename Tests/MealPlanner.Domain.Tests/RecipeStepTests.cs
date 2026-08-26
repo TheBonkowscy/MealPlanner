@@ -3,7 +3,7 @@ using MealPlanner.Domain.Recipes;
 using MealPlanner.Domain.Shared;
 using MealPlanner.Tests.Shared.Helpers;
 
-namespace MealPlanner.Domain.Tests.Recipes;
+namespace MealPlanner.Domain.Tests;
 
 public class RecipeStepTests
 {

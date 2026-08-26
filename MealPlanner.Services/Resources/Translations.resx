@@ -76,7 +76,7 @@
         <value>There is already a menu for {0}</value>
     </data>
     <data name="InvalidMealsInMenu" xml:space="preserve">
-        <value>Please provide the correct number of meals</value>
+        <value>Please provide correct number of meals</value>
     </data>
     <data name="RecipeDoesNotExist" xml:space="preserve">
         <value>Could not find the specified recipe</value>
@@ -85,7 +85,7 @@
         <value>There is already a recipe with this name</value>
     </data>
     <data name="InvalidRecipeIngredients" xml:space="preserve">
-        <value>Please provide the correct number of ingredients with appropriate quantities</value>
+        <value>Please provide correct number of ingredients with appropriate quantities</value>
     </data>
     <data name="IngredientDoesNotExist" xml:space="preserve">
         <value>Could not find ingredients with the following IDs: {0}</value>
@@ -149,14 +149,5 @@
     </data>
     <data name="MenuDateTooFarInTheFuture" xml:space="preserve">
         <value>The date for menu is too far in the future</value>
-    </data>
-    <data name="InvalidPreparations" xml:space="preserve">
-        <value>Please provide the details of ahead of cooking preparations</value>
-    </data>
-    <data name="InvalidDescription" xml:space="preserve">
-        <value>Please provide the correct preparation description</value>
-    </data>
-    <data name="InvalidLeadDays" xml:space="preserve">
-        <value>Please provide the correct number of days ahead for preparations</value>
     </data>
 </root>

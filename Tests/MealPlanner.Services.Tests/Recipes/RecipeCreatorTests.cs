@@ -102,9 +102,6 @@ public class RecipeEditorTests
         byLitres.Unit.ToString().Should().Be(ingredientByLitres.Unit);
     }
     
-    // TODO: test for when step mapping results in error
-    // TODO: test for when prep step mapping results in error
-    
     [Fact]
     public async Task Create_Succeeds()
     {
@@ -124,7 +121,6 @@ public class RecipeEditorTests
     {
         var ingredient = new AddIngredientRequest(PreExistingIngredient.Id, 1, nameof(MeasureUnit.Bottle));
         var step = new AddRecipeStepRequest(1, "Step 1");
-        var prep = new AddRecipePreparationsRequest("Preparation 1", 1, true);
-        return new CreateRecipeRequest(Guid.NewGuid().ToString(), 1, [ingredient], [step], [prep]);
+        return new CreateRecipeRequest(Guid.NewGuid().ToString(), 1, [ingredient], [step]);
     }
 }

@@ -143,13 +143,4 @@
     <data name="Teaspoon" xml:space="preserve">
         <value>łyżecz.</value>
     </data>
-    <data name="InvalidPreparations" xml:space="preserve">
-        <value>Podaj szczegóły przygotowań do gotowania</value>
-    </data>
-    <data name="InvalidDescription" xml:space="preserve">
-        <value>Podaj prawidłowy opis przygotowań</value>
-    </data>
-    <data name="InvalidLeadDays" xml:space="preserve">
-        <value>Podaj prawidłową liczbę dni wstecz dla przygotowań</value>
-    </data>
 </root>

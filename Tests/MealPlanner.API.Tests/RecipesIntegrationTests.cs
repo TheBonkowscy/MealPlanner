@@ -288,68 +288,9 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    [Fact]
-    public async Task Post_Preparations_ReturnsOk()
-    {
-        // Arrange
-        var recipe = TestRecipes.Create();
-        await AddRecipeToDatabase(recipe);
-        const string prepDescription = "Ahead of time prep";
-        var request = new CreateRecipePreparationsRequest(prepDescription, 1, true);
-        
-        // Act
-        var result = await Client.PostAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/preparations", request);
-        
-        // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.OK);
-        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
-        var returnedPrep =  details?.Preparations.First(x => x.Description == prepDescription);
-        returnedPrep.Should().NotBeNull();
-        returnedPrep.LeadDays.Should().Be(1);
-        returnedPrep.Required.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task Put_Preparations_ReturnsOk()
-    {
-        // Arrange
-        var recipe = TestRecipes.Create();
-        await AddRecipeToDatabase(recipe);
-        var preparation = recipe.Preparations[0];
-        var request = new UpdateRecipePreparationsRequest(preparation.Id, "Updated prep description", 2, false);
-        
-        // Act
-        var result = await Client.PutAsJsonAsync($"{Constants.RecipesRoute}/{recipe.Id}/preparations/{preparation.Id}", request);
-        
-        // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.OK);
-        var details = await result.Content.ReadFromJsonAsync<GetRecipeDetailsResponse>();
-        var returnedPrep =  details?.Preparations.First(x => x.Id == preparation.Id);
-        returnedPrep.Should().NotBeNull();
-        returnedPrep.LeadDays.Should().Be(request.LeadDays);
-        returnedPrep.Required.Should().Be(request.Required);
-        returnedPrep.Description.Should().Be(request.Description);
-    }
-
-    [Fact]
-    public async Task Delete_Preparations_ReturnsNoContent()
-    {
-        // Arrange
-        var recipe = TestRecipes.Create();
-        await AddRecipeToDatabase(recipe);
-        var preparation = recipe.Preparations[0];
-        
-        // Act
-        var result = await Client.DeleteAsync($"{Constants.RecipesRoute}/{recipe.Id}/preparations/{preparation.Id}");
-        
-        // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
-    }
-
     private static CreateRecipeRequest CreateNewRecipeRequest(string recipeName, Ingredient ingredient) =>
         new(recipeName,
             1,
             [new AddIngredientRequest(ingredient.Id, 1, ingredient.ApplicableUnits.First().ToString())],
-            [new AddRecipeStepRequest(1, "Test")],
-            [new AddRecipePreparationsRequest("Test", 1, true)]);
+            [new AddRecipeStepRequest(1, "Test")]);
 }

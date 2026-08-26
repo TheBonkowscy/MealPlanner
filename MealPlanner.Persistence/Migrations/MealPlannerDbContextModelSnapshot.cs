@@ -105,7 +105,7 @@ namespace MealPlanner.Persistence.Migrations
                     b.ToTable("Menus", (string)null);
                 });
 
-            modelBuilder.Entity("MealPlanner.Domain.Recipes.Recipe", b =>
+            modelBuilder.Entity("MealPlanner.Domain.Recipe", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -125,35 +125,7 @@ namespace MealPlanner.Persistence.Migrations
                     b.ToTable("Recipes", (string)null);
                 });
 
-            modelBuilder.Entity("MealPlanner.Domain.Recipes.RecipePreparation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("LeadDays")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("RecipeId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("Required")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("RecipePreparations", (string)null);
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Recipes.RecipeStep", b =>
+            modelBuilder.Entity("MealPlanner.Domain.RecipeStep", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -186,7 +158,7 @@ namespace MealPlanner.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MealPlanner.Domain.Recipes.Recipe", "Recipe")
+                    b.HasOne("MealPlanner.Domain.Recipe", "Recipe")
                         .WithMany("Ingredients")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -205,7 +177,7 @@ namespace MealPlanner.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MealPlanner.Domain.Recipes.Recipe", "Recipe")
+                    b.HasOne("MealPlanner.Domain.Recipe", "Recipe")
                         .WithMany()
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -216,17 +188,9 @@ namespace MealPlanner.Persistence.Migrations
                     b.Navigation("Recipe");
                 });
 
-            modelBuilder.Entity("MealPlanner.Domain.Recipes.RecipePreparation", b =>
+            modelBuilder.Entity("MealPlanner.Domain.RecipeStep", b =>
                 {
-                    b.HasOne("MealPlanner.Domain.Recipes.Recipe", null)
-                        .WithMany("Preparations")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("MealPlanner.Domain.Recipes.RecipeStep", b =>
-                {
-                    b.HasOne("MealPlanner.Domain.Recipes.Recipe", null)
+                    b.HasOne("MealPlanner.Domain.Recipe", null)
                         .WithMany("Steps")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -237,11 +201,9 @@ namespace MealPlanner.Persistence.Migrations
                     b.Navigation("Meals");
                 });
 
-            modelBuilder.Entity("MealPlanner.Domain.Recipes.Recipe", b =>
+            modelBuilder.Entity("MealPlanner.Domain.Recipe", b =>
                 {
                     b.Navigation("Ingredients");
-
-                    b.Navigation("Preparations");
 
                     b.Navigation("Steps");
                 });

@@ -153,62 +153,6 @@
                Class="mb-6">
         @L[TranslationKeys.RecipeEditor.RecipeEditorRecipeStepsAddButtonTitle]
     </MudButton>
-    
-    <MudDivider Class="my-4" />
-
-    <MudText Typo="Typo.h6" Class="mb-2">Przygotowania wstępne</MudText>
-
-    <MudDropContainer @ref="_preparationsContainer"
-                      T="PreparationDto"
-                      Items="_preparations"
-                      ItemsSelector="@((item, dropzone) => item.ZoneIdentifier == dropzone)"
-                      ItemDropped="PreparationDropped"
-                      Class="d-flex flex-column mb-4">
-        <ChildContent>
-            <MudDropZone T="PreparationDto"
-                         Identifier="PreparationsZone"
-                         AllowReorder="true"
-                         Class="rounded mud-background-gray pa-3 min-height-100">
-                <ItemRenderer>
-                    <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2">
-                        <MudIcon Icon="@Icons.Material.Filled.DragHandle" Class="cursor-grab" />
-
-                        <MudTextField @bind-Value="context.Description"
-                                      Label="Opis przygotowania"
-                                      Lines="1"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      Class="flex-grow-1" />
-
-                        <MudNumericField @bind-Value="context.LeadDays"
-                                         Label="Wyprzedzenie (dni)"
-                                         Min="0"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         Style="max-width: 150px;" />
-
-                        <MudCheckBox @bind-Value="context.Required"
-                                     Label="Wymagane"
-                                     Color="Color.Primary"
-                                     Dense="true" />
-
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                       Color="Color.Error"
-                                       Size="Size.Small"
-                                       OnClick="@(() => RemovePreparation(context))" />
-                    </MudPaper>
-                </ItemRenderer>
-            </MudDropZone>
-        </ChildContent>
-    </MudDropContainer>
-
-    <MudButton StartIcon="@Icons.Material.Filled.Add"
-               Color="Color.Secondary"
-               Variant="Variant.Outlined"
-               OnClick="AddPreparation"
-               Class="mb-6">
-        Dodaj przygotowanie
-    </MudButton>
 
     <MudDivider Class="my-4" />
 
@@ -231,9 +175,6 @@
 
     private MudDropContainer<StepDto>? _stepsContainer;
     private readonly List<StepDto> _steps = [];
-    
-    private MudDropContainer<PreparationDto>? _preparationsContainer;
-    private readonly List<PreparationDto> _preparations = [];
 
     private List<PredefinedProductDto> _predefinedProducts = [];
     private readonly CancellationTokenSource _cts = new();
@@ -346,36 +287,6 @@
             _steps[i].Order = i;
         }
     }
-    
-    private void AddPreparation()
-    {
-        _preparations.Add(new PreparationDto
-        {
-            Description = string.Empty,
-            LeadDays = 1,
-            Required = true
-        });
-        _preparationsContainer?.Refresh();
-        StateHasChanged();
-    }
-
-    private void RemovePreparation(PreparationDto item)
-    {
-        _preparations.Remove(item);
-        _preparationsContainer?.Refresh();
-        StateHasChanged();
-    }
-
-    private void PreparationDropped(MudItemDropInfo<PreparationDto> dropItem)
-    {
-        if (dropItem?.Item is null) return;
-
-        _preparations.Remove(dropItem.Item);
-        var targetIndex = Math.Clamp(dropItem.IndexInZone, 0, _preparations.Count);
-        _preparations.Insert(targetIndex, dropItem.Item);
-
-        _preparationsContainer?.Refresh();
-    }
 
     private async Task SaveRecipeAsync()
     {
@@ -396,12 +307,6 @@
             Snackbar.Add(L[TranslationKeys.RecipeEditor.RecipeEditorValidationStepsError], Severity.Warning);
             return;
         }
-        
-        if (_preparations.Any(p => string.IsNullOrWhiteSpace(p.Description)))
-        {
-            Snackbar.Add("Opis przygotowania nie może być pusty.", Severity.Warning);
-            return;
-        }
 
         var finalIngredients = _ingredients.Select(i => 
                 new AddIngredientRequest(i.Id, 
@@ -411,11 +316,8 @@
         var finalSteps = _steps.Select(s => 
             new AddRecipeStepRequest(s.Order + 1, s.Instructions)
         ).ToList();
-        
-        var finalPreparations = _preparations
-            .Select(p => new AddRecipePreparationsRequest(p.Description, p.LeadDays, p.Required)).ToList();
 
-        var request = new CreateRecipeRequest(_recipeName, _servings, finalIngredients, finalSteps, finalPreparations);
+        var request = new CreateRecipeRequest(_recipeName, _servings, finalIngredients, finalSteps);
         var response = await RecipeEditor.CreateRecipe(request, _cts.Token);
         if (response.IsSuccess)
         {

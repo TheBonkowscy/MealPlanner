@@ -167,52 +167,6 @@
                Class="mb-6">
         @L[TranslationKeys.RecipeEditor.RecipeEditorRecipeStepsAddButtonTitle]
     </MudButton>
-
-    <MudDivider Class="my-4" />
-
-    <MudText Typo="Typo.h6" Class="mb-2">Przygotowania wstępne</MudText>
-
-    <div class="d-flex flex-column mb-4 rounded mud-background-gray pa-3 min-height-100">
-        @foreach (var prep in _preparations)
-        {
-            <MudPaper Class="pa-3 my-2 d-flex align-center gap-4" Elevation="2" @key="prep.ClientGuid">
-                <MudTextField @bind-Value="prep.Description"
-                              @bind-Value:after="@(() => AutoSavePreparationAsync(prep))"
-                              Label="Opis przygotowania"
-                              Lines="1"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Class="flex-grow-1" />
-
-                <MudNumericField @bind-Value="prep.LeadDays"
-                                 @bind-Value:after="@(() => AutoSavePreparationAsync(prep))"
-                                 Label="Wyprzedzenie (dni)"
-                                 Min="0"
-                                 Variant="Variant.Outlined"
-                                 Margin="Margin.Dense"
-                                 Style="max-width: 150px;" />
-
-                <MudCheckBox @bind-Value="prep.Required"
-                             @bind-Value:after="@(() => AutoSavePreparationAsync(prep))"
-                             Label="Wymagane"
-                             Color="Color.Primary"
-                             Dense="true" />
-
-                <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                               Color="Color.Error"
-                               Size="Size.Small"
-                               OnClick="@(() => RemovePreparationAsync(prep))" />
-            </MudPaper>
-        }
-    </div>
-
-    <MudButton StartIcon="@Icons.Material.Filled.Add"
-               Color="Color.Secondary"
-               Variant="Variant.Outlined"
-               OnClick="AddPreparationLocal"
-               Class="mb-6">
-        Dodaj przygotowanie
-    </MudButton>
 </MudPaper>
 
 @code {
@@ -226,8 +180,6 @@
 
     private MudDropContainer<StepDto>? _stepsContainer;
     private List<StepDto> _steps = [];
-
-    private List<PreparationDto> _preparations = [];
 
     private List<PredefinedProductDto> _predefinedProducts = [];
     private readonly CancellationTokenSource _cts = new();
@@ -245,9 +197,6 @@
         if (recipe is null) return;
 
         ResetRecipe(recipe);
-        _ingredientsContainer?.Refresh();
-        _stepsContainer?.Refresh();
-        StateHasChanged();
     }
 
     private void ResetRecipe(GetRecipeDetailsResponse recipe)
@@ -256,7 +205,6 @@
         _servings = recipe.Servings;
         _ingredients = MapIngredients(recipe);
         _steps = MapSteps(recipe);
-        _preparations = MapPreparations(recipe);
     }
 
     private List<IngredientDto> MapIngredients(GetRecipeDetailsResponse recipe)
@@ -280,33 +228,13 @@
     {
         return
         [
-            .. recipe.Steps.Select(x => new StepDto()
+            .. recipe.Steps.Select((x, index) => new StepDto()
             {
                 Id = x.Id,
                 Order = x.Order,
-                Instructions = x.Instructions,
-                ClientGuid = Guid.NewGuid()
+                Instructions = x.Instructions
             }).OrderBy(x => x.Order)
         ];
-    }
-
-    private List<PreparationDto> MapPreparations(GetRecipeDetailsResponse recipe)
-    {
-        return recipe.Preparations
-            .Select(x =>
-            {
-                var existing = _preparations.FirstOrDefault(p => p.Id == x.Id && p.Id != 0);
-
-                return new PreparationDto
-                {
-                    Id = x.Id,
-                    Description = x.Description,
-                    LeadDays = x.LeadDays,
-                    Required = x.Required,
-                    ClientGuid = existing?.ClientGuid ?? Guid.NewGuid()
-                };
-            })
-            .ToList();
     }
 
     private async Task LoadPredefinedProductsAsync()
@@ -415,8 +343,7 @@
         {
             Id = 0,
             Order = _steps.Count + 1,
-            Instructions = string.Empty,
-            ClientGuid = Guid.NewGuid(),
+            Instructions = string.Empty
         });
     
         _stepsContainer?.Refresh();
@@ -504,52 +431,6 @@
         }
     }
 
-    private void AddPreparationLocal()
-    {
-        _preparations.Add(new PreparationDto
-        {
-            Id = 0,
-            Description = string.Empty,
-            LeadDays = 1,
-            Required = true,
-            ClientGuid = Guid.NewGuid()
-        });
-    }
-
-    private async Task AutoSavePreparationAsync(PreparationDto prep)
-    {
-        if (string.IsNullOrWhiteSpace(prep.Description))
-            return;
-
-        if (prep.Id == 0)
-        {
-            var request = new AddRecipePreparationsRequest(prep.Description.Trim(), prep.LeadDays, prep.Required);
-            await RecipeUpdater.AddPreparations(RecipeId, request, _cts.Token);
-        }
-        else
-        {
-            var request = new UpdateRecipePreparationsRequest(prep.Id, prep.Description.Trim(), prep.LeadDays, prep.Required);
-            await RecipeUpdater.UpdatePreparations(RecipeId, request, _cts.Token);
-        }
-
-        await LoadRecipeDataAsync();
-        Snackbar.Add(@L[TranslationKeys.RecipeEditor.RecipeEditorPreparationSavedTitle], Severity.Success);
-    }
-
-    private async Task RemovePreparationAsync(PreparationDto prep)
-    {
-        if (prep.Id > 0)
-        {
-            await RecipeUpdater.DeletePreparations(RecipeId, prep.Id, _cts.Token);
-            await LoadRecipeDataAsync();
-            Snackbar.Add(@L[TranslationKeys.RecipeEditor.RecipeEditorPreparationRemovedTitle], Severity.Info);
-        }
-        else
-        {
-            _preparations.Remove(prep);
-        }
-    }
-
     private Task<IEnumerable<PredefinedProductDto>> SearchIngredientsAsync(string value, CancellationToken arg2)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -592,4 +473,5 @@
     
         Snackbar.Add(@L[TranslationKeys.RecipeEditor.RecipeEditorStepSavedTitle], Severity.Success);
     }
+
 }

@@ -52,8 +52,6 @@ public static class TranslationKeys
         public const string RecipeEditorIngredientSavedTitle = nameof(RecipeEditorIngredientSavedTitle);
         public const string RecipeEditorStepSavedTitle = nameof(RecipeEditorStepSavedTitle);
         public const string RecipeEditorIngredientRemovedTitle = nameof(RecipeEditorIngredientRemovedTitle);
-        public const string RecipeEditorPreparationSavedTitle = nameof(RecipeEditorPreparationSavedTitle);
-        public const string RecipeEditorPreparationRemovedTitle = nameof(RecipeEditorPreparationRemovedTitle);
     }
 
     public static class MenuEditor

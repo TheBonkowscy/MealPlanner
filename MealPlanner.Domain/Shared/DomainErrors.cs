@@ -33,8 +33,6 @@ public static class DomainErrors
         public static readonly Error InvalidSteps = Error.Validation(TranslationKeys.Recipe.InvalidRecipeSteps);
         
         public static readonly Error IsNull = Error.Validation(TranslationKeys.Recipe.RecipeIsNull);
-        
-        public static readonly Error InvalidPreparations = Error.Validation(TranslationKeys.Recipe.InvalidPreparations);
     }
 
     public static class RecipeStep
@@ -61,12 +59,5 @@ public static class DomainErrors
         public static readonly Error DateIsUnset = Error.Validation(TranslationKeys.Menu.MenuDateUnset);
         public static readonly Error DateTooFarInThePast = Error.Validation(TranslationKeys.Menu.MenuDateTooFarInThePast);
         public static readonly Error DateTooFarInTheFuture = Error.Validation(TranslationKeys.Menu.MenuDateTooFarInTheFuture);
-    }
-
-    public static class RecipePreparation
-    {
-        public static Error InvalidDescription(string description) => Error.Validation(TranslationKeys.RecipePreparation.InvalidDescription, ("Description", description));
-        public static Error InvalidLeadDays(int leadDays) => Error.Validation(TranslationKeys.RecipePreparation.InvalidLeadDays, ("LeadDays", leadDays));
-        public static readonly Error NotFound = Error.Validation(TranslationKeys.RecipePreparation.RecipePreparationNotFound);
     }
 }

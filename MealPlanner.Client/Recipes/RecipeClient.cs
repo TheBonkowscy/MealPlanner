@@ -132,31 +132,4 @@ internal class RecipeClient(HttpClient httpClient) :
 
         throw new Exception("Unable to delete ingredients from this recipe");   // TODO: concrete types?
     }
-
-    public async Task<ApiResult<GetRecipeDetailsResponse>> AddPreparations(int id, AddRecipePreparationsRequest request, CancellationToken cancellationToken)
-    {
-        var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/preparations/");
-        var response = await httpClient.PostAsJsonAsync(endpoint, request, options: null, cancellationToken);
-        return await response.ToApiResult<GetRecipeDetailsResponse>(cancellationToken);
-    }
-
-    public async Task<ApiResult<GetRecipeDetailsResponse>> UpdatePreparations(int id, UpdateRecipePreparationsRequest request, CancellationToken cancellationToken)
-    {
-        var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/preparations/").AppendPathSegment(request.Id);
-        var response = await httpClient.PutAsJsonAsync(endpoint, request, options: null, cancellationToken);
-        return await response.ToApiResult<GetRecipeDetailsResponse>(cancellationToken);
-    }
-
-    public async Task DeletePreparations(int id, int preparationId, CancellationToken cancellationToken)
-    {
-        var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/preparations/").AppendPathSegment(preparationId);
-        var response = await httpClient.DeleteAsync(endpoint, cancellationToken);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return;
-        }
-
-        throw new Exception("Unable to delete preparations from this recipe");   // TODO: concrete types?
-    }
 }
