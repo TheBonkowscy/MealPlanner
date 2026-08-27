@@ -345,6 +345,16 @@ public class RecipesIntegrationTests(MealPlannerWebApplicationFactory factory) :
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
+    
+    [Fact]
+    public async Task Get_ForSpecificDate_ReturnsOk()
+    {
+        // Act
+        var result = await Client.GetAsync($"{Constants.PreparationsRoute}/{DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd")}");
+        
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
 
     private static CreateRecipeRequest CreateNewRecipeRequest(string recipeName, Ingredient ingredient) =>
         new(recipeName,

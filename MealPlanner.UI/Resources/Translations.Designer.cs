@@ -60,6 +60,60 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dashboard.
+        /// </summary>
+        public static string DashboardAppBarTitle {
+            get {
+                return ResourceManager.GetString("DashboardAppBarTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No initial preparations planned for today!.
+        /// </summary>
+        public static string DashboardTodaysInitialPreparationsNothingToPrepareTitle {
+            get {
+                return ResourceManager.GetString("DashboardTodaysInitialPreparationsNothingToPrepareTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To prepare today.
+        /// </summary>
+        public static string DashboardTodaysInitialPreparationsTitle {
+            get {
+                return ResourceManager.GetString("DashboardTodaysInitialPreparationsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Today&apos;s menu.
+        /// </summary>
+        public static string DashboardTodaysMenu {
+            get {
+                return ResourceManager.GetString("DashboardTodaysMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Servings: {0}.
+        /// </summary>
+        public static string DashboardTodaysMenuMealServingsTitle {
+            get {
+                return ResourceManager.GetString("DashboardTodaysMenuMealServingsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no meals planned for today..
+        /// </summary>
+        public static string DashboardTodaysMenuNoMealsTitle {
+            get {
+                return ResourceManager.GetString("DashboardTodaysMenuNoMealsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Go to today.
         /// </summary>
         public static string MainLayoutGoToTodayButtonTitle {
@@ -636,6 +690,15 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ahead of time prep.: {0} day(s).
+        /// </summary>
+        public static string ViewRecipeLeadDaysTitle {
+            get {
+                return ResourceManager.GetString("ViewRecipeLeadDaysTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loeading....
         /// </summary>
         public static string ViewRecipeLoadingNameTitle {
@@ -663,11 +726,38 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Optional.
+        /// </summary>
+        public static string ViewRecipeOptionalTitle {
+            get {
+                return ResourceManager.GetString("ViewRecipeOptionalTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initial preparations.
+        /// </summary>
+        public static string ViewRecipePreparationsSectionTitle {
+            get {
+                return ResourceManager.GetString("ViewRecipePreparationsSectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cooking steps.
         /// </summary>
         public static string ViewRecipeRecipeStepsSectionTitle {
             get {
                 return ResourceManager.GetString("ViewRecipeRecipeStepsSectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required.
+        /// </summary>
+        public static string ViewRecipeRequiredTitle {
+            get {
+                return ResourceManager.GetString("ViewRecipeRequiredTitle", resourceCulture);
             }
         }
         

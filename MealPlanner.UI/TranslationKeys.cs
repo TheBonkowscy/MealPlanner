@@ -108,5 +108,19 @@ public static class TranslationKeys
 
         public const string ViewRecipeEditRecipeActionTitle = nameof(ViewRecipeEditRecipeActionTitle);
         public const string ViewRecipeDeleteRecipeActionTitle = nameof(ViewRecipeDeleteRecipeActionTitle);
+        public const string ViewRecipePreparationsSectionTitle = nameof(ViewRecipePreparationsSectionTitle);
+        public const string ViewRecipeRequiredTitle = nameof(ViewRecipeRequiredTitle);
+        public const string ViewRecipeOptionalTitle = nameof(ViewRecipeOptionalTitle);
+        public const string ViewRecipeLeadDaysTitle = nameof(ViewRecipeLeadDaysTitle);
+    }
+
+    public static class Dashboard
+    {
+        public const string DashboardTodaysMenu = nameof(DashboardTodaysMenu);
+        public const string DashboardTodaysMenuMealServingsTitle = nameof(DashboardTodaysMenuMealServingsTitle);
+        public const string DashboardTodaysMenuNoMealsTitle = nameof(DashboardTodaysMenuNoMealsTitle);
+        public const string DashboardTodaysInitialPreparationsTitle = nameof(DashboardTodaysInitialPreparationsTitle);
+        public const string DashboardTodaysInitialPreparationsNothingToPrepareTitle = nameof(DashboardTodaysInitialPreparationsNothingToPrepareTitle);
+        public const string DashboardAppBarTitle = nameof(DashboardAppBarTitle);
     }
 }
