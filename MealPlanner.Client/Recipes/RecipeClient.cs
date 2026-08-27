@@ -42,6 +42,18 @@ internal class RecipeClient(HttpClient httpClient) :
         return null;
     }
 
+    public async Task<GetRecipePreparationsDetailsResponse?> GetPreparations(DateOnly date, CancellationToken cancellationToken = default)
+    {
+        var endpoint = Constants.PreparationsRoute.AppendPathSegment(date.ToString("yyyy-MM-dd"));
+        var result = await httpClient.GetAsync(endpoint, cancellationToken);
+        if (result.IsSuccessStatusCode)
+        {
+            return await result.Content.ReadFromJsonAsync<GetRecipePreparationsDetailsResponse?>(cancellationToken);
+        }
+
+        return null;
+    }
+
     public async Task<GetIngredientsResponse> Get(CancellationToken cancellationToken = default)
     {
         const string endpoint = Constants.IngredientsRoute;

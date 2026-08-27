@@ -60,6 +60,60 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dashboard.
+        /// </summary>
+        public static string DashboardAppBarTitle {
+            get {
+                return ResourceManager.GetString("DashboardAppBarTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No initial preparations planned for today!.
+        /// </summary>
+        public static string DashboardTodaysInitialPreparationsNothingToPrepareTitle {
+            get {
+                return ResourceManager.GetString("DashboardTodaysInitialPreparationsNothingToPrepareTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To prepare today.
+        /// </summary>
+        public static string DashboardTodaysInitialPreparationsTitle {
+            get {
+                return ResourceManager.GetString("DashboardTodaysInitialPreparationsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Today&apos;s menu.
+        /// </summary>
+        public static string DashboardTodaysMenu {
+            get {
+                return ResourceManager.GetString("DashboardTodaysMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Servings: {0}.
+        /// </summary>
+        public static string DashboardTodaysMenuMealServingsTitle {
+            get {
+                return ResourceManager.GetString("DashboardTodaysMenuMealServingsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no meals planned for today..
+        /// </summary>
+        public static string DashboardTodaysMenuNoMealsTitle {
+            get {
+                return ResourceManager.GetString("DashboardTodaysMenuNoMealsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Go to today.
         /// </summary>
         public static string MainLayoutGoToTodayButtonTitle {

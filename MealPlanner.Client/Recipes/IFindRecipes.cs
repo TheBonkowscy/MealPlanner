@@ -6,4 +6,5 @@ public interface IFindRecipes
 {
     Task<GetRecipesResponse> Get(string? query, CancellationToken cancellationToken = default);
     Task<GetRecipeDetailsResponse?> Get(int id, CancellationToken cancellationToken = default);
+    Task<GetRecipePreparationsDetailsResponse?> GetPreparations(DateOnly date, CancellationToken cancellationToken = default);
 }

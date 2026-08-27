@@ -252,4 +252,22 @@
     <data name="ViewRecipeLeadDaysTitle" xml:space="preserve">
         <value>Wyprzedzenie: {0} dni</value>
     </data>
+    <data name="DashboardTodaysMenu" xml:space="preserve">
+        <value>Menu na dzisiaj</value>
+    </data>
+    <data name="DashboardTodaysMenuMealServingsTitle" xml:space="preserve">
+        <value>Porcje: {0}</value>
+    </data>
+    <data name="DashboardTodaysMenuNoMealsTitle" xml:space="preserve">
+        <value>Brak zaplanowanych posiłków na dzisiaj.</value>
+    </data>
+    <data name="DashboardTodaysInitialPreparationsTitle" xml:space="preserve">
+        <value>Do przygotowania dzisiaj</value>
+    </data>
+    <data name="DashboardTodaysInitialPreparationsNothingToPrepareTitle" xml:space="preserve">
+        <value>Brak zaplanowanych na dzisiaj przygotowań wstępnych!</value>
+    </data>
+    <data name="DashboardAppBarTitle" xml:space="preserve">
+        <value>Dashboard</value>
+    </data>
 </root>

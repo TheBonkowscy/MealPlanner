@@ -255,4 +255,22 @@
     <data name="ViewRecipeLeadDaysTitle" xml:space="preserve">
         <value>Ahead of time prep.: {0} day(s)</value>
     </data>
+    <data name="DashboardTodaysMenu" xml:space="preserve">
+        <value>Today's menu</value>
+    </data>
+    <data name="DashboardTodaysMenuMealServingsTitle" xml:space="preserve">
+        <value>Servings: {0}</value>
+    </data>
+    <data name="DashboardTodaysMenuNoMealsTitle" xml:space="preserve">
+        <value>There are no meals planned for today.</value>
+    </data>
+    <data name="DashboardTodaysInitialPreparationsTitle" xml:space="preserve">
+        <value>To prepare today</value>
+    </data>
+    <data name="DashboardTodaysInitialPreparationsNothingToPrepareTitle" xml:space="preserve">
+        <value>No initial preparations planned for today!</value>
+    </data>
+    <data name="DashboardAppBarTitle" xml:space="preserve">
+        <value>Dashboard</value>
+    </data>
 </root>

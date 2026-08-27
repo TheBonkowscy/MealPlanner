@@ -1,0 +1,154 @@
+﻿@page "/"
+@using MealPlanner.Client.Menus
+@using MealPlanner.Client.Recipes
+@using MealPlanner.UI.Services
+@using Microsoft.Extensions.Localization
+@implements IDisposable
+
+@inject NavigationManager Navigation
+@inject AppBarService AppBarService
+@inject IFindMenus MenuFinder
+@inject IFindRecipes RecipeFinder
+@inject IStringLocalizer<Translations> L
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+    <MudGrid>
+        <MudItem xs="12" md="7">
+            <MudPaper Class="pa-4 rounded-lg" Elevation="2">
+                <MudText Typo="Typo.h6" Class="mb-3 d-flex align-center gap-2">
+                    <MudIcon Icon="@Icons.Material.Filled.RestaurantMenu" Color="Color.Primary" />
+                    @L[TranslationKeys.Dashboard.DashboardTodaysMenu]
+                </MudText>
+
+                <MudDivider Class="mb-3" />
+
+                @if (_todayMeals.Any())
+                {
+                    <MudList T="string" Clickable="true">
+                        @foreach (var meal in _todayMeals)
+                        {
+                            <MudListItem OnClick="@(() => NavigateToRecipe(meal.Id))" Class="pa-2 my-1 rounded-lg hover-elevation">
+                                <div class="d-flex align-center justify-space-between w-100">
+                                    <div class="d-flex align-center gap-3">
+                                        <div>
+                                            <MudText Typo="Typo.subtitle1" Class="fw-bold">
+                                                @meal.Name
+                                            </MudText>
+                                            <MudText Typo="Typo.caption" Class="text-muted">
+                                                @L[TranslationKeys.Dashboard.DashboardTodaysMenuMealServingsTitle, @meal.Servings]
+                                            </MudText>
+                                        </div>
+                                    </div>
+                                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" />
+                                </div>
+                            </MudListItem>
+                        }
+                    </MudList>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="my-2">
+                        @L[TranslationKeys.Dashboard.DashboardTodaysMenuNoMealsTitle]
+                    </MudAlert>
+                }
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="5">
+            <MudPaper Class="pa-4 rounded-lg" Elevation="2">
+                <MudText Typo="Typo.h6" Class="mb-3 d-flex align-center gap-2">
+                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Warning" />
+                    @L[TranslationKeys.Dashboard.DashboardTodaysInitialPreparationsTitle]
+                </MudText>
+
+                <MudDivider Class="mb-3" />
+
+                @if (_todayPreparations.Any())
+                {
+                    <MudList T="string" Dense="true">
+                        @foreach (var prep in _todayPreparations)
+                        {
+                            <MudListItem Class="@(prep.Required ? "border border-solid mud-border-error rounded-lg pa-2 my-2" : "border border-solid mud-border-lines rounded-lg pa-2 my-2")">
+                                <div class="d-flex align-center justify-space-between w-100">
+                                    <MudText Typo="Typo.body2" Class="fw-bold">
+                                        @prep.Description
+                                    </MudText>
+                                    <MudText Typo="Typo.caption" Class="d-inline-flex align-center gap-1 text-muted">
+                                        <span>
+                                            <b>@prep.RecipeName</b> (@prep.MealDate.ToString("dd.MM"))
+                                        </span>
+                                        @if (prep.Required)
+                                        {
+                                            <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Error" Size="Size.Small" />
+                                        }
+                                    </MudText>
+                                </div>
+                            </MudListItem>
+                        }
+                    </MudList>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="my-2">
+                        @L[TranslationKeys.Dashboard.DashboardTodaysInitialPreparationsNothingToPrepareTitle]
+                    </MudAlert>
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+<style>
+    .text-muted {
+        opacity: 0.7;
+    }
+    .hover-elevation:hover {
+        background-color: var(--mud-palette-action-default-hover);
+    }
+</style>
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+    private List<TodayMealItemDto> _todayMeals = [];
+    private List<DashboardPrepItemDto> _todayPreparations = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppBarService.SetTitle(L[TranslationKeys.Dashboard.DashboardAppBarTitle]);
+        await LoadDashboardDataAsync();
+    }
+
+    private async Task LoadDashboardDataAsync()
+    {
+        var menuForToday = await MenuFinder.GetToday(_cts.Token);
+        _todayMeals =
+        [
+            .. menuForToday?.Meals.OrderBy(x => x.Order).Select(x => new TodayMealItemDto(x.Id, x.Name, x.Servings)) ?? []
+        ];
+
+        var prepForToday = await RecipeFinder.GetPreparations(DateOnly.FromDateTime(DateTime.Now), _cts.Token);
+        _todayPreparations = 
+        [ 
+            .. prepForToday?.Preparations.Select(x => new DashboardPrepItemDto(x.RecipeId, x.Description, x.Required, x.RecipeName, x.MealDate))
+                ?? []
+        ];
+
+        await Task.CompletedTask;
+    }
+
+    private void NavigateToRecipe(int recipeId)
+    {
+        Navigation.NavigateTo($"/recipes/{recipeId}");
+    }
+
+    public record TodayMealItemDto(int Id, string Name, int Servings);
+
+    public record DashboardPrepItemDto(int Id, string Description, bool Required, string RecipeName, DateOnly MealDate);
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+}
