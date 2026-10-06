@@ -28,16 +28,18 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore --configuration Release
-
-    - name: Run tests
-        run: |
-          dotnet test --no-build --configuration Release \
-          --logger "trx;LogFilePath={framework}_{assembly}.trx" \
+        
+   - name: Run tests
+      run: |
+        dotnet test --no-build --configuration Release \
+          --logger "trx" \
           --results-directory ./TestResults
 
-  - name: Dotnet Test Reporter
-    uses: bibipkins/dotnet-test-reporter@v1
-    if: always()
-    with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
-      results-path: './TestResults/**/*.trx'
+# 2. Akcja zbierze WSZYSTKIE pliki .trx znajdujące się w katalogu TestResults
+   - name: Dotnet Test Reporter
+     uses: bibipkins/dotnet-test-reporter@v1
+     if: always() # Wykonaj nawet jeśli testy nie przeszły
+     with:
+       github-token: ${{ secrets.GITHUB_TOKEN }}
+       results-path: './TestResults/*.trx'
+       comment-title: '🧪 Podsumowanie testów jednostkowych'
