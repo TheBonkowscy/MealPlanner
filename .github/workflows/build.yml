@@ -35,7 +35,7 @@ jobs:
           --results-directory ./TestResults
 
     - name: Dotnet Test Reporter
-      uses: bibipkins/dotnet-test-reporter@v1
+      uses: bibipkins/dotnet-test-reporter@v1.6.4
       if: always()
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
