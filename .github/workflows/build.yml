@@ -40,4 +40,4 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         results-path: './TestResults/*.trx'
-        comment-title: '🧪 Podsumowanie testów jednostkowych'
+        comment-title: '🧪 Test summary'
