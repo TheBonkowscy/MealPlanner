@@ -13,7 +13,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    
     permissions:
       contents: read
       pull-requests: write
@@ -35,10 +34,9 @@ jobs:
           --logger "trx" \
           --results-directory ./TestResults
 
-# 2. Akcja zbierze WSZYSTKIE pliki .trx znajdujące się w katalogu TestResults
    - name: Dotnet Test Reporter
      uses: bibipkins/dotnet-test-reporter@v1
-     if: always() # Wykonaj nawet jeśli testy nie przeszły
+     if: always()
      with:
        github-token: ${{ secrets.GITHUB_TOKEN }}
        results-path: './TestResults/*.trx'
