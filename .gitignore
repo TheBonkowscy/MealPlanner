@@ -482,3 +482,9 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Spec Kit (local only)
+.specify/
+
+# Claude 
+.claude/

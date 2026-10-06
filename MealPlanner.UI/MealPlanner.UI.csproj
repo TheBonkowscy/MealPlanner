@@ -13,7 +13,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\MealPlanner.Client\MealPlanner.Client.csproj" />
-      <ProjectReference Include="..\MealPlanner.Services\MealPlanner.Services.csproj" />
     </ItemGroup>
 
     <ItemGroup>
