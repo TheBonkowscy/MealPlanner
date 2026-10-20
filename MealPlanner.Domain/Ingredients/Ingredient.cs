@@ -40,7 +40,7 @@ public class Ingredient
             .AddRule(applicableUnits.Count > 0, DomainErrors.Ingredient.MissingMeasureUnits(name))
             .AddRule(shelfLife >= 0, DomainErrors.Ingredient.InvalidShelfLife(name));
 
-        return errors.Count > 0 ? Result.Failure<Ingredient>(errors) : Result.Success(new Ingredient(name, shelfLife!, applicableUnits));
+        return errors.Count > 0 ? Result.Failure<Ingredient>(errors) : Result.Success(new Ingredient(name, shelfLife, applicableUnits));
     }
 
     public bool IsApplicableUnit(MeasureUnit unit) => ApplicableUnits.Any(x => x == unit);

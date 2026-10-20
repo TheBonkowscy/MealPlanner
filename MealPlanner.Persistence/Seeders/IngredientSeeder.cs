@@ -26,6 +26,7 @@ internal static class IngredientSeeder
             if (existingIngredient != null)
             {
                 existingIngredient.UpdateApplicableUnits(ingredient.ApplicableUnits);
+                existingIngredient.UpdateShelfLife(ingredient.ShelfLifeDays);
             }
             else
             {
