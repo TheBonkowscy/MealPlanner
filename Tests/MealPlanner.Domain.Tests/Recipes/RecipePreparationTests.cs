@@ -10,7 +10,7 @@ public class RecipePreparationTests
     private const string Description = "Test description";
     
     [Theory]
-    [ClassData(typeof(NegativeNumbersTestDataProvider))]
+    [ClassData(typeof(NonPositiveNumbersTestDataProvider))]
     public void Create_WithNegativeLeadDays_Fails(int invalidLeadDays)
     {
         // Act
@@ -52,7 +52,7 @@ public class RecipePreparationTests
     }
     
     [Theory]
-    [ClassData(typeof(NegativeNumbersTestDataProvider))]
+    [ClassData(typeof(NonPositiveNumbersTestDataProvider))]
     public void UpdateLeadDays_WithNegative_Fails(int invalidLeadDays)
     {
         // Arrange 
