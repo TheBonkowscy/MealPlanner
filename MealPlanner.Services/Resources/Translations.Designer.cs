@@ -249,6 +249,15 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Shelf life should either be positive or null for ingredient {0}..
+        /// </summary>
+        internal static string InvalidShelfLife {
+            get {
+                return ResourceManager.GetString("InvalidShelfLife", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to kg.
         /// </summary>
         internal static string Kilogram {

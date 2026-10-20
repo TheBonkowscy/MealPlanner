@@ -19,6 +19,9 @@ public static class DomainErrors
 
         public static Error MissingMeasureUnits(string ingredientName) => Error.Validation(
             TranslationKeys.Ingredient.MissingIngredientMeasureUnits, ("IngredientName", ingredientName));
+
+        public static Error InvalidShelfLife(string name) => Error.Validation(
+            TranslationKeys.Ingredient.InvalidShelfLife, ("Name", name));
     }
 
     public static class Recipe
