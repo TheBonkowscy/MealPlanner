@@ -32,9 +32,9 @@ public class Ingredient
 
     public bool IsApplicableUnit(MeasureUnit unit) => ApplicableUnits.Any(x => x == unit);
 
-    public Result UpdateApplicableUnits(List<MeasureUnit> applicableUnits)
+    internal Result UpdateApplicableUnits(List<MeasureUnit> applicableUnits)
     {
-        if (applicableUnits.Count > 0)
+        if (applicableUnits.Count <= 0)
         {
             return Result.Failure(DomainErrors.Ingredient.MissingMeasureUnits(Name));
         }

@@ -67,4 +67,38 @@ public class IngredientTests
         yield return [MeasureUnit.GlassCup, true];
         yield return [MeasureUnit.Milliliter, false];
     }
+
+    [Fact]
+    public void UpdateApplicableUnits_WithEmptyUnits_Fails()
+    {
+        // Arrange
+        var ingredient = Ingredient.Create(Name, Units).Value;
+        var expectedError = DomainErrors.Ingredient.MissingMeasureUnits(ingredient.Name);
+        
+        // Act
+        var result = ingredient.UpdateApplicableUnits([]);
+        
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be(expectedError.Code);
+        result.Error.Type.Should().Be(expectedError.Type);
+        result.Error.Metadata.Should().BeEquivalentTo(expectedError.Metadata);
+    }
+
+    [Fact]
+    public void UpdateApplicableUnits_WithUnits_ReplacesExistingUnits()
+    {
+        // Arrange
+        var ingredient = Ingredient.Create(Name, Units).Value;
+        var previousUnits = ingredient.ApplicableUnits;
+        var newUnits = Enum.GetValues<MeasureUnit>().Except(ingredient.ApplicableUnits).ToList();
+        
+        // Act
+        var result = ingredient.UpdateApplicableUnits(newUnits);
+        
+        // Assert
+        result.IsFailure.Should().BeFalse();
+        newUnits.Should().Contain(newUnits);
+        newUnits.Should().NotContain(previousUnits);
+    }
 }
