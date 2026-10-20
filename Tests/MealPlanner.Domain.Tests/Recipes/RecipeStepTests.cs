@@ -10,7 +10,7 @@ public class RecipeStepTests
     private const string Instructions = "Bake in 180 degrees for 45 minutes or until golden";
     
     [Theory]
-    [ClassData(typeof(NegativeNumbersTestDataProvider))]
+    [ClassData(typeof(NonPositiveNumbersTestDataProvider))]
     public void Create_WithNegativeOrder_Fails(int invalidOrder)
     {
         // Act
@@ -52,7 +52,7 @@ public class RecipeStepTests
     }
 
     [Theory]
-    [ClassData(typeof(NegativeNumbersTestDataProvider))]
+    [ClassData(typeof(NonPositiveNumbersTestDataProvider))]
     public void UpdateOrder_WithNegativeOrder_Fails(int newOrder)
     {
         // Arrange

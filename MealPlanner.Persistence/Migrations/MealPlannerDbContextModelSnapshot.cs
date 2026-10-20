@@ -39,6 +39,9 @@ namespace MealPlanner.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("ShelfLifeDays")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.ToTable("Ingredients", (string)null);

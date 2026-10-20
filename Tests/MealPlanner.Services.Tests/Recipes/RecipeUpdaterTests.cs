@@ -69,7 +69,7 @@ public class RecipeUpdaterTests
     }
     
     [Theory]
-    [ClassData(typeof(NegativeNumbersTestDataProvider))]
+    [ClassData(typeof(NonPositiveNumbersTestDataProvider))]
     public async Task Update_Fails_WhenServingsAreOutOfRange(int servings)
     {
         // Arrange

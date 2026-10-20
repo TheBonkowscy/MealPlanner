@@ -12,6 +12,7 @@ public class IngredientConfiguration : IEntityTypeConfiguration<Ingredient>
         
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.ShelfLifeDays).IsRequired(false).HasDefaultValue(null);
         builder.Property(x => x.ApplicableUnits).IsRequired()
             .HasColumnType("text[]");
     }

@@ -6,8 +6,8 @@ public class NegativeNumbersTestDataProvider : IEnumerable<object[]>
 {
     public IEnumerator<object[]> GetEnumerator()
     {
-        yield return [0];
         yield return [-1];
+        yield return [int.MinValue];
     }
 
     IEnumerator IEnumerable.GetEnumerator()

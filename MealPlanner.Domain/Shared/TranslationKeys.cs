@@ -8,6 +8,7 @@ public static class TranslationKeys
         public const string IngredientUnitNotApplicable = nameof(IngredientUnitNotApplicable);
         public const string InvalidIngredientName = nameof(InvalidIngredientName);
         public const string MissingIngredientMeasureUnits = nameof(MissingIngredientMeasureUnits);
+        public const string InvalidShelfLife = nameof(InvalidShelfLife);
     }
 
     public static class Recipe

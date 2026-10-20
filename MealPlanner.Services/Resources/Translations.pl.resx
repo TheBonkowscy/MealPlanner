@@ -152,4 +152,7 @@
     <data name="InvalidLeadDays" xml:space="preserve">
         <value>Podaj prawidłową liczbę dni wstecz dla przygotowań</value>
     </data>
+    <data name="InvalidShelfLife" xml:space="preserve">
+        <value>Podaj dni świeżości dla składnika {0} lub pozostaw je puste.</value>
+    </data>
 </root>

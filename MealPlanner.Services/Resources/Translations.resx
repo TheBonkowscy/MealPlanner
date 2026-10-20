@@ -159,4 +159,7 @@
     <data name="InvalidLeadDays" xml:space="preserve">
         <value>Please provide the correct number of days ahead for preparations</value>
     </data>
+    <data name="InvalidShelfLife" xml:space="preserve">
+        <value>Shelf life should either be positive or null for ingredient {0}.</value>
+    </data>
 </root>
