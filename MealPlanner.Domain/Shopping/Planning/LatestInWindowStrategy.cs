@@ -2,8 +2,6 @@
 
 public class LatestInWindowStrategy : IPlanningStrategy
 {
-    public Task<ShoppingPlan> PlanShopping(ICollection<ShoppingNeed> productsToBuy)
-    {
-        throw new NotImplementedException();
-    }
+    public DateOnly Choose(IReadOnlyCollection<DateOnly> allowedTrips, IReadOnlySet<DateOnly> usedTrips) =>
+        allowedTrips.Max();
 }

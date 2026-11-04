@@ -2,5 +2,6 @@
 
 public interface IPlanningStrategy
 {
-    Task<ShoppingPlan> PlanShopping(ICollection<ShoppingNeed> productsToBuy);
+    // Precondition: allowedTrips is not empty. Returns one of allowedTrips.
+    DateOnly Choose(IReadOnlyCollection<DateOnly> allowedTrips, IReadOnlySet<DateOnly> usedTrips);
 }

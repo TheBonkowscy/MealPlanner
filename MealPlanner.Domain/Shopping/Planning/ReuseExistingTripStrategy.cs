@@ -2,8 +2,9 @@
 
 public class ReuseExistingTripStrategy : IPlanningStrategy
 {
-    public Task<ShoppingPlan> PlanShopping(ICollection<ShoppingNeed> productsToBuy)
+    public DateOnly Choose(IReadOnlyCollection<DateOnly> allowedTrips, IReadOnlySet<DateOnly> usedTrips)
     {
-        throw new NotImplementedException();
+        var reusable = allowedTrips.Where(usedTrips.Contains).ToList();
+        return reusable.Count > 0 ? reusable.Max() : allowedTrips.Max();
     }
 }
