@@ -155,4 +155,7 @@
     <data name="InvalidShelfLife" xml:space="preserve">
         <value>Podaj dni świeżości dla składnika {0} lub pozostaw je puste.</value>
     </data>
+    <data name="NoOpenBigShopDay" xml:space="preserve">
+        <value>Brak dnia, w którym można zrobić duże zakupy, w ciągu sześciu dni przed lub po {0}</value>
+    </data>
 </root>
