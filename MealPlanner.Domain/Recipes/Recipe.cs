@@ -10,7 +10,7 @@ public class Recipe
     
     public string Name { get; private set; }
     
-    public int Servings { get; set; }
+    public int Servings { get; private set; }
 
     private List<UsedIngredient> _ingredients = [];
     
