@@ -14,27 +14,25 @@ public class RealisticWeekTests
 
     private readonly IPlanShoppingTrips _planner = new ShoppingTripPlanner();
 
-    private static DateOnly Oct(int day) => new(2026, 10, day);
-
     private static ShoppingNeed Need(string name, int? shelfLifeDays, DateOnly day) =>
         TestShoppingNeeds.Create(name, day, shelfLifeDays);
 
     private static List<ShoppingNeed> RealisticWeek() =>
     [
-        Need("Makaron", null, Oct(24)),
-        Need("Kiełbasa", 1, Oct(24)),
-        Need("Bułki", 0, Oct(25)),
-        Need("Szynka", 3, Oct(25)),
-        Need("Banany", 1, Oct(25)),
-        Need("Pieczywo", 1, Oct(26)),
-        Need("Ryż", null, Oct(27)),
-        Need("Sałata", 2, Oct(27)),
-        Need("Pomidor", 4, Oct(28)),
-        Need("Mleko", 2, Oct(28)),
-        Need("Ogórek", 4, Oct(29)),
-        Need("Jogurt", 2, Oct(29)),
-        Need("Ser", null, Oct(30)),
-        Need("Bułeczki", 0, Oct(30))
+        Need("Pasta", null, TestDates.Oct(24)),
+        Need("Sausage", 1, TestDates.Oct(24)),
+        Need("Cake", 0, TestDates.Oct(25)),
+        Need("Ham", 3, TestDates.Oct(25)),
+        Need("Bananas", 1, TestDates.Oct(25)),
+        Need("Chicken Leg", 1, TestDates.Oct(26)),
+        Need("Rice", null, TestDates.Oct(27)),
+        Need("Lettuce", 2, TestDates.Oct(27)),
+        Need("Tomato", 4, TestDates.Oct(28)),
+        Need("Milk", 2, TestDates.Oct(28)),
+        Need("Cucumber", 4, TestDates.Oct(29)),
+        Need("Yoghurt", 2, TestDates.Oct(29)),
+        Need("Cheese", null, TestDates.Oct(30)),
+        Need("Chocolate", 0, TestDates.Oct(30))
     ];
 
     private ShoppingTrips Plan(PlanningStrategyKind strategy, List<ShoppingNeed> needs)

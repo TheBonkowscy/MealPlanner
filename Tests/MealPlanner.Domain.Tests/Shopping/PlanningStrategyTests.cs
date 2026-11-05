@@ -1,14 +1,11 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Domain.Shopping.Planning;
+using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests.Shopping;
 
 public class PlanningStrategyTests
 {
-    private static DateOnly Oct(int day) => new(2026, 10, day);
-
-    private static DateOnly[] Oct(int[] days) => [.. days.Select(Oct)];
-
     [Theory]
     [InlineData(new[] { 23, 24, 26 }, new int[0], 26)]
     [InlineData(new[] { 23, 24, 26 }, new[] { 23 }, 26)]
@@ -19,10 +16,10 @@ public class PlanningStrategyTests
         var strategy = new LatestInWindowStrategy();
 
         // Act
-        var chosen = strategy.Choose(Oct(allowedDays), Oct(usedDays).ToHashSet());
+        var chosen = strategy.Choose(TestDates.Oct(allowedDays), TestDates.Oct(usedDays).ToHashSet());
 
         // Assert
-        chosen.Should().Be(Oct(expectedDay));
+        chosen.Should().Be(TestDates.Oct(expectedDay));
     }
 
     [Theory]
@@ -35,10 +32,10 @@ public class PlanningStrategyTests
         var strategy = new ReuseExistingTripStrategy();
 
         // Act
-        var chosen = strategy.Choose(Oct(allowedDays), Oct(usedDays).ToHashSet());
+        var chosen = strategy.Choose(TestDates.Oct(allowedDays), TestDates.Oct(usedDays).ToHashSet());
 
         // Assert
-        chosen.Should().Be(Oct(expectedDay));
+        chosen.Should().Be(TestDates.Oct(expectedDay));
     }
 
     [Theory]
@@ -51,9 +48,9 @@ public class PlanningStrategyTests
         var strategy = new ReuseExistingTripStrategy();
 
         // Act
-        var chosen = strategy.Choose(Oct(allowedDays), Oct(usedDays).ToHashSet());
+        var chosen = strategy.Choose(TestDates.Oct(allowedDays), TestDates.Oct(usedDays).ToHashSet());
 
         // Assert
-        chosen.Should().Be(Oct(expectedDay));
+        chosen.Should().Be(TestDates.Oct(expectedDay));
     }
 }
