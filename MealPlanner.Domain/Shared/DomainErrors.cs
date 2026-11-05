@@ -72,4 +72,9 @@ public static class DomainErrors
         public static Error InvalidLeadDays(int leadDays) => Error.Validation(TranslationKeys.RecipePreparation.InvalidLeadDays, ("LeadDays", leadDays));
         public static readonly Error NotFound = Error.Validation(TranslationKeys.RecipePreparation.RecipePreparationNotFound);
     }
+
+    public static class Shopping
+    {
+        public static Error NoOpenBigShopDay(DateOnly startDay) => Error.Validation(TranslationKeys.Shopping.NoOpenBigShopDay, ("StartDay", startDay));
+    }
 }

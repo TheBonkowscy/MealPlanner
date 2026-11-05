@@ -51,4 +51,9 @@ public static class TranslationKeys
         public const string InvalidLeadDays = nameof(InvalidLeadDays);
         public const string RecipePreparationNotFound = nameof(RecipePreparationNotFound);
     }
+
+    public static class Shopping
+    {
+        public const string NoOpenBigShopDay = nameof(NoOpenBigShopDay);
+    }
 }

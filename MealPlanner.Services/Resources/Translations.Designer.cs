@@ -393,6 +393,15 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No open day is available for the big shop within six days before or after {0}.
+        /// </summary>
+        internal static string NoOpenBigShopDay {
+            get {
+                return ResourceManager.GetString("NoOpenBigShopDay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to package(s).
         /// </summary>
         internal static string Package {

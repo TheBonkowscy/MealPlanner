@@ -162,4 +162,7 @@
     <data name="InvalidShelfLife" xml:space="preserve">
         <value>Shelf life should either be positive or null for ingredient {0}.</value>
     </data>
+    <data name="NoOpenBigShopDay" xml:space="preserve">
+        <value>No open day is available for the big shop within six days before or after {0}</value>
+    </data>
 </root>
