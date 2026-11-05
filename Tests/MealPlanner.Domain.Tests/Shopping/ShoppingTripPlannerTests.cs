@@ -239,8 +239,8 @@ public class ShoppingTripPlannerTests
     }
 
     [Theory]
-    [InlineData(PlanningStrategyKind.ReuseExistingTrip, "24[Pasta=1,Bread=1!]")]
-    [InlineData(PlanningStrategyKind.LatestInWindow, "24[Pasta=1,Bread=1!]")]
+    [InlineData(PlanningStrategyKind.ReuseExistingTrip, "24[Bread=1!,Pasta=1]")]
+    [InlineData(PlanningStrategyKind.LatestInWindow, "24[Bread=1!,Pasta=1]")]
     public void PlanTrips_ClosedFridayAndSaturday_MoveBigTripToThursday(PlanningStrategyKind strategy,
         string expected)
     {
