@@ -4,6 +4,7 @@ using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Domain.Shopping;
 using MealPlanner.Persistence;
+using MealPlanner.Services.Shared;
 using MealPlanner.Services.Shopping.Adapters;
 using MealPlanner.Tests.Shared;
 using MealPlanner.Tests.Shared.Factories;
@@ -33,10 +34,10 @@ public class MealPlanningNeedsAdapterTests
         PlanMenu(TestDates.Oct(5), (RecipeOf(2, (flour, 150m)), 4));
 
         // Act
-        var needs = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
+        var result = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
 
         // Assert
-        needs.Should().ContainSingle().Which.Quantity.Should().Be(300m);
+        result.Value.Should().ContainSingle().Which.Quantity.Should().Be(300m);
     }
 
     [Fact]
@@ -52,10 +53,10 @@ public class MealPlanningNeedsAdapterTests
             (RecipeOf(1, (milk, 50m)), 3));
 
         // Act
-        var needs = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
+        var result = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
 
         // Assert
-        needs.Should().BeEquivalentTo(
+        result.Value.Should().BeEquivalentTo(
         [
             new ShoppingNeed(flour.Id, "Flour", 200m, MeasureUnit.Gram, null, date),
             new ShoppingNeed(sugar.Id, "Sugar", 20m, MeasureUnit.Gram, null, date),
@@ -74,10 +75,10 @@ public class MealPlanningNeedsAdapterTests
         PlanMenu(date, (RecipeOf(1, (tomato, 3m)), 1));
 
         // Act
-        var needs = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
+        var result = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
 
         // Assert
-        needs.Should().ContainSingle().Which.Should().BeEquivalentTo(
+        result.Value.Should().ContainSingle().Which.Should().BeEquivalentTo(
             new ShoppingNeed(tomato.Id, "Tomato", 3m, MeasureUnit.Piece, shelfLifeDays, date));
     }
 
@@ -92,10 +93,10 @@ public class MealPlanningNeedsAdapterTests
         }
 
         // Act
-        var needs = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
+        var result = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
 
         // Assert: 1 October (the start day) and 9 October (after the cycle) are left out; days without a menu add nothing
-        needs.Select(x => x.ConsumptionDate).Should().BeEquivalentTo(TestDates.Oct([2, 5, 8]));
+        result.Value.Select(x => x.ConsumptionDate).Should().BeEquivalentTo(TestDates.Oct([2, 5, 8]));
     }
 
     [Fact]
@@ -106,11 +107,45 @@ public class MealPlanningNeedsAdapterTests
         PlanMenu(TestDates.Oct(20), (RecipeOf(1, (flour, 100m)), 1));
 
         // Act
-        var needs = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
+        var result = await _sut.GetShoppingNeeds(TestDates.Oct(2), TestDates.Oct(8), CancellationToken.None);
 
         // Assert
-        needs.Should().BeEmpty();
+        result.Value.Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task GetShoppingNeeds_ReadsThatOneDay_WhenFromEqualsTo()
+    {
+        // Arrange: a one-day range is valid, only an inverted one is not
+        var flour = IngredientOf("Flour", MeasureUnit.Gram);
+        PlanMenu(TestDates.Oct(4), (RecipeOf(1, (flour, 100m)), 1));
+        PlanMenu(TestDates.Oct(5), (RecipeOf(1, (flour, 100m)), 1));
+
+        // Act
+        var result = await _sut.GetShoppingNeeds(TestDates.Oct(5), TestDates.Oct(5), CancellationToken.None);
+
+        // Assert
+        result.Value.Select(x => x.ConsumptionDate).Should().BeEquivalentTo(TestDates.Oct([5]));
+    }
+
+    [Theory]
+    [MemberData(nameof(InvertedRanges))]
+    public async Task GetShoppingNeeds_Fails_WhenTheRangeIsInverted(DateOnly from, DateOnly to)
+    {
+        // Act
+        var result = await _sut.GetShoppingNeeds(from, to, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Errors.Should().ContainEquivalentOf(ServiceErrors.Shopping.InvertedDateRange(from, to));
+    }
+
+    public static TheoryData<DateOnly, DateOnly> InvertedRanges => new()
+    {
+        // from, to
+        { TestDates.Oct(8), TestDates.Oct(2) }, // the range ends well before it starts
+        { TestDates.Oct(6), TestDates.Oct(5) }, // the range ends one day before it starts
+    };
 
     private void PlanMenu(DateOnly date, params (Recipe Recipe, int Servings)[] meals)
     {
