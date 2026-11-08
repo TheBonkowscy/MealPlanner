@@ -31,4 +31,12 @@ public static class ServiceErrors
         public static Error DoesNotExist(params int[] missingIds) =>
             Error.Validation(TranslationKeys.Ingredient.IngredientDoesNotExist, ("MissingIds", missingIds));
     }
+
+    public static class Shopping
+    {
+        public static Error InvertedDateRange(DateOnly from, DateOnly to) =>
+        Error.Validation(TranslationKeys.Shopping.InvertedDateRange, 
+            ("From", from), 
+            ("To", to));
+    }
 }

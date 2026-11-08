@@ -258,6 +258,15 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Date range can not be inverted ({0} is after {1}).
+        /// </summary>
+        internal static string InvertedDateRange {
+            get {
+                return ResourceManager.GetString("InvertedDateRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to kg.
         /// </summary>
         internal static string Kilogram {
