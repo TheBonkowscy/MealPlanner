@@ -26,7 +26,7 @@ public class StaticClosedDaysProviderTests
     [Fact]
     public async Task GetClosedDays_ReturnsNothing_WhenTheListIsEmpty()
     {
-        // Arrange: the shipped list starts empty until the product owner adds holidays
+        // Arrange
         var sut = new StaticClosedDaysProvider([]);
 
         // Act
@@ -54,19 +54,18 @@ public class StaticClosedDaysProviderTests
     public static TheoryData<DateOnly, DateOnly> InvertedRanges => new()
     {
         // from, to
-        { TestDates.Oct(8), TestDates.Oct(2) }, // the range ends well before it starts
-        { TestDates.Oct(6), TestDates.Oct(5) }, // the range ends one day before it starts
+        { TestDates.Oct(8), TestDates.Oct(2) },
+        { TestDates.Oct(6), TestDates.Oct(5) },
     };
 
-    // The provider holds the closed days 2, 5 and 8 October. Expected values are written out by hand.
     public static TheoryData<DateOnly, DateOnly, DateOnly[]> RangeCases => new()
     {
         // from, to, expected
-        { TestDates.Oct(2), TestDates.Oct(8), TestDates.Oct([2, 5, 8]) }, // a closed day on each bound is included
-        { TestDates.Oct(3), TestDates.Oct(7), TestDates.Oct([5]) },       // closed days outside both bounds are left out
-        { TestDates.Oct(5), TestDates.Oct(5), TestDates.Oct([5]) },       // a one-day range on a closed day
-        { TestDates.Oct(6), TestDates.Oct(7), [] },                       // a range between closed days
-        { TestDates.Oct(1), TestDates.Oct(1), [] },                       // every closed day is after the range
-        { TestDates.Oct(9), TestDates.Oct(12), [] },                      // every closed day is before the range
+        { TestDates.Oct(2), TestDates.Oct(8), TestDates.Oct([2, 5, 8]) },
+        { TestDates.Oct(3), TestDates.Oct(7), TestDates.Oct([5]) },
+        { TestDates.Oct(5), TestDates.Oct(5), TestDates.Oct([5]) },
+        { TestDates.Oct(6), TestDates.Oct(7), [] },
+        { TestDates.Oct(1), TestDates.Oct(1), [] },
+        { TestDates.Oct(9), TestDates.Oct(12), [] },
     };
 }

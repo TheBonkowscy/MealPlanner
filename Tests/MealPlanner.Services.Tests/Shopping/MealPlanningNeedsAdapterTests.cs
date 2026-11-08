@@ -29,7 +29,7 @@ public class MealPlanningNeedsAdapterTests
     [Fact]
     public async Task GetShoppingNeeds_ScalesQuantityToPlannedServings()
     {
-        // Arrange: 4 servings planned on a recipe written for 2
+        // Arrange
         var flour = IngredientOf("Flour", MeasureUnit.Gram);
         PlanMenu(TestDates.Oct(5), (RecipeOf(2, (flour, 150m)), 4));
 
@@ -43,7 +43,7 @@ public class MealPlanningNeedsAdapterTests
     [Fact]
     public async Task GetShoppingNeeds_ScalesEachMealByItsOwnServings_AndIncludesEveryIngredientOfEveryMeal()
     {
-        // Arrange: two meals on one day, each with its own recipe servings and planned servings
+        // Arrange
         var flour = IngredientOf("Flour", MeasureUnit.Gram);
         var sugar = IngredientOf("Sugar", MeasureUnit.Gram);
         var milk = IngredientOf("Milk", MeasureUnit.Milliliter);
@@ -85,7 +85,7 @@ public class MealPlanningNeedsAdapterTests
     [Fact]
     public async Task GetShoppingNeeds_IncludesOnlyMenusWithinTheRange_BoundsInclusive()
     {
-        // Arrange: the range is F+1 ... F+7 for a start day F = 1 October, as the generator calls it
+        // Arrange
         var flour = IngredientOf("Flour", MeasureUnit.Gram);
         foreach (var day in new[] { 1, 2, 5, 8, 9 })
         {
@@ -116,7 +116,7 @@ public class MealPlanningNeedsAdapterTests
     [Fact]
     public async Task GetShoppingNeeds_ReadsThatOneDay_WhenFromEqualsTo()
     {
-        // Arrange: a one-day range is valid, only an inverted one is not
+        // Arrange
         var flour = IngredientOf("Flour", MeasureUnit.Gram);
         PlanMenu(TestDates.Oct(4), (RecipeOf(1, (flour, 100m)), 1));
         PlanMenu(TestDates.Oct(5), (RecipeOf(1, (flour, 100m)), 1));

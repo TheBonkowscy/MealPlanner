@@ -30,7 +30,6 @@ public class MealTests
     {
         // Arrange
         var recipe = RecipeWithQuantity(100m, 1);
-        // Recipe.Create and UpdateServings reject this value, so simulate a row loaded from the database with invalid data.
         typeof(Recipe).GetProperty(nameof(Recipe.Servings))!.SetValue(recipe, nonPositiveRecipeServings);
         var meal = PlanMeal(recipe, 3);
 
@@ -44,12 +43,12 @@ public class MealTests
     public static TheoryData<decimal, int, int, decimal> ScalingCases => new()
     {
         // quantity, recipe servings, planned servings, expected
-        { 150m, 2, 4, 300m },  // 4 planned on a recipe for 2 doubles the quantity
-        { 150m, 4, 2, 75m },   // the ratio is planned / recipe, not the other way round
-        { 150m, 2, 2, 150m },  // equal servings leave the quantity unchanged
-        { 2m, 4, 3, 1.5m },    // 3 / 4 must not be evaluated as integer division (that gives 0)
-        { 0.75m, 2, 4, 1.5m }, // fractional quantity
-        { 3m, 3, 2, 2m },      // multiply before dividing: 3 * 2 / 3 is exactly 2, not 2.0000000000000000000000000001
+        { 150m, 2, 4, 300m },
+        { 150m, 4, 2, 75m },
+        { 150m, 2, 2, 150m },
+        { 2m, 4, 3, 1.5m },
+        { 0.75m, 2, 4, 1.5m },
+        { 3m, 3, 2, 2m },
     };
 
     private static Recipe RecipeWithQuantity(decimal quantity, int servings)
