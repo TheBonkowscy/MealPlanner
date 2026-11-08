@@ -15,10 +15,6 @@
     <ItemGroup>
         <EmbeddedResource Update="Resources\Translations.resx">
             <Generator>PublicResXFileCodeGenerator</Generator>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Translations.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Translations.Designer.cs</LastGenOutput>
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
