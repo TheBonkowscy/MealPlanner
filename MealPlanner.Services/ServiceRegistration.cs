@@ -4,6 +4,8 @@ using MealPlanner.Services.Recipes;
 using MealPlanner.Services.Recipes.Ingredients;
 using MealPlanner.Services.Recipes.Preparations;
 using MealPlanner.Services.Recipes.Steps;
+using MealPlanner.Services.Shopping;
+using MealPlanner.Services.Shopping.Adapters;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MealPlanner.Services;
@@ -47,6 +49,10 @@ public static class ServiceRegistration
         
         /* Shared */
         services.AddTransient<MeasureUnitMapper>();
+        
+        /* Shopping */
+        services.AddTransient<IShoppingNeedsSource, MealPlanningNeedsAdapter>();
+        services.AddSingleton<IClosedDaysProvider>(_ => new StaticClosedDaysProvider([.. ClosedDaysCalendar.Dates]));
         
         return Task.CompletedTask;
     }

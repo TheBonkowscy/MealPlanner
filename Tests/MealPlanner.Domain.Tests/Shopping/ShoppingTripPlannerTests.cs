@@ -119,7 +119,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow, "24[Bread=1!]")]
     public void PlanTrips_EmptyWindow_FallsBackToLatestTripWithWarning(PlanningStrategyKind strategy, string expected)
     {
-        // Arrange: the window for a Monday need with shelf life 1 is Sunday only, and Sunday is no shop day
+        // Arrange
         List<ShoppingNeed> needs = [Need("Bread", 1, TestDates.Oct(26))];
 
         // Act
@@ -164,8 +164,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow, "23[Pasta=1];27[Tomato=1]")]
     public void PlanTrips_DurableNeeds_AreAssignedBeforeOtherNeeds(PlanningStrategyKind strategy, string expected)
     {
-        // Arrange: chronologically the tomatoes come first, but the big trip happens anyway because of the pasta,
-        // so reusing it is cheaper than a separate trip (the tomatoes' window reaches back to Friday)
+        // Arrange
         List<ShoppingNeed> needs = [Need("Tomato", 5, TestDates.Oct(28)), Need("Pasta", null, TestDates.Oct(29))];
 
         // Act
@@ -180,7 +179,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow, "27[Tomato=1]")]
     public void PlanTrips_WithoutDurableNeeds_DoesNotTreatBigTripAsUsed(PlanningStrategyKind strategy, string expected)
     {
-        // Arrange: nothing needs the big trip, so it must not attract the tomatoes
+        // Arrange
         List<ShoppingNeed> needs = [Need("Tomato", 5, TestDates.Oct(28))];
 
         // Act
@@ -190,15 +189,13 @@ public class ShoppingTripPlannerTests
         Summarize(plan).Should().Be(expected);
     }
 
-    // --- The big trip on a closed Friday: the nearest open day, the earlier one on a tie ---
-
     [Theory]
     [InlineData(PlanningStrategyKind.ReuseExistingTrip, "24[Pasta=1]")]
     [InlineData(PlanningStrategyKind.LatestInWindow, "24[Pasta=1]")]
     public void PlanTrips_ClosedFriday_WhenThursdayAndSaturdayAreOpen_EarlierDayWins(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: Thursday TestDates.Dec 24 and Saturday TestDates.Dec 26 are both one day away from the closed Friday
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Dec(28))];
 
         // Act
@@ -213,7 +210,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow, "26[Bread=1,Pasta=1]")]
     public void PlanTrips_ClosedFridayAndThursday_MoveBigTripToSaturday(PlanningStrategyKind strategy, string expected)
     {
-        // Arrange: both needs are dated on the Saturday that becomes the big-trip day
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Dec(26)), Need("Bread", 1, TestDates.Dec(26))];
 
         // Act
@@ -228,7 +225,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow, "26[Pasta=1]")]
     public void PlanTrips_NearerLaterDay_BeatsFurtherEarlierDay(PlanningStrategyKind strategy, string expected)
     {
-        // Arrange: Saturday TestDates.Dec 26 is one day from the closed Friday, Wednesday TestDates.Dec 23 is two days
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Dec(28))];
 
         // Act
@@ -260,7 +257,7 @@ public class ShoppingTripPlannerTests
     public void PlanTrips_ClosedThursdayFridayAndSaturday_MoveBigTripToWednesday(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: Wednesday TestDates.Dec 23 and Sunday TestDates.Dec 27 are both two days away, so the earlier one wins
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Dec(28))];
 
         // Act
@@ -276,7 +273,7 @@ public class ShoppingTripPlannerTests
     public void PlanTrips_WhenEarlierDaysAreClosed_BigTripMovesForwardToSunday(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: TestDates.Dec 23 ... TestDates.Dec 26 are closed, so the nearest open day is Sunday TestDates.Dec 27 (two days after the Friday)
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Dec(28)), Need("Bread", 1, TestDates.Dec(29))];
 
         // Act
@@ -292,7 +289,7 @@ public class ShoppingTripPlannerTests
     public void PlanTrips_NeedOnForwardBigTripDay_IsBoughtThatDayWithoutWarning(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: the big trip is on Sunday TestDates.Dec 27, and so is the meal
+        // Arrange
         List<ShoppingNeed> needs = [Need("Tomato", 2, TestDates.Dec(27))];
 
         // Act
@@ -308,7 +305,7 @@ public class ShoppingTripPlannerTests
     public void PlanTrips_NeedDatedBeforeForwardBigTrip_IsBoughtOnBigTripWithWarning(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: every day between the Friday and the big trip is closed, so nothing can be bought before Saturday
+        // Arrange
         List<ShoppingNeed> needs = [Need("Tomato", 2, TestDates.Dec(26))];
 
         // Act
@@ -324,7 +321,7 @@ public class ShoppingTripPlannerTests
     public void PlanTrips_DurableNeedDatedBeforeForwardBigTrip_IsFlagged(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: the pasta is needed on Saturday, the rice only after the big trip
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Dec(26)), Need("Rice", null, TestDates.Dec(28))];
 
         // Act
@@ -339,7 +336,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow)]
     public void PlanTrips_BigTripSixDaysBeforeTheFriday_IsStillFound(PlanningStrategyKind strategy)
     {
-        // Arrange: only Saturday TestDates.Oct 17 is open, six days before the start Friday
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Oct(25))];
         var closedDays = Enumerable.Range(18, 12).Select(TestDates.Oct).ToArray();
 
@@ -355,7 +352,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow)]
     public void PlanTrips_BigTripSixDaysAfterTheFriday_IsStillFound(PlanningStrategyKind strategy)
     {
-        // Arrange: only Thursday TestDates.Oct 29 is open, six days after the start Friday
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Oct(30))];
         var closedDays = Enumerable.Range(17, 12).Select(TestDates.Oct).ToArray();
 
@@ -372,7 +369,7 @@ public class ShoppingTripPlannerTests
     public void PlanTrips_NeedOnBigTripSaturday_IsBoughtThatDayWithoutWarning(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: no trip exists before the big-trip Saturday, yet the need must not get a warning
+        // Arrange
         List<ShoppingNeed> needs = [Need("Tomato", 2, TestDates.Dec(26))];
 
         // Act
@@ -388,7 +385,7 @@ public class ShoppingTripPlannerTests
     public void PlanTrips_NeedAfterBigTripSaturday_FallsBackOverSundayWithWarning(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: the window for a Monday need with shelf life 1 is Sunday only
+        // Arrange
         List<ShoppingNeed> needs = [Need("Bread", 1, TestDates.Dec(28))];
 
         // Act
@@ -419,7 +416,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow)]
     public void PlanTrips_WhenEveryEarlierDayIsClosed_UsesSaturdayForBigTrip(PlanningStrategyKind strategy)
     {
-        // Arrange: TestDates.Oct 17 ... TestDates.Oct 23 closed, Saturday TestDates.Oct 24 open
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Oct(25))];
         var closedWeek = Enumerable.Range(17, 7).Select(TestDates.Oct).ToArray();
 
@@ -429,8 +426,6 @@ public class ShoppingTripPlannerTests
         // Assert
         Summarize(plan).Should().Be("24[Pasta=1]");
     }
-
-    // --- Aggregation and result ---
 
     [Theory]
     [InlineData(PlanningStrategyKind.ReuseExistingTrip)]
@@ -477,7 +472,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow)]
     public void PlanTrips_WhenAnyContributingNeedHasWarning_FlagsTheItem(PlanningStrategyKind strategy)
     {
-        // Arrange: the first need falls back to trip 24 with a warning, the second lands on 24 without one
+        // Arrange
         List<ShoppingNeed> needs = [Need("Bread", 1, TestDates.Oct(26)), Need("Bread", 3, TestDates.Oct(26))];
 
         // Act
@@ -505,7 +500,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow)]
     public void PlanTrips_NeedsOutsideTheCycle_AreIgnored(PlanningStrategyKind strategy)
     {
-        // Arrange: the cycle covers TestDates.Oct 24 ... TestDates.Oct 30, so the start Friday and TestDates.Oct 31 are outside of it
+        // Arrange
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Oct(23)), Need("Pasta", null, TestDates.Oct(31))];
 
         // Act
@@ -567,8 +562,6 @@ public class ShoppingTripPlannerTests
         planFromReversed.Should().BeEquivalentTo(plan, options => options.WithStrictOrdering());
     }
 
-    // --- The start day is the big-shop day, whatever its weekday ---
-
     public static TheoryData<PlanningStrategyKind, int> EveryStartWeekday()
     {
         // TestDates.Oct 19 (Monday) ... TestDates.Oct 25 (Sunday) 2026
@@ -605,8 +598,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow, "24[Tomato=1]")]
     public void PlanTrips_StartOnWednesday_PlansFreshTripsOnShopDays(PlanningStrategyKind strategy, string expected)
     {
-        // Arrange: the cycle is TestDates.Oct 22 ... TestDates.Oct 28; the window of a Monday need with shelf life 2 is Sat TestDates.Oct 24 and
-        // Sun TestDates.Oct 25, and Sunday is no shop day
+        // Arrange
         var wednesday = TestDates.Oct(21);
         List<ShoppingNeed> needs = [Need("Tomato", 2, TestDates.Oct(26))];
 
@@ -623,7 +615,7 @@ public class ShoppingTripPlannerTests
     public void PlanTrips_StartOnSunday_BigTripIsATripForTheNextDayNeed(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: Sunday is no fresh-shop day, but the start day is the big-trip day, so it is a trip all the same
+        // Arrange
         var sunday = TestDates.Oct(25);
         List<ShoppingNeed> needs = [Need("Tomato", 1, TestDates.Oct(26))];
 
@@ -640,7 +632,7 @@ public class ShoppingTripPlannerTests
     public void PlanTrips_ClosedStartDayOnWednesday_MovesBigTripToTheEarlierDay(PlanningStrategyKind strategy,
         string expected)
     {
-        // Arrange: Tuesday TestDates.Oct 20 and Thursday TestDates.Oct 22 are both one day from the closed Wednesday
+        // Arrange
         var wednesday = TestDates.Oct(21);
         List<ShoppingNeed> needs = [Need("Pasta", null, TestDates.Oct(24))];
 
@@ -658,7 +650,7 @@ public class ShoppingTripPlannerTests
     [InlineData(PlanningStrategyKind.LatestInWindow)]
     public void PlanTrips_WhenNoDayIsOpenForTheBigTrip_Fails(PlanningStrategyKind strategy)
     {
-        // Arrange: TestDates.Oct 17 ... TestDates.Oct 29, i.e. the Friday and the six days on either side of it
+        // Arrange
         var closedDays = Enumerable.Range(17, 13).Select(TestDates.Oct).ToHashSet();
 
         // Act

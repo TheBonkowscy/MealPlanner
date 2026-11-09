@@ -165,4 +165,7 @@
     <data name="NoOpenBigShopDay" xml:space="preserve">
         <value>No open day is available for the big shop within six days before or after {0}</value>
     </data>
+    <data name="InvertedDateRange" xml:space="preserve">
+        <value>Date range can not be inverted ({0} is after {1})</value>
+    </data>
 </root>

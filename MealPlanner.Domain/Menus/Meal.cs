@@ -1,4 +1,5 @@
-﻿using MealPlanner.Domain.Recipes;
+﻿using MealPlanner.Domain.Ingredients;
+using MealPlanner.Domain.Recipes;
 using MealPlanner.Domain.Shared;
 
 namespace MealPlanner.Domain.Menus;
@@ -27,6 +28,12 @@ public class Meal
         RecipeId = recipe.Id;
         Order = order;
         Servings = servings;
+    }
+
+    public decimal ScaledQuantityOf(UsedIngredient ingredient)
+    {
+        var targetServings = Math.Max(1, Recipe.Servings);
+        return ingredient.Quantity * Servings / targetServings;
     }
 
     public static Result<Meal> Create(Menu? menu, Recipe? recipe, int order, int servings)

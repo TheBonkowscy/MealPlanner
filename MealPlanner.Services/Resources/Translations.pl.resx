@@ -158,4 +158,7 @@
     <data name="NoOpenBigShopDay" xml:space="preserve">
         <value>Brak dnia, w którym można zrobić duże zakupy, w ciągu sześciu dni przed lub po {0}</value>
     </data>
+    <data name="InvertedDateRange" xml:space="preserve">
+        <value>Zakres dat nie może być odwrócony ({0} wypada po {1})</value>
+    </data>
 </root>

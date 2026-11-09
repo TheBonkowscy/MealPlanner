@@ -26,4 +26,9 @@ public static class TranslationKeys
     {
         public const string IngredientDoesNotExist = nameof(IngredientDoesNotExist);
     }
+
+    public static class Shopping
+    {
+        public const string InvertedDateRange = nameof(InvertedDateRange);
+    }
 }
