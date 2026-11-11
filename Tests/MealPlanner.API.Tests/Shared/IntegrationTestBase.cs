@@ -3,6 +3,7 @@ using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 
 namespace MealPlanner.API.Tests.Shared;
@@ -36,7 +37,10 @@ public abstract class IntegrationTestBase : IDisposable, IAsyncDisposable
     private static readonly Lock DbLock = new();
 
     protected HttpClient Client => _factory.CreateClient(_options);
-    
+
+    protected HttpClient CreateClient(Action<IServiceCollection> configureServices) =>
+        _factory.WithWebHostBuilder(builder => builder.ConfigureTestServices(configureServices)).CreateClient(_options);
+
     protected MealPlannerDbContext DatabaseContext => _serviceScope.ServiceProvider.GetRequiredService<MealPlannerDbContext>() ?? throw new Exception("Could not retrieve database instance");
     
     private void ClearDatabase()
