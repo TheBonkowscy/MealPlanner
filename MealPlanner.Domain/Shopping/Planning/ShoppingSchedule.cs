@@ -1,4 +1,4 @@
-﻿namespace MealPlanner.Domain.Shopping;
+﻿namespace MealPlanner.Domain.Shopping.Planning;
 
 // TODO: at some point this should be pulled from the database. Right now it lives here.
 public static class ShoppingSchedule
