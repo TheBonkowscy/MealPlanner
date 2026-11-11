@@ -139,7 +139,7 @@ public class ShoppingTripPlanner : IPlanShoppingTrips
                     x.Key.Unit,
                     x.Sum(z => z.Need.Quantity),
                     x.Any(f => f.Warning)))
-                .OrderBy(x => x.IngredientName, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(x => x.IngredientName, StringComparer.CurrentCultureIgnoreCase)
                 .ThenBy(x => x.Unit)
                 .ToList();
             trips.Add(new PlannedTrip(trip.Key, items));

@@ -1,3 +1,4 @@
+using MealPlanner.Domain.Shopping.Planning;
 using MealPlanner.Services.Ingredients;
 using MealPlanner.Services.Menus;
 using MealPlanner.Services.Recipes;
@@ -53,6 +54,8 @@ public static class ServiceRegistration
         /* Shopping */
         services.AddTransient<IShoppingNeedsSource, MealPlanningNeedsAdapter>();
         services.AddSingleton<IClosedDaysProvider>(_ => new StaticClosedDaysProvider([.. ClosedDaysCalendar.Dates]));
+        services.AddSingleton<IPlanShoppingTrips, ShoppingTripPlanner>();
+        services.AddTransient<ShoppingListGenerator>();
         
         return Task.CompletedTask;
     }
