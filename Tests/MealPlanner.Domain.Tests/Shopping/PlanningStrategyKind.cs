@@ -1,13 +1,7 @@
 ﻿using MealPlanner.Domain.Shopping.Planning;
+using MealPlanner.Shared.Shopping;
 
 namespace MealPlanner.Domain.Tests.Shopping;
-
-// Lets [Theory] rows name a strategy: the strategy classes themselves are not serializable test data.
-public enum PlanningStrategyKind
-{
-    ReuseExistingTrip,
-    LatestInWindow
-}
 
 public static class PlanningStrategyKindExtensions
 {

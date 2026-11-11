@@ -4,6 +4,7 @@ using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Shared;
 using MealPlanner.Domain.Shopping;
 using MealPlanner.Domain.Shopping.Planning;
+using MealPlanner.Shared.Shopping;
 using MealPlanner.Tests.Shared.Factories;
 
 namespace MealPlanner.Domain.Tests.Shopping;
