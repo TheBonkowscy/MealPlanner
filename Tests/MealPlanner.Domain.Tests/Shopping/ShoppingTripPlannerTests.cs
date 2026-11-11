@@ -563,6 +563,43 @@ public class ShoppingTripPlannerTests
         planFromReversed.Should().BeEquivalentTo(plan, options => options.WithStrictOrdering());
     }
 
+    [Theory]
+    [InlineData(PlanningStrategyKind.ReuseExistingTrip, "pl", "26[Apple,Czosnek];29[Ćwikła]")]
+    [InlineData(PlanningStrategyKind.ReuseExistingTrip, "en", "26[Apple,Czosnek];29[Ćwikła]")]
+    [InlineData(PlanningStrategyKind.LatestInWindow, "pl", "26[Apple];29[Czosnek,Ćwikła]")]
+    [InlineData(PlanningStrategyKind.LatestInWindow, "en", "26[Apple];29[Czosnek,Ćwikła]")]
+    public void PlanTrips_ChoosesTheSameTripsInEveryCulture(PlanningStrategyKind strategy, string cultureName,
+        string expected)
+    {
+        // Arrange: the culture decides how names sort, in Polish "Ć" follows "C" while in English "Ćwikła" sorts before "Czosnek".
+        // Apple forces a Monday 26 trip. Czosnek and Ćwikła are both needed on Friday 30: Ćwikła can only be bought on Thursday 29,
+        // while Czosnek can use Monday to Thursday, so it reuses Monday's trip only if it is planned before Ćwikła opens Thursday's.
+        List<ShoppingNeed> needs =
+        [
+            Need("Apple", 1, TestDates.Oct(27)),
+            Need("Czosnek", 5, TestDates.Oct(30)),
+            Need("Ćwikła", 1, TestDates.Oct(30))
+        ];
+        var originalCulture = CultureInfo.CurrentCulture;
+
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo(cultureName);
+
+            // Act
+            var plan = Plan(strategy, BigShopFriday, needs);
+
+            // Assert: which items share a trip is the plan; the order within a trip only follows the culture
+            string.Join(";", plan.Trips.Select(trip =>
+                    $"{trip.Date.Day}[{string.Join(",", trip.Items.Select(item => item.IngredientName).Order(StringComparer.Ordinal))}]"))
+                .Should().Be(expected);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
     public static TheoryData<PlanningStrategyKind, int> EveryStartWeekday()
     {
         // TestDates.Oct 19 (Monday) ... TestDates.Oct 25 (Sunday) 2026
