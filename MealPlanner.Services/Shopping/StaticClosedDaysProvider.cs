@@ -6,16 +6,16 @@ namespace MealPlanner.Services.Shopping;
 
 public interface IClosedDaysProvider
 {
-    Task<Result<List<DateOnly>>> GetClosedDays(DateOnly from, DateOnly to, CancellationToken ct);
+    Task<Result<HashSet<DateOnly>>> GetClosedDays(DateOnly from, DateOnly to, CancellationToken ct);
 }
 
 public class StaticClosedDaysProvider(params DateOnly[] closedDays) : IClosedDaysProvider
 {
-    public Task<Result<List<DateOnly>>> GetClosedDays(DateOnly from, DateOnly to, CancellationToken ct)
+    public Task<Result<HashSet<DateOnly>>> GetClosedDays(DateOnly from, DateOnly to, CancellationToken ct)
     {
         var validationResult = DateRangeValidator.Validate(from, to);
         return Task.FromResult(validationResult.IsFailure 
-            ? Result.Failure<List<DateOnly>>(validationResult.Errors) 
-            : Result.Success(closedDays.Where(d => from <= d && d <= to).ToList()));
+            ? Result.Failure<HashSet<DateOnly>>(validationResult.Errors) 
+            : Result.Success(closedDays.Where(d => from <= d && d <= to).ToHashSet()));
     }
 }
