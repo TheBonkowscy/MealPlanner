@@ -51,6 +51,7 @@ public class MenusController(
         return menu is null ? Results.NotFound() : Results.Ok(menu);
     }
     
+    [HttpGet]
     [ProducesResponseType(typeof(GetMenuResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IResult> GetForDateRange([FromQuery(Name = "from")] DateOnly? from,
