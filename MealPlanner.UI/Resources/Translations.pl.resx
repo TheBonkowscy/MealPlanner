@@ -300,6 +300,12 @@
     <data name="ShoppingListShelfLifeWarningTooltip" xml:space="preserve">
         <value>Brak odpowiedniego dnia zakupów: termin przydatności może zostać przekroczony</value>
     </data>
+    <data name="ShoppingListCopyButtonTitle" xml:space="preserve">
+        <value>Kopiuj</value>
+    </data>
+    <data name="ShoppingListCopiedMessage" xml:space="preserve">
+        <value>Skopiowano do schowka</value>
+    </data>
     <data name="NavMenuDashboardName" xml:space="preserve">
         <value>Dashboard</value>
     </data>

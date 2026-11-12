@@ -126,6 +126,8 @@ public static class TranslationKeys
         public const string ShoppingListEmptyTitle = nameof(ShoppingListEmptyTitle);
         public const string ShoppingListEmptyPlanMenuLink = nameof(ShoppingListEmptyPlanMenuLink);
         public const string ShoppingListShelfLifeWarningTooltip = nameof(ShoppingListShelfLifeWarningTooltip);
+        public const string ShoppingListCopyButtonTitle = nameof(ShoppingListCopyButtonTitle);
+        public const string ShoppingListCopiedMessage = nameof(ShoppingListCopiedMessage);
     }
 
     public static class Dashboard

@@ -303,4 +303,10 @@
     <data name="ShoppingListShelfLifeWarningTooltip" xml:space="preserve">
         <value>No suitable shopping day: the shelf life may be exceeded</value>
     </data>
+    <data name="ShoppingListCopyButtonTitle" xml:space="preserve">
+        <value>Copy</value>
+    </data>
+    <data name="ShoppingListCopiedMessage" xml:space="preserve">
+        <value>Copied to clipboard</value>
+    </data>
 </root>
