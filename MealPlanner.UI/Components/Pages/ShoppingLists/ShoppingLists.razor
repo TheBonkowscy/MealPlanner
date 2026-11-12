@@ -4,9 +4,11 @@
 @using MealPlanner.Shared.Shopping.Responses
 @using MealPlanner.UI.Services
 @using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
 @implements IDisposable
 @inject IFindShoppingLists ShoppingListFinder
 @inject ISnackbar Snackbar
+@inject IJSRuntime JS
 @inject TimeProvider Clock
 @inject IStringLocalizer<Translations> L
 
@@ -79,7 +81,9 @@
                                     {
                                         <MudListItem>
                                             <div class="d-flex align-center">
-                                                <MudText Typo="Typo.body1">@FormatItem(item)</MudText>
+                                                <MudText Typo="Typo.body1">
+                                                    @ShoppingTripFormatter.FormatItem(item, CultureInfo.CurrentCulture, includeWarningMarker: false)
+                                                </MudText>
                                                 @if (item.ShelfLifeWarning)
                                                 {
                                                     <MudTooltip Text="@L[TranslationKeys.ShoppingList.ShoppingListShelfLifeWarningTooltip]">
@@ -94,6 +98,14 @@
                                     }
                                 </MudList>
                             </MudCardContent>
+                            <MudCardActions Class="pt-0">
+                                <MudButton Variant="Variant.Text"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.ContentCopy"
+                                           OnClick="() => CopyAsync(trip)">
+                                    @L[TranslationKeys.ShoppingList.ShoppingListCopyButtonTitle]
+                                </MudButton>
+                            </MudCardActions>
                         </MudCard>
                     </MudItem>
                 }
@@ -151,8 +163,21 @@
         }
     }
 
-    private static string FormatItem(PlannedItemResponse item) =>
-        $"{item.IngredientName} {item.Quantity.ToString("0.##", CultureInfo.CurrentCulture)} {item.Unit.DisplayName}";
+    private async Task CopyAsync(PlannedTripResponse trip)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync(
+                "navigator.clipboard.writeText",
+                ShoppingTripFormatter.Format(trip, CultureInfo.CurrentCulture));
+            Snackbar.Add(L[TranslationKeys.ShoppingList.ShoppingListCopiedMessage], Severity.Success);
+        }
+        catch (JSException ex)
+        {
+            // The clipboard needs a secure context (https or localhost) and the user's permission.
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
 
     public void Dispose()
     {
