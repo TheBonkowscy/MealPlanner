@@ -2,6 +2,7 @@
 using MealPlanner.Client.Handlers;
 using MealPlanner.Client.Menus;
 using MealPlanner.Client.Recipes;
+using MealPlanner.Client.Shopping;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -37,6 +38,9 @@ public static class ServiceRegistration
             services.AddHttpClient<IFindIngredients, RecipeClient>(nameof(RecipeClient), IServiceCollection.ConfigureClient())
                 .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
             
+            services.AddHttpClient<IFindShoppingLists, ShoppingListClient>(nameof(ShoppingListClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+
             return services;
         }    
         

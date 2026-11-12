@@ -273,4 +273,34 @@
     <data name="DashboardAppBarTitle" xml:space="preserve">
         <value>Dashboard</value>
     </data>
+    <data name="NavMenuShoppingListsLink" xml:space="preserve">
+        <value>Shopping lists</value>
+    </data>
+    <data name="ShoppingListPageTitle" xml:space="preserve">
+        <value>Shopping list</value>
+    </data>
+    <data name="ShoppingListStartDateLabel" xml:space="preserve">
+        <value>Big shop on</value>
+    </data>
+    <data name="ShoppingListStrategyLabel" xml:space="preserve">
+        <value>Strategy</value>
+    </data>
+    <data name="ShoppingListStrategyReuseExistingTrip" xml:space="preserve">
+        <value>Fewer trips (reuse existing trips)</value>
+    </data>
+    <data name="ShoppingListStrategyLatestInWindow" xml:space="preserve">
+        <value>Freshest (latest possible trip)</value>
+    </data>
+    <data name="ShoppingListGenerateButtonTitle" xml:space="preserve">
+        <value>Generate</value>
+    </data>
+    <data name="ShoppingListEmptyTitle" xml:space="preserve">
+        <value>There are no meals planned for this cycle, so there is nothing to buy.</value>
+    </data>
+    <data name="ShoppingListEmptyPlanMenuLink" xml:space="preserve">
+        <value>Plan the menu</value>
+    </data>
+    <data name="ShoppingListShelfLifeWarningTooltip" xml:space="preserve">
+        <value>No suitable shopping day: the shelf life may be exceeded</value>
+    </data>
 </root>

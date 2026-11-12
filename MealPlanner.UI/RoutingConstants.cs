@@ -44,4 +44,9 @@ public static class RoutingConstants
         
         public static string DetailsFor(int id) => $"/{BasePath}/{id}";
     }
+
+    public static class ShoppingLists
+    {
+        public const string Path = "/shopping-lists";
+    }
 }

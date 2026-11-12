@@ -12,6 +12,7 @@ public static class TranslationKeys
         public const string NavMenuDashboardName = nameof(NavMenuDashboardName);
         public const string NavMenuMenusGroupTitle = nameof(NavMenuMenusGroupTitle);
         public const string NavMenuEditorsGroupTitle = nameof(NavMenuEditorsGroupTitle);
+        public const string NavMenuShoppingListsLink = nameof(NavMenuShoppingListsLink);
     }
 
     public static class RecipeEditorNavigation
@@ -112,6 +113,19 @@ public static class TranslationKeys
         public const string ViewRecipeRequiredTitle = nameof(ViewRecipeRequiredTitle);
         public const string ViewRecipeOptionalTitle = nameof(ViewRecipeOptionalTitle);
         public const string ViewRecipeLeadDaysTitle = nameof(ViewRecipeLeadDaysTitle);
+    }
+
+    public static class ShoppingList
+    {
+        public const string ShoppingListPageTitle = nameof(ShoppingListPageTitle);
+        public const string ShoppingListStartDateLabel = nameof(ShoppingListStartDateLabel);
+        public const string ShoppingListStrategyLabel = nameof(ShoppingListStrategyLabel);
+        public const string ShoppingListStrategyReuseExistingTrip = nameof(ShoppingListStrategyReuseExistingTrip);
+        public const string ShoppingListStrategyLatestInWindow = nameof(ShoppingListStrategyLatestInWindow);
+        public const string ShoppingListGenerateButtonTitle = nameof(ShoppingListGenerateButtonTitle);
+        public const string ShoppingListEmptyTitle = nameof(ShoppingListEmptyTitle);
+        public const string ShoppingListEmptyPlanMenuLink = nameof(ShoppingListEmptyPlanMenuLink);
+        public const string ShoppingListShelfLifeWarningTooltip = nameof(ShoppingListShelfLifeWarningTooltip);
     }
 
     public static class Dashboard
