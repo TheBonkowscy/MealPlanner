@@ -1,0 +1,162 @@
+@page "/shopping-lists"
+@using MealPlanner.Client.Shopping
+@using MealPlanner.Shared.Shopping
+@using MealPlanner.Shared.Shopping.Responses
+@using MealPlanner.UI.Services
+@using Microsoft.Extensions.Localization
+@implements IDisposable
+@inject IFindShoppingLists ShoppingListFinder
+@inject ISnackbar Snackbar
+@inject TimeProvider Clock
+@inject IStringLocalizer<Translations> L
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h5" Class="mb-4">@L[TranslationKeys.ShoppingList.ShoppingListPageTitle]</MudText>
+
+    <MudGrid Class="mb-4 align-center">
+        <MudItem xs="12" sm="4">
+            <MudDatePicker @bind-Date="_startDate"
+                           Label="@L[TranslationKeys.ShoppingList.ShoppingListStartDateLabel]"
+                           Variant="Variant.Outlined"
+                           Clearable="false" />
+        </MudItem>
+        <MudItem xs="12" sm="5">
+            <MudSelect T="PlanningStrategyKind"
+                       @bind-Value="_strategy"
+                       Label="@L[TranslationKeys.ShoppingList.ShoppingListStrategyLabel]"
+                       Variant="Variant.Outlined">
+                <MudSelectItem Value="PlanningStrategyKind.ReuseExistingTrip">
+                    @L[TranslationKeys.ShoppingList.ShoppingListStrategyReuseExistingTrip]
+                </MudSelectItem>
+                <MudSelectItem Value="PlanningStrategyKind.LatestInWindow">
+                    @L[TranslationKeys.ShoppingList.ShoppingListStrategyLatestInWindow]
+                </MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="3" Class="d-flex justify-end">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="@(_loading || _startDate is null)"
+                       OnClick="GenerateAsync">
+                @L[TranslationKeys.ShoppingList.ShoppingListGenerateButtonTitle]
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+
+    @if (_loading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+    }
+    else if (_response is not null)
+    {
+        @if (_response.Trips.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Class="mt-4">
+                @L[TranslationKeys.ShoppingList.ShoppingListEmptyTitle]
+                <MudLink Href="@RoutingConstants.Menus.CreateForDate(_response.StartDate.AddDays(1))">
+                    @L[TranslationKeys.ShoppingList.ShoppingListEmptyPlanMenuLink]
+                </MudLink>
+            </MudAlert>
+        }
+        else
+        {
+            <MudGrid>
+                @foreach (var trip in _response.Trips)
+                {
+                    <MudItem xs="12" sm="6" md="4" Class="d-flex">
+                        <MudCard Elevation="2" Class="flex-grow-1">
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.h6">@trip.Date.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture)</MudText>
+                                    <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                                        @trip.Date.ToString("dddd", CultureInfo.CurrentUICulture)
+                                    </MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent Class="pt-0">
+                                <MudList T="PlannedItemResponse" Dense="true">
+                                    @foreach (var item in trip.Items)
+                                    {
+                                        <MudListItem>
+                                            <div class="d-flex align-center">
+                                                <MudText Typo="Typo.body1">@FormatItem(item)</MudText>
+                                                @if (item.ShelfLifeWarning)
+                                                {
+                                                    <MudTooltip Text="@L[TranslationKeys.ShoppingList.ShoppingListShelfLifeWarningTooltip]">
+                                                        <MudIcon Icon="@Icons.Material.Filled.Warning"
+                                                                 Color="Color.Warning"
+                                                                 Size="Size.Small"
+                                                                 Class="ml-2" />
+                                                    </MudTooltip>
+                                                }
+                                            </div>
+                                        </MudListItem>
+                                    }
+                                </MudList>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+    }
+</MudContainer>
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+    private DateTime? _startDate;
+    private PlanningStrategyKind _strategy = PlanningStrategyKind.ReuseExistingTrip;
+    private ShoppingListResponse? _response;
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _startDate = ShoppingStartDate.Default(Clock).ToDateTime(TimeOnly.MinValue);
+        await GenerateAsync();
+    }
+
+    private async Task GenerateAsync()
+    {
+        if (_startDate is null)
+        {
+            return;
+        }
+
+        _loading = true;
+        try
+        {
+            var result = await ShoppingListFinder.Get(DateOnly.FromDateTime(_startDate.Value), _strategy, _cts.Token);
+            if (result.IsSuccess)
+            {
+                _response = result.Value;
+            }
+            else
+            {
+                _response = null;
+                Snackbar.Add(result.Error!.Message, Severity.Error);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // The page was left while the request was in flight.
+        }
+        catch (Exception ex)
+        {
+            _response = null;
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private static string FormatItem(PlannedItemResponse item) =>
+        $"{item.IngredientName} {item.Quantity.ToString("0.##", CultureInfo.CurrentCulture)} {item.Unit.DisplayName}";
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

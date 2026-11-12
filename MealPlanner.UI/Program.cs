@@ -22,6 +22,7 @@ builder.Services.AddSingleton<IMenuStateService, MenuStateService>();
 builder.Services.AddScoped<AppBarService>();
 builder.Services.AddScoped<MenuDialogService>();
 builder.Services.AddSingleton<MealMapper>();
+builder.Services.AddSingleton(TimeProvider.System);
 
 // TODO: Shared localizations library?
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
