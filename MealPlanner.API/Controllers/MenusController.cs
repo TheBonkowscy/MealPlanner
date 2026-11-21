@@ -1,5 +1,6 @@
 ﻿using MealPlanner.Services;
 using MealPlanner.Services.Menus;
+using MealPlanner.Shared.Menus;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -78,4 +79,9 @@ public class MenusController(
         await menuDeleter.Delete(DateOnly.FromDateTime(day), cancellationToken);
         return Results.NoContent();
     }
+
+    [ProducesResponseType(typeof(GetWeekResponse), StatusCodes.Status200OK)]
+    [HttpGet(Constants.MenuWeeksRoute + "/{day:datetime}")]
+    public async Task<IResult> GetWeek([FromRoute(Name = "day")] DateTime day, CancellationToken cancellationToken) =>
+        Results.Ok(await menuReader.GetWeek(day, cancellationToken));
 }
