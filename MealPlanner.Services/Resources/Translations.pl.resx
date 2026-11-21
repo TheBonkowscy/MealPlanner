@@ -161,4 +161,7 @@
     <data name="InvertedDateRange" xml:space="preserve">
         <value>Zakres dat nie może być odwrócony ({0} wypada po {1})</value>
     </data>
+    <data name="NotFoundInTheDay" xml:space="preserve">
+        <value>Określony posiłek nie został odnaleziony w menu na ten dzień</value>
+    </data>
 </root>

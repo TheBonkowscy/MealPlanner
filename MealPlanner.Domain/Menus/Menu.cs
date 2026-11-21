@@ -95,4 +95,79 @@ public class Menu
     {
         _meals.Clear();
     }
+
+    public Result InsertMeal(AddMealAction addMeal)
+    {
+        var existingMeal = _meals.FirstOrDefault(x => x.RecipeId == addMeal.Recipe.Id);
+        if (existingMeal is not null)
+        {
+            return Result.Failure(DomainErrors.Meal.AlreadyPresentInTheDay(addMeal.Recipe.Name));
+        }
+
+        if (addMeal.Order > _meals.Count + 1)
+        {
+            return Result.Failure(DomainErrors.Menu.InvalidMealOrder);
+        }
+        
+        var meal = Meal.Create(this, addMeal.Recipe, addMeal.Order, addMeal.Servings);
+        if (meal.IsFailure)
+        {
+            return Result.Failure<Menu>(meal.Errors);
+        }
+        
+        _meals = [.. _meals.OrderBy(x => x.Order)];
+        _meals.Insert(addMeal.Order - 1, meal.Value);
+        ReindexMeals();
+        return Result.Success();
+    }
+
+    private void ReindexMeals()
+    {
+        for (int i = 0; i < _meals.Count; i++)
+        {
+            _meals[i].UpdateOrder(i + 1);
+        }
+    }
+
+    public Result RemoveMeal(int recipeId)
+    {
+        var meal = _meals.FirstOrDefault(x => x.RecipeId == recipeId);
+        if (meal is not null)
+        {
+            _meals = [.. _meals.OrderBy(x => x.Order)];
+            _meals.Remove(meal);
+            ReindexMeals();
+            return Result.Success();
+        }
+
+        return Result.Failure(DomainErrors.Meal.NotFoundInTheDay(recipeId));
+    }
+
+    public Result MoveMeal(int recipeId, int newOrder)
+    {
+        var meal =  _meals.FirstOrDefault(x => x.RecipeId == recipeId);
+        if (meal is null)
+        {
+            return Result.Failure(DomainErrors.Meal.NotFoundInTheDay(recipeId));
+        }
+
+        if (newOrder <= 0 || newOrder >= _meals.Count + 1)
+        {
+            return Result.Failure(DomainErrors.Menu.InvalidMealOrder);
+        }
+        
+        _meals = [.. _meals.OrderBy(x => x.Order)];
+        _meals.Remove(meal);
+        _meals.Insert(newOrder - 1, meal);
+        ReindexMeals();
+        return Result.Success();
+    }
+
+    public Result ChangeServings(int recipeId, int newServings)
+    {
+        var meal = _meals.FirstOrDefault(x => x.RecipeId == recipeId);
+        return meal is null 
+            ? Result.Failure(DomainErrors.Meal.NotFoundInTheDay(recipeId)) 
+            : meal.UpdateServings(newServings);
+    }
 }

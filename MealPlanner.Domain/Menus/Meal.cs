@@ -45,4 +45,24 @@ public class Meal
             .AddRule(servings >= 1, DomainErrors.Meal.InvalidServings(servings));
         return errors.Count != 0 ? Result.Failure<Meal>(errors) : Result.Success(new Meal(menu, recipe, order, servings));
     }
+
+    public Result UpdateOrder(int newOrder)
+    {
+        var errors = new  List<Error>();
+        errors.AddRule(newOrder >= Menu.MinOrder, DomainErrors.Meal.InvalidOrder(newOrder));
+        if (errors.Count != 0) return Result.Failure<Meal>(errors);
+        
+        Order = newOrder;
+        return Result.Success();
+    }
+
+    public Result UpdateServings(int newServings)
+    {
+        if (newServings <= 0)
+        {
+            return Result.Failure(DomainErrors.Meal.InvalidServings(newServings));
+        }
+        Servings = newServings;
+        return Result.Success();
+    }
 }

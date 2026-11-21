@@ -411,6 +411,15 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Specified meal could not be found in the day.
+        /// </summary>
+        internal static string NotFoundInTheDay {
+            get {
+                return ResourceManager.GetString("NotFoundInTheDay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to package(s).
         /// </summary>
         internal static string Package {

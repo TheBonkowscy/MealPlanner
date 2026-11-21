@@ -168,4 +168,7 @@
     <data name="InvertedDateRange" xml:space="preserve">
         <value>Date range can not be inverted ({0} is after {1})</value>
     </data>
+    <data name="NotFoundInTheDay" xml:space="preserve">
+        <value>Specified meal could not be found in the day</value>
+    </data>
 </root>
