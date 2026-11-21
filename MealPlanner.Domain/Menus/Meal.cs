@@ -46,7 +46,7 @@ public class Meal
         return errors.Count != 0 ? Result.Failure<Meal>(errors) : Result.Success(new Meal(menu, recipe, order, servings));
     }
 
-    public Result UpdateOrder(int newOrder)
+    internal Result UpdateOrder(int newOrder)
     {
         var errors = new  List<Error>();
         errors.AddRule(newOrder >= Menu.MinOrder, DomainErrors.Meal.InvalidOrder(newOrder));

@@ -23,8 +23,6 @@ public static class TestRecipes
         return randomRecipe;
     }
 
-    // Menu meals copy Recipe.Id into Meal.RecipeId when they are created, so the id has to be set before
-    // the recipe is added to a menu. Unlike RandomId.Set it is deterministic, so two recipes never collide.
     public static Recipe CreateWithId(int id, string? name = null)
     {
         var recipe = Create(name);
