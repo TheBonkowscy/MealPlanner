@@ -71,6 +71,18 @@ internal class MenuClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IUp
         return GetExistingMenusResponse.Empty;
     }
 
+    public async Task<GetWeekResponse> GetWeek(DateOnly date, CancellationToken cancellationToken)
+    {
+        var endpoint = Constants.MenuWeeksRoute.AppendPathSegment(date.ToString("O"));
+        var result = await httpClient.GetAsync(endpoint, cancellationToken);
+        if (result.IsSuccessStatusCode)
+        {
+            return await result.Content.ReadFromJsonAsync<GetWeekResponse>(cancellationToken);
+        }
+
+        return GetWeekResponse.Empty;
+    }
+
     public async Task<ApiResult<UpdateMenuResponse>> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
     {
         var response = await httpClient.PutAsJsonAsync(AppendDateToBaseUri(request.Date.ToString("yyyy-MM-dd")), request, options: null,

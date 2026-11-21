@@ -11,4 +11,6 @@ public interface IFindMenus
     Task<GetMenuResponse?> GetToday(CancellationToken cancellationToken);
     
     Task<GetExistingMenusResponse> GetRange(DateOnly? from, DateOnly? to, CancellationToken cancellationToken);
+    
+    Task<GetWeekResponse> GetWeek(DateOnly date, CancellationToken cancellationToken);
 }

@@ -9,4 +9,5 @@ public static class Constants
     public const string RecipeStepsRoute = "/recipes/{recipeId:int}/steps";
     public const string RecipePreparationsRoute = "/recipes/{recipeId:int}/preparations";
     public const string PreparationsRoute = "/preparations";
+    public const string MenuWeeksRoute = MenusRoute + "/weeks";
 }
