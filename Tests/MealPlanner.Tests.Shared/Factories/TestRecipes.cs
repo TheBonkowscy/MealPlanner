@@ -22,4 +22,11 @@ public static class TestRecipes
         var randomRecipe = Recipe.Create(name, servings.Value, addIngredients, steps, preparations).Value;
         return randomRecipe;
     }
+
+    public static Recipe CreateWithId(int id, string? name = null)
+    {
+        var recipe = Create(name);
+        typeof(Recipe).GetProperty(nameof(Recipe.Id))!.SetValue(recipe, id);
+        return recipe;
+    }
 }

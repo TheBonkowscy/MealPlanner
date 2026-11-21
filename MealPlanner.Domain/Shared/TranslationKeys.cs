@@ -34,6 +34,7 @@ public static class TranslationKeys
         public const string InvalidMealServings = nameof(InvalidMealServings);
         public const string MealAlreadyExistsAtPosition = nameof(MealAlreadyExistsAtPosition);
         public const string MealAlreadyPresentInTheDay = nameof(MealAlreadyPresentInTheDay);
+        public const string NotFoundInTheDay = nameof(NotFoundInTheDay);
     }
 
     public static class Menu

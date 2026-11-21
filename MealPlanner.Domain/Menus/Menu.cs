@@ -95,4 +95,91 @@ public class Menu
     {
         _meals.Clear();
     }
+
+    public Result InsertMeal(AddMealAction addMeal)
+    {
+        var existingMeal = _meals.FirstOrDefault(x => x.RecipeId == addMeal.Recipe.Id);
+        if (existingMeal is not null)
+        {
+            return Result.Failure(DomainErrors.Meal.AlreadyPresentInTheDay(addMeal.Recipe.Name));
+        }
+
+        if (addMeal.Order > _meals.Count + 1)
+        {
+            return Result.Failure(DomainErrors.Menu.InvalidMealOrder);
+        }
+        
+        var meal = Meal.Create(this, addMeal.Recipe, addMeal.Order, addMeal.Servings);
+        if (meal.IsFailure)
+        {
+            return meal;
+        }
+
+        SortMealsByOrder();
+        _meals.Insert(addMeal.Order - 1, meal.Value);
+        ReindexMeals();
+        return Result.Success();
+    }
+
+    private void SortMealsByOrder()
+    {
+        _meals = [.. _meals.OrderBy(x => x.Order)];
+    }
+
+    private Result<Meal> FindMeal(int recipeId)
+    {
+        var found = _meals.FirstOrDefault(x => x.RecipeId == recipeId);
+        return found is not null ? Result.Success(found) : Result.Failure<Meal>(DomainErrors.Meal.NotFoundInTheDay(recipeId));
+    }
+
+    private void ReindexMeals()
+    {
+        for (int i = 0; i < _meals.Count; i++)
+        {
+            _meals[i].UpdateOrder(i + 1);
+        }
+    }
+
+    public Result RemoveMeal(int recipeId)
+    {
+        var foundMeal = FindMeal(recipeId);
+        if (foundMeal.IsFailure)
+        {
+            return foundMeal;
+        }
+
+        SortMealsByOrder();
+        _meals.Remove(foundMeal.Value);
+        ReindexMeals();
+        return Result.Success();
+    }
+
+    public Result MoveMeal(int recipeId, int newOrder)
+    {
+        var foundMeal = FindMeal(recipeId);
+        if (foundMeal.IsFailure)
+        {
+            return foundMeal;
+        }
+
+        if (newOrder < MinOrder || newOrder >= _meals.Count + 1)
+        {
+            return Result.Failure(DomainErrors.Menu.InvalidMealOrder);
+        }
+        
+        var meal = foundMeal.Value;
+        SortMealsByOrder();
+        _meals.Remove(meal);
+        _meals.Insert(newOrder - 1, meal);
+        ReindexMeals();
+        return Result.Success();
+    }
+
+    public Result ChangeServings(int recipeId, int newServings)
+    {
+        var foundMeal = FindMeal(recipeId);
+        return foundMeal.IsFailure
+            ? foundMeal
+            : foundMeal.Value.UpdateServings(newServings);
+    }
 }

@@ -55,6 +55,9 @@ public static class DomainErrors
             Error.Validation(TranslationKeys.Meal.MealAlreadyExistsAtPosition, ("Order", order));
         public static Error AlreadyPresentInTheDay(string mealName) =>
             Error.Validation(TranslationKeys.Meal.MealAlreadyPresentInTheDay, ("MealName", mealName));
+
+        public static Error NotFoundInTheDay(int recipeId) =>
+            Error.NotFound(TranslationKeys.Meal.NotFoundInTheDay, ("RecipeId", recipeId));
     }
 
     public static class Menu
