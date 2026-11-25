@@ -1,6 +1,7 @@
 using MealPlanner.Domain.Shopping.Planning;
 using MealPlanner.Services.Ingredients;
 using MealPlanner.Services.Menus;
+using MealPlanner.Services.Menus.Meals;
 using MealPlanner.Services.Recipes;
 using MealPlanner.Services.Recipes.Ingredients;
 using MealPlanner.Services.Recipes.Preparations;
@@ -23,6 +24,9 @@ public static class ServiceRegistration
         
         /* Meals */
         services.AddTransient<IMapMeals, MealsMapper>();
+        services.AddTransient<ICreateMeals, MealCreator>();
+        services.AddTransient<IUpdateMeals, MealUpdater>();
+        services.AddTransient<IDeleteMeals, MealDeleter>();
 
         /* Recipes */
         services.AddTransient<IReadRecipe, RecipeReader>();
