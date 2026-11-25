@@ -816,11 +816,74 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The week could not be loaded.
+        /// </summary>
+        public static string WeekMenuLoadErrorTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuLoadErrorTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Portions: {0}.
+        /// </summary>
+        public static string WeekMenuMealServingsTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuMealServingsTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Next week.
+        /// </summary>
+        public static string WeekMenuNextWeekButtonTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuNextWeekButtonTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No meals.
+        /// </summary>
+        public static string WeekMenuNoMealsTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuNoMealsTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Previous week.
+        /// </summary>
+        public static string WeekMenuPreviousWeekButtonTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuPreviousWeekButtonTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Week {0}.
+        /// </summary>
+        public static string WeekMenuTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Week {0} of {1}.
         /// </summary>
         public static string WeeklyMenuNavigationTitle {
             get {
                 return ResourceManager.GetString("WeeklyMenuNavigationTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Week view.
+        /// </summary>
+        public static string WeeklyMenuNavigationWeekViewLink {
+            get {
+                return ResourceManager.GetString("WeeklyMenuNavigationWeekViewLink", resourceCulture);
             }
         }
     }

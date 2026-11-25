@@ -25,6 +25,7 @@ public static class TranslationKeys
     public static class WeeklyMenuNavigation
     {
         public const string WeeklyMenuNavigationTitle = nameof(WeeklyMenuNavigationTitle);
+        public const string WeeklyMenuNavigationWeekViewLink = nameof(WeeklyMenuNavigationWeekViewLink);
     }
 
     public static class RecipeEditor
@@ -86,6 +87,16 @@ public static class TranslationKeys
         public const string ViewMenuEditMenuActionTitle = nameof(ViewMenuEditMenuActionTitle);
         public const string ViewMenuDeleteMenuActionTitle = nameof(ViewMenuDeleteMenuActionTitle);
         public const string ViewMenuCreateMenuActionTitle = nameof(ViewMenuCreateMenuActionTitle);
+    }
+
+    public static class WeekMenu
+    {
+        public const string WeekMenuTitle = nameof(WeekMenuTitle);
+        public const string WeekMenuPreviousWeekButtonTitle = nameof(WeekMenuPreviousWeekButtonTitle);
+        public const string WeekMenuNextWeekButtonTitle = nameof(WeekMenuNextWeekButtonTitle);
+        public const string WeekMenuNoMealsTitle = nameof(WeekMenuNoMealsTitle);
+        public const string WeekMenuMealServingsTitle = nameof(WeekMenuMealServingsTitle);
+        public const string WeekMenuLoadErrorTitle = nameof(WeekMenuLoadErrorTitle);
     }
 
     public static class ViewRecipe

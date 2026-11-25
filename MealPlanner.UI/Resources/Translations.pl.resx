@@ -309,4 +309,25 @@
     <data name="NavMenuDashboardName" xml:space="preserve">
         <value>Dashboard</value>
     </data>
+    <data name="WeeklyMenuNavigationWeekViewLink" xml:space="preserve">
+        <value>Widok tygodnia</value>
+    </data>
+    <data name="WeekMenuTitle" xml:space="preserve">
+        <value>Tydzień {0}</value>
+    </data>
+    <data name="WeekMenuPreviousWeekButtonTitle" xml:space="preserve">
+        <value>Poprzedni tydzień</value>
+    </data>
+    <data name="WeekMenuNextWeekButtonTitle" xml:space="preserve">
+        <value>Następny tydzień</value>
+    </data>
+    <data name="WeekMenuNoMealsTitle" xml:space="preserve">
+        <value>Brak posiłków</value>
+    </data>
+    <data name="WeekMenuMealServingsTitle" xml:space="preserve">
+        <value>Porcje: {0}</value>
+    </data>
+    <data name="WeekMenuLoadErrorTitle" xml:space="preserve">
+        <value>Nie udało się wczytać tygodnia</value>
+    </data>
 </root>

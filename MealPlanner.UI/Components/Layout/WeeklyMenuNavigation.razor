@@ -21,6 +21,10 @@
             @if (IsExpanded(week))
             {
                 <MudNavMenu Class="ml-4">
+                    <MudNavLink Href="@(RoutingConstants.Menus.WeekFor(week.Days[0].Day))"
+                                Icon="@Icons.Material.Filled.CalendarViewWeek">
+                        @L[TranslationKeys.WeeklyMenuNavigation.WeeklyMenuNavigationWeekViewLink]
+                    </MudNavLink>
                     @foreach (var day in week.Days)
                     {
                         <div class="d-flex align-center justify-space-between @GetDayClass(day.Day)">

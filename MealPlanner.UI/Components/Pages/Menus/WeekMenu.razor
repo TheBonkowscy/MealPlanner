@@ -1,0 +1,127 @@
+@page "/menus/week/{Date:datetime}"
+@using MealPlanner.Client.Menus
+@using MealPlanner.UI.Models
+@using MealPlanner.UI.Services
+@using Microsoft.Extensions.Localization
+@implements IDisposable
+@inject IFindMenus FindMenus
+@inject AppBarService AppBarService
+@inject MealMapper MealMapper
+@inject TimeProvider Clock
+@inject IStringLocalizer<Translations> L
+
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-4">
+    <div class="week-header">
+        <MudTooltip Text="@L[TranslationKeys.WeekMenu.WeekMenuPreviousWeekButtonTitle]">
+            <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
+                           Href="@RoutingConstants.Menus.WeekFor(WeekNavigation.Previous(_weekStart))"
+                           aria-label="@L[TranslationKeys.WeekMenu.WeekMenuPreviousWeekButtonTitle]" />
+        </MudTooltip>
+
+        <div class="week-title">
+            <MudText Typo="Typo.h5">@WeekTitle</MudText>
+            <MudText Typo="Typo.subtitle2" Class="mud-text-secondary">@WeekRange</MudText>
+        </div>
+
+        <MudTooltip Text="@L[TranslationKeys.WeekMenu.WeekMenuNextWeekButtonTitle]">
+            <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
+                           Href="@RoutingConstants.Menus.WeekFor(WeekNavigation.Next(_weekStart))"
+                           aria-label="@L[TranslationKeys.WeekMenu.WeekMenuNextWeekButtonTitle]" />
+        </MudTooltip>
+    </div>
+
+    @if (_loading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-4" />
+    }
+    else if (_failed)
+    {
+        <MudAlert Severity="Severity.Error">@L[TranslationKeys.WeekMenu.WeekMenuLoadErrorTitle]</MudAlert>
+    }
+    else
+    {
+        <div class="week-grid">
+            @foreach (var day in _days)
+            {
+                <section class="week-day @(day.Date == _today ? "today" : string.Empty)"
+                         aria-label="@day.Date.ToString("D", CultureInfo.CurrentUICulture)">
+                    <header class="week-day-header">
+                        <div class="day-name">@day.Date.ToString("dddd", CultureInfo.CurrentUICulture)</div>
+                        <div class="day-date">@day.Date.ToString("d MMM", CultureInfo.CurrentUICulture)</div>
+                    </header>
+
+                    @if (day.Meals.Count == 0)
+                    {
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                            @L[TranslationKeys.WeekMenu.WeekMenuNoMealsTitle]
+                        </MudText>
+                    }
+                    else
+                    {
+                        <ul class="meal-list">
+                            @foreach (var meal in day.Meals)
+                            {
+                                <li class="meal">
+                                    <MudLink Href="@RoutingConstants.Recipes.DetailsFor(meal.Id)">@meal.Name</MudLink>
+                                    <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                                        @L[TranslationKeys.WeekMenu.WeekMenuMealServingsTitle, meal.Servings]
+                                    </MudText>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </section>
+            }
+        </div>
+    }
+</MudContainer>
+
+@code {
+    [Parameter] public DateTime Date { get; set; }
+
+    private readonly CancellationTokenSource _cts = new();
+
+    private DateOnly _weekStart;
+    private DateOnly _today;
+    private List<WeekDay> _days = [];
+    private bool _loading = true;
+    private bool _failed;
+
+    private string WeekTitle =>
+        L[TranslationKeys.WeekMenu.WeekMenuTitle, ISOWeek.GetWeekOfYear(_weekStart.ToDateTime(TimeOnly.MinValue))];
+
+    private string WeekRange =>
+        $"{_weekStart.ToString("d MMM", CultureInfo.CurrentUICulture)} – {_weekStart.AddDays(6).ToString("d MMM yyyy", CultureInfo.CurrentUICulture)}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var requestedWeek = WeekNavigation.StartOf(DateOnly.FromDateTime(Date));
+
+        _weekStart = requestedWeek;
+        _today = DateOnly.FromDateTime(Clock.GetLocalNow().Date);
+        _loading = true;
+        AppBarService.SetTitle($"{WeekTitle} • {WeekRange}");
+
+        var week = await FindMenus.GetWeek(requestedWeek, _cts.Token);
+
+        if (requestedWeek != _weekStart)
+        {
+            return;
+        }
+
+        _failed = week.Days.Count == 0;
+        _days = [.. week.Days
+            .OrderBy(x => x.Date)
+            .Select(x => new WeekDay(x.Date, MealMapper.MapMeals(x.Meals)))];
+        _loading = false;
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+        AppBarService.ClearActions();
+    }
+
+    private sealed record WeekDay(DateOnly Date, List<MealDto> Meals);
+}
