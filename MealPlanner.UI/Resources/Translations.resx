@@ -309,4 +309,25 @@
     <data name="ShoppingListCopiedMessage" xml:space="preserve">
         <value>Copied to clipboard</value>
     </data>
+    <data name="WeeklyMenuNavigationWeekViewLink" xml:space="preserve">
+        <value>Week view</value>
+    </data>
+    <data name="WeekMenuTitle" xml:space="preserve">
+        <value>Week {0}</value>
+    </data>
+    <data name="WeekMenuPreviousWeekButtonTitle" xml:space="preserve">
+        <value>Previous week</value>
+    </data>
+    <data name="WeekMenuNextWeekButtonTitle" xml:space="preserve">
+        <value>Next week</value>
+    </data>
+    <data name="WeekMenuNoMealsTitle" xml:space="preserve">
+        <value>No meals</value>
+    </data>
+    <data name="WeekMenuMealServingsTitle" xml:space="preserve">
+        <value>Portions: {0}</value>
+    </data>
+    <data name="WeekMenuLoadErrorTitle" xml:space="preserve">
+        <value>The week could not be loaded</value>
+    </data>
 </root>
