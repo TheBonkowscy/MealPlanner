@@ -6,10 +6,10 @@ using MealPlanner.Shared.Menus.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
-namespace MealPlanner.API.Controllers;
+namespace MealPlanner.API.Controllers.Menus;
 
 [ApiController]
-[Route(Shared.Menus.Constants.MenusRoute)]
+[Route(Constants.MenusRoute)]
 public class MenusController(
     ICreateMenu menuCreator,
     IReadMenu menuReader,

@@ -5,27 +5,48 @@ namespace MealPlanner.Client.Extensions;
 
 public static class HttpResponseExtensions
 {
-    public static async Task<ApiResult<T>> ToApiResult<T>(
-        this HttpResponseMessage response,
-        CancellationToken ct)
+    extension(HttpResponseMessage response)
     {
-        if (response.IsSuccessStatusCode)
+        public async Task<ApiResult<T>> ToApiResult<T>(CancellationToken ct)
         {
-            var value = await response.Content.ReadFromJsonAsync<T>(cancellationToken: ct);
+            if (response.IsSuccessStatusCode)
+            {
+                var value = await response.Content.ReadFromJsonAsync<T>(cancellationToken: ct);
 
-            return ApiResult<T>.Success(value!);
+                return ApiResult<T>.Success(value!);
+            }
+
+            var problem = await response.Content
+                .ReadFromJsonAsync<ApiProblemDetails>(cancellationToken: ct);
+
+            var error = problem?.Errors.FirstOrDefault();
+
+            return ApiResult<T>.Failure(
+                new ApiError(
+                    problem?.Status ?? (int)response.StatusCode,
+                    error?.Code ?? "unknown",
+                    error?.Message ?? "Unknown error",
+                    error?.Metadata ?? []));
         }
 
-        var problem = await response.Content
-            .ReadFromJsonAsync<ApiProblemDetails>(cancellationToken: ct);
+        public async Task<ApiResult> ToApiResult(CancellationToken ct)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return ApiResult.Success();
+            }
 
-        var error = problem?.Errors.FirstOrDefault();
+            var problem = await response.Content
+                .ReadFromJsonAsync<ApiProblemDetails>(cancellationToken: ct);
 
-        return ApiResult<T>.Failure(
-            new ApiError(
-                problem?.Status ?? (int)response.StatusCode,
-                error?.Code ?? "unknown",
-                error?.Message ?? "Unknown error",
-                error?.Metadata ?? []));
+            var error = problem?.Errors.FirstOrDefault();
+
+            return ApiResult.Failure(
+                new ApiError(
+                    problem?.Status ?? (int)response.StatusCode,
+                    error?.Code ?? "unknown",
+                    error?.Message ?? "Unknown error",
+                    error?.Metadata ?? []));
+        }
     }
 }

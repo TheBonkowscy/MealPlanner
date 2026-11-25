@@ -106,7 +106,7 @@ public class MenuTests
         
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().Contain(DomainErrors.Menu.InvalidMealOrder);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Menu.InvalidMealOrder(999));
     }
 
     [Theory]
@@ -150,7 +150,7 @@ public class MenuTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().Contain(DomainErrors.Menu.InvalidMealOrder);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Menu.InvalidMealOrder(2));
         menu.Meals.Should().BeEmpty();
     }
 
@@ -179,7 +179,7 @@ public class MenuTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().Contain(DomainErrors.Menu.InvalidMealOrder);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Menu.InvalidMealOrder(4));
         AssertLayout(menu, 1, 2);
     }
 
@@ -340,7 +340,7 @@ public class MenuTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().Contain(DomainErrors.Menu.InvalidMealOrder);
+        result.Errors.Should().ContainEquivalentOf(DomainErrors.Menu.InvalidMealOrder(newPosition));
         AssertLayout(menu, 11, 22, 33, 44);
     }
 
@@ -499,4 +499,4 @@ public class MenuTests
         menu.Meals.OrderBy(m => m.Order).Select(m => m.RecipeId).Should().Equal(expectedRecipeIds);
         menu.Meals.Select(m => m.Order).Order().Should().Equal(Enumerable.Range(1, expectedRecipeIds.Length));
     }
-}
+}

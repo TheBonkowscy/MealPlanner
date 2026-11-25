@@ -1,5 +1,6 @@
 ﻿using MealPlanner.Client.Configuration;
 using MealPlanner.Client.Handlers;
+using MealPlanner.Client.Meals;
 using MealPlanner.Client.Menus;
 using MealPlanner.Client.Recipes;
 using MealPlanner.Client.Shopping;
@@ -39,6 +40,15 @@ public static class ServiceRegistration
                 .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
             
             services.AddHttpClient<IFindShoppingLists, ShoppingListClient>(nameof(ShoppingListClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            
+            services.AddHttpClient<IAddMeals, MealClient>(nameof(MealClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            
+            services.AddHttpClient<IUpdateMeals, MealClient>(nameof(MealClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+            
+            services.AddHttpClient<IDeleteMeals, MealClient>(nameof(MealClient), IServiceCollection.ConfigureClient())
                 .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
 
             return services;

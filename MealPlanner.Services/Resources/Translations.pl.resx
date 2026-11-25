@@ -74,7 +74,7 @@
     <data name="MealAlreadyExistsAtPosition" xml:space="preserve">
         <value>Na pozycji #{0} znajduje się już posiłek</value>
     </data>
-    <data name="MealAlreadyPresentInTheMenu" xml:space="preserve">
+    <data name="MealAlreadyPresentInTheDay" xml:space="preserve">
         <value>Posiłek {0} został już dodany do menu</value>
     </data>
     <data name="MealDetailsMissing" xml:space="preserve">
@@ -163,5 +163,8 @@
     </data>
     <data name="NotFoundInTheDay" xml:space="preserve">
         <value>Określony posiłek nie został odnaleziony w menu na ten dzień</value>
+    </data>
+    <data name="NothingToUpdateForMeal" xml:space="preserve">
+        <value>Podaj dane niezbędne do zaktualizowania posiłku</value>
     </data>
 </root>

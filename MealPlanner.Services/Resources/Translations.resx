@@ -132,7 +132,7 @@
     <data name="MealAlreadyExistsAtPosition" xml:space="preserve">
         <value>There is already a meal at the position #{0}</value>
     </data>
-    <data name="MealAlreadyPresentInTheMenu" xml:space="preserve">
+    <data name="MealAlreadyPresentInTheDay" xml:space="preserve">
         <value>The meal {0} is already present in the menu</value>
     </data>
     <data name="MenuIsNull" xml:space="preserve">
@@ -170,5 +170,8 @@
     </data>
     <data name="NotFoundInTheDay" xml:space="preserve">
         <value>Specified meal could not be found in the day</value>
+    </data>
+    <data name="NothingToUpdateForMeal" xml:space="preserve">
+        <value>Nothing to update for the specified meal</value>
     </data>
 </root>
