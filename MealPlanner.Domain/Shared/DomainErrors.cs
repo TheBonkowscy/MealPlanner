@@ -63,7 +63,7 @@ public static class DomainErrors
     public static class Menu
     {
         public static readonly Error IsNull = Error.Validation(TranslationKeys.Menu.MenuIsNull);
-        public static readonly Error InvalidMealOrder = Error.Validation(TranslationKeys.Menu.InvalidMealOrderInMenu);
+        public static Error InvalidMealOrder(int order) => Error.Validation(TranslationKeys.Menu.InvalidMealOrderInMenu, ("Order", order));
         public static readonly Error DateIsUnset = Error.Validation(TranslationKeys.Menu.MenuDateUnset);
         public static readonly Error DateTooFarInThePast = Error.Validation(TranslationKeys.Menu.MenuDateTooFarInThePast);
         public static readonly Error DateTooFarInTheFuture = Error.Validation(TranslationKeys.Menu.MenuDateTooFarInTheFuture);
