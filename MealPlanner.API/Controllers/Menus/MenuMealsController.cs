@@ -1,6 +1,7 @@
 ﻿using MealPlanner.Services;
 using MealPlanner.Services.Menus.Meals;
 using MealPlanner.Shared.Menus;
+using MealPlanner.Shared.Menus.Meals;
 using MealPlanner.Shared.Menus.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -15,6 +16,7 @@ public class MenuMealsController(
     ICreateMeals mealCreator,
     IUpdateMeals mealUpdater,
     IDeleteMeals mealDeleter,
+    ITransferMeals mealTransferer,
     IStringLocalizer<Translations> localizer) : ControllerBase
 {
     [HttpPost]
@@ -45,6 +47,17 @@ public class MenuMealsController(
         CancellationToken token)
     {
         var result = await mealDeleter.Delete(DateOnly.FromDateTime(date), mealId, token);
+        return result.ToHttpResult(localizer);
+    }
+
+    [HttpPost("{mealId:int}/transfer")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IResult> TransferMeal([FromRoute(Name = "date")] DateTime date,
+        [FromRoute(Name = "mealId")] int mealId,
+        [FromBody] TransferMealRequest request,
+        CancellationToken token)
+    {
+        var result = await mealTransferer.Transfer(DateOnly.FromDateTime(date), mealId, request, token);
         return result.ToHttpResult(localizer);
     }
 }

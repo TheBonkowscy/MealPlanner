@@ -167,4 +167,7 @@
     <data name="NothingToUpdateForMeal" xml:space="preserve">
         <value>Podaj dane niezbędne do zaktualizowania posiłku</value>
     </data>
+    <data name="TransferToTheSameDay" xml:space="preserve">
+        <value>Nie można przenieść posiłku na ten sam dzień</value>
+    </data>
 </root>

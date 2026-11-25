@@ -526,5 +526,14 @@ namespace MealPlanner.Services {
                 return ResourceManager.GetString("Teaspoon", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///     Looks up a localized string similar to Can not transfer to the same day.
+        /// </summary>
+        public static string TransferToTheSameDay {
+            get {
+                return ResourceManager.GetString("TransferToTheSameDay", resourceCulture);
+            }
+        }
     }
 }

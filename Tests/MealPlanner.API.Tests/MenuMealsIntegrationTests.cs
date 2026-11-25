@@ -4,6 +4,7 @@ using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Shared.Menus;
+using MealPlanner.Shared.Menus.Meals;
 using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using MealPlanner.Shared.Recipes.Responses;
@@ -17,6 +18,7 @@ namespace MealPlanner.API.Tests;
 public class MenuMealsIntegrationTests(MealPlannerWebApplicationFactory factory) : IntegrationTestBase(factory)
 {
     private static readonly DateOnly PlannedDay = TestDates.Oct(14);
+    private static readonly DateOnly TargetDay = TestDates.Oct(15);
     private const int MissingRecipeId = 999_999;
     
     [Theory]
@@ -453,6 +455,321 @@ public class MenuMealsIntegrationTests(MealPlannerWebApplicationFactory factory)
         problem.Type.Should().Be("MenuDoesNotExist");
     }
 
+    [Theory]
+    [MemberData(nameof(TransferPositionsWithResultingOrder))]
+    public async Task PostTransfer_Move_InsertsTheMealAtTheGivenPositionAndClosesTheGapInTheSourceDay(int position, string[] expectedTargetOrder)
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        var stew = await AddRecipe("Stew");
+        var bread = await AddRecipe("Bread");
+        var pasta = await AddRecipe("Pasta");
+        var salad = await AddRecipe("Salad");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2), (stew, 2, 3), (bread, 3, 4));
+        await AddMenuWithMeals(TargetDay, (pasta, 1, 5), (salad, 2, 6));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, stew.Id), new TransferMealRequest(TargetDay, position, TransferMode.Move));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var source = await GetDay(PlannedDay);
+        source.Meals.Should().Equal(
+            new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"),
+            new OrderedRecipeListItemResponse(bread.Id, 2, 4, "Bread"));
+        var target = await GetDay(TargetDay);
+        target.Meals.Select(meal => meal.Name).Should().Equal(expectedTargetOrder);
+        target.Meals.Select(meal => meal.Order).Should().Equal(1, 2, 3);
+        target.Meals.ToDictionary(meal => meal.Name, meal => meal.Servings)
+            .Should().BeEquivalentTo(new Dictionary<string, int> { ["Pasta"] = 5, ["Salad"] = 6, ["Stew"] = 3 });
+    }
+
+    public static TheoryData<int, string[]> TransferPositionsWithResultingOrder =>
+        new()
+        {
+            { 1, ["Stew", "Pasta", "Salad"] },
+            { 2, ["Pasta", "Stew", "Salad"] },
+            { 3, ["Pasta", "Salad", "Stew"] }
+        };
+
+    [Fact]
+    public async Task PostTransfer_Move_CreatesTheTargetMenu_WhenTheTargetDayHasNone()
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        var stew = await AddRecipe("Stew");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2), (stew, 2, 3));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, stew.Id), new TransferMealRequest(TargetDay, 1, TransferMode.Move));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var source = await GetDay(PlannedDay);
+        source.Meals.Should().Equal(new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"));
+        var target = await GetDay(TargetDay);
+        target.Date.Should().Be(TargetDay);
+        target.Meals.Should().Equal(new OrderedRecipeListItemResponse(stew.Id, 1, 3, "Stew"));
+    }
+
+    [Fact]
+    public async Task PostTransfer_Move_DeletesTheSourceMenu_WhenItWasTheLastMeal()
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        var pasta = await AddRecipe("Pasta");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2));
+        await AddMenuWithMeals(TargetDay, (pasta, 1, 5));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, soup.Id), new TransferMealRequest(TargetDay, 2, TransferMode.Move));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        await AssertDayHasNoMenu(PlannedDay);
+        var target = await GetDay(TargetDay);
+        target.Meals.Should().Equal(
+            new OrderedRecipeListItemResponse(pasta.Id, 1, 5, "Pasta"),
+            new OrderedRecipeListItemResponse(soup.Id, 2, 2, "Soup"));
+    }
+
+    [Fact]
+    public async Task PostTransfer_Move_CreatesTheTargetMenuAndDeletesTheSourceMenu_WhenTheLastMealMovesToADayWithNoMenu()
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, soup.Id), new TransferMealRequest(TargetDay, 1, TransferMode.Move));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        await AssertDayHasNoMenu(PlannedDay);
+        var target = await GetDay(TargetDay);
+        target.Meals.Should().Equal(new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"));
+    }
+
+    [Fact]
+    public async Task PostTransfer_Copy_InsertsTheMealWithTheSameServingsAndKeepsTheSourceDay()
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        var stew = await AddRecipe("Stew");
+        var pasta = await AddRecipe("Pasta");
+        var salad = await AddRecipe("Salad");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2), (stew, 2, 3));
+        await AddMenuWithMeals(TargetDay, (pasta, 1, 5), (salad, 2, 6));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, stew.Id), new TransferMealRequest(TargetDay, 2, TransferMode.Copy));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var source = await GetDay(PlannedDay);
+        source.Meals.Should().Equal(
+            new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"),
+            new OrderedRecipeListItemResponse(stew.Id, 2, 3, "Stew"));
+        var target = await GetDay(TargetDay);
+        target.Meals.Should().Equal(
+            new OrderedRecipeListItemResponse(pasta.Id, 1, 5, "Pasta"),
+            new OrderedRecipeListItemResponse(stew.Id, 2, 3, "Stew"),
+            new OrderedRecipeListItemResponse(salad.Id, 3, 6, "Salad"));
+    }
+
+    [Fact]
+    public async Task PostTransfer_Copy_KeepsTheSourceMenuAndCreatesTheTargetMenu_WhenTheLastMealIsCopiedToADayWithNoMenu()
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 3));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, soup.Id), new TransferMealRequest(TargetDay, 1, TransferMode.Copy));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var source = await GetDay(PlannedDay);
+        source.Meals.Should().Equal(new OrderedRecipeListItemResponse(soup.Id, 1, 3, "Soup"));
+        var target = await GetDay(TargetDay);
+        target.Date.Should().Be(TargetDay);
+        target.Meals.Should().Equal(new OrderedRecipeListItemResponse(soup.Id, 1, 3, "Soup"));
+    }
+
+    [Theory]
+    [InlineData(TransferMode.Move)]
+    [InlineData(TransferMode.Copy)]
+    public async Task PostTransfer_ReturnsBadRequestAndChangesNothing_WhenTheRecipeIsAlreadyInTheTargetDay(TransferMode mode)
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        var stew = await AddRecipe("Stew");
+        var pasta = await AddRecipe("Pasta");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2), (stew, 2, 3));
+        await AddMenuWithMeals(TargetDay, (pasta, 1, 5), (stew, 2, 6));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, stew.Id), new TransferMealRequest(TargetDay, 1, mode));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var problem = await result.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem.Should().NotBeNull();
+        problem.Type.Should().Be("MealAlreadyPresentInTheDay");
+        var source = await GetDay(PlannedDay);
+        source.Meals.Should().Equal(
+            new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"),
+            new OrderedRecipeListItemResponse(stew.Id, 2, 3, "Stew"));
+        var target = await GetDay(TargetDay);
+        target.Meals.Should().Equal(
+            new OrderedRecipeListItemResponse(pasta.Id, 1, 5, "Pasta"),
+            new OrderedRecipeListItemResponse(stew.Id, 2, 6, "Stew"));
+    }
+
+    [Theory]
+    [InlineData(TransferMode.Move)]
+    [InlineData(TransferMode.Copy)]
+    public async Task PostTransfer_ReturnsBadRequestAndChangesNothing_WhenTheTargetDayIsTheSourceDay(TransferMode mode)
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        var pasta = await AddRecipe("Pasta");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2), (pasta, 2, 3));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, soup.Id), new TransferMealRequest(PlannedDay, 2, mode));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var day = await GetDay(PlannedDay);
+        day.Meals.Should().Equal(
+            new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"),
+            new OrderedRecipeListItemResponse(pasta.Id, 2, 3, "Pasta"));
+    }
+
+    [Theory]
+    [InlineData(TransferMode.Move, 0)]
+    [InlineData(TransferMode.Move, -1)]
+    [InlineData(TransferMode.Move, 4)]
+    [InlineData(TransferMode.Copy, 0)]
+    [InlineData(TransferMode.Copy, -1)]
+    [InlineData(TransferMode.Copy, 4)]
+    public async Task PostTransfer_ReturnsBadRequestAndChangesNothing_WhenThePositionIsOutOfRangeForTheTargetDay(TransferMode mode, int position)
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        var stew = await AddRecipe("Stew");
+        var pasta = await AddRecipe("Pasta");
+        var salad = await AddRecipe("Salad");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2), (stew, 2, 3));
+        await AddMenuWithMeals(TargetDay, (pasta, 1, 5), (salad, 2, 6));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, stew.Id), new TransferMealRequest(TargetDay, position, mode));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var source = await GetDay(PlannedDay);
+        source.Meals.Should().Equal(
+            new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"),
+            new OrderedRecipeListItemResponse(stew.Id, 2, 3, "Stew"));
+        var target = await GetDay(TargetDay);
+        target.Meals.Should().Equal(
+            new OrderedRecipeListItemResponse(pasta.Id, 1, 5, "Pasta"),
+            new OrderedRecipeListItemResponse(salad.Id, 2, 6, "Salad"));
+    }
+
+    [Theory]
+    [InlineData(TransferMode.Move, 0)]
+    [InlineData(TransferMode.Move, -1)]
+    [InlineData(TransferMode.Move, 2)]
+    [InlineData(TransferMode.Copy, 0)]
+    [InlineData(TransferMode.Copy, -1)]
+    [InlineData(TransferMode.Copy, 2)]
+    public async Task PostTransfer_ReturnsBadRequestAndChangesNothing_WhenThePositionIsOutOfRangeForATargetDayWithNoMenu(TransferMode mode, int position)
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, soup.Id), new TransferMealRequest(TargetDay, position, mode));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var source = await GetDay(PlannedDay);
+        source.Meals.Should().Equal(new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"));
+        await AssertDayHasNoMenu(TargetDay);
+    }
+
+    [Theory]
+    [MemberData(nameof(DaysOutsideTheSupportedRange))]
+    public async Task PostTransfer_ReturnsBadRequestAndChangesNothing_WhenTheTargetDayIsOutsideTheSupportedRange(DateOnly targetDay)
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, soup.Id), new TransferMealRequest(targetDay, 1, TransferMode.Move));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var source = await GetDay(PlannedDay);
+        source.Meals.Should().Equal(new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"));
+        await AssertDayHasNoMenu(targetDay);
+    }
+
+    [Fact]
+    public async Task PostTransfer_ReturnsNotFound_WhenTheSourceDayHasNoMenu()
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        var pasta = await AddRecipe("Pasta");
+        await AddMenuWithMeals(TargetDay, (pasta, 1, 5));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, soup.Id), new TransferMealRequest(TargetDay, 1, TransferMode.Move));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        var problem = await result.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem.Should().NotBeNull();
+        problem.Type.Should().Be("MenuDoesNotExist");
+        var target = await GetDay(TargetDay);
+        target.Meals.Should().Equal(new OrderedRecipeListItemResponse(pasta.Id, 1, 5, "Pasta"));
+    }
+
+    [Fact]
+    public async Task PostTransfer_ReturnsNotFound_WhenTheMealIsNotInTheSourceDay()
+    {
+        // Arrange
+        var soup = await AddRecipe("Soup");
+        var pasta = await AddRecipe("Pasta");
+        var salad = await AddRecipe("Salad");
+        await AddMenuWithMeals(PlannedDay, (soup, 1, 2));
+        await AddMenuWithMeals(TargetDay, (salad, 1, 6));
+
+        // Act
+        var result = await Client.PostAsJsonAsync(BuildTransferRoute(PlannedDay, pasta.Id), new TransferMealRequest(TargetDay, 1, TransferMode.Move));
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        var problem = await result.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem.Should().NotBeNull();
+        problem.Type.Should().Be("NotFoundInTheDay");
+        var source = await GetDay(PlannedDay);
+        source.Meals.Should().Equal(new OrderedRecipeListItemResponse(soup.Id, 1, 2, "Soup"));
+        var target = await GetDay(TargetDay);
+        target.Meals.Should().Equal(new OrderedRecipeListItemResponse(salad.Id, 1, 6, "Salad"));
+    }
+
+    private async Task AssertDayHasNoMenu(DateOnly date)
+    {
+        var result = await Client.GetAsync(BuildGetRoute(date));
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
     private async Task<GetMenuResponse> GetDay(DateOnly date)
     {
         var result = await Client.GetAsync(BuildGetRoute(date));
@@ -478,6 +795,8 @@ public class MenuMealsIntegrationTests(MealPlannerWebApplicationFactory factory)
     private static string BuildMealsRoute(DateOnly date) => $"{Constants.MenusRoute}/{date.ToString("O")}/meals";
 
     private static string BuildMealRoute(DateOnly date, int recipeId) => $"{BuildMealsRoute(date)}/{recipeId}";
+
+    private static string BuildTransferRoute(DateOnly date, int recipeId) => $"{BuildMealRoute(date, recipeId)}/transfer";
 
     private static string BuildGetRoute(DateOnly date) => $"{Constants.MenusRoute}/{date.ToString("O")}";
 }
