@@ -59,7 +59,7 @@ public class Menu
     private Result ValidateOrder(int order)
     {
         var errors = new List<Error>();
-        errors.AddRule(!(order > _meals.Count + 1 && _meals.Count != 0), DomainErrors.Menu.InvalidMealOrder(order));
+        errors.AddRule(!(order > _meals.Count + 1 && !IsEmpty()), DomainErrors.Menu.InvalidMealOrder(order));
 
         var mealAtIndex = GetRecipe(order);
         errors.AddRule(mealAtIndex is null, DomainErrors.Meal.AlreadyExistsAtPosition(order));
@@ -182,4 +182,6 @@ public class Menu
             ? foundMeal
             : foundMeal.Value.UpdateServings(newServings);
     }
+
+    public bool IsEmpty() => _meals.Count == 0;
 }

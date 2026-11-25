@@ -9,6 +9,7 @@ public static class ServiceErrors
         public static Error MissingRecipesById(params int[] missingIds) => Error.Validation(TranslationKeys.Meal.MissingMealRecipesById, ("MissingIds", missingIds));
         public static readonly Error DetailsMissing = Error.Validation(TranslationKeys.Meal.MealDetailsMissing);
         public static readonly Error NothingToUpdateForMeal = Error.Validation(TranslationKeys.Meal.NothingToUpdateForMeal);
+        public static readonly Error TransferToTheSameDay = Error.Validation(TranslationKeys.Meal.TransferToTheSameDay);
     }
 
     public static class Menu

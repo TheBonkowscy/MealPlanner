@@ -27,6 +27,7 @@ public static class ServiceRegistration
         services.AddTransient<ICreateMeals, MealCreator>();
         services.AddTransient<IUpdateMeals, MealUpdater>();
         services.AddTransient<IDeleteMeals, MealDeleter>();
+        services.AddTransient<ITransferMeals, MealTransferer>();
 
         /* Recipes */
         services.AddTransient<IReadRecipe, RecipeReader>();

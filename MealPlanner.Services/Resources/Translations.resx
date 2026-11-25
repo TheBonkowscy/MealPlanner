@@ -174,4 +174,7 @@
     <data name="NothingToUpdateForMeal" xml:space="preserve">
         <value>Nothing to update for the specified meal</value>
     </data>
+    <data name="TransferToTheSameDay" xml:space="preserve">
+        <value>Can not transfer to the same day</value>
+    </data>
 </root>

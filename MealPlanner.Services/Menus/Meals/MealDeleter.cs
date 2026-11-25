@@ -27,7 +27,7 @@ public class MealDeleter(MealPlannerDbContext ctx) : IDeleteMeals
             return removed;
         }
 
-        if (!existingMenu.Meals.Any())
+        if (existingMenu.IsEmpty())
         {
             ctx.Menus.Remove(existingMenu);
         }

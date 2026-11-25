@@ -7,6 +7,7 @@ public static class TranslationKeys
         public const string MissingMealRecipesById = nameof(MissingMealRecipesById);
         public const string MealDetailsMissing = nameof(MealDetailsMissing);
         public const string NothingToUpdateForMeal = nameof(NothingToUpdateForMeal);
+        public const string TransferToTheSameDay = nameof(TransferToTheSameDay);
     }
 
     public static class Menu
