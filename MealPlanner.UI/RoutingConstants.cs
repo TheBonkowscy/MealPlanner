@@ -11,8 +11,6 @@ public static class RoutingConstants
         public static string DetailsForDate(DateOnly date) => $"/{Details}{date:yyyy-MM-dd}";
 
         public static string WeekFor(DateOnly date) => $"/{Week}{date:yyyy-MM-dd}";
-        
-        public static string DeleteForDate(DateOnly date) => $"/{BasePath}{date:yyyy-MM-dd}";
     }
     
     public static class Editors
