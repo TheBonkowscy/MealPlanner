@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using MealPlanner.Shared.Menus.Meals;
 using MealPlanner.UI.Services;
 
 namespace MealPlanner.UI.Tests;
@@ -143,5 +144,84 @@ public class WeekDropDecisionTests
 
         // Assert
         result.Should().Be(new WeekDropAction.AddMeal(Monday, 10, 2, 3));
+    }
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(1, 2)]
+    [InlineData(3, 4)]
+    [InlineData(4, 5)]
+    [InlineData(99, 5)]
+    [InlineData(-5, 1)]
+    public void DecideTransfer_ReturnsMoveAtTheDroppedPosition_ClampedToOneThroughCountPlusOne(int dropIndex, int expectedPosition)
+    {
+        // Arrange
+        int[] mealsInDay = [10, 20, 30, 40];
+
+        // Act
+        var result = WeekDropDecision.DecideTransfer(Monday, 50, Tuesday, dropIndex, false, mealsInDay);
+
+        // Assert
+        result.Should().Be(new WeekDropAction.TransferMeal(Monday, 50, Tuesday, expectedPosition, TransferMode.Move));
+    }
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(2, 3)]
+    [InlineData(99, 5)]
+    public void DecideTransfer_ReturnsCopyAtTheDroppedPosition_WhenCopyIsRequested(int dropIndex, int expectedPosition)
+    {
+        // Arrange
+        int[] mealsInDay = [10, 20, 30, 40];
+
+        // Act
+        var result = WeekDropDecision.DecideTransfer(Monday, 50, Tuesday, dropIndex, true, mealsInDay);
+
+        // Assert
+        result.Should().Be(new WeekDropAction.TransferMeal(Monday, 50, Tuesday, expectedPosition, TransferMode.Copy));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    [InlineData(-1)]
+    public void DecideTransfer_ReturnsPositionOne_ForATargetDayWithoutMeals(int dropIndex)
+    {
+        // Arrange
+        int[] mealsInDay = [];
+
+        // Act
+        var result = WeekDropDecision.DecideTransfer(Monday, 50, Tuesday, dropIndex, false, mealsInDay);
+
+        // Assert
+        result.Should().Be(new WeekDropAction.TransferMeal(Monday, 50, Tuesday, 1, TransferMode.Move));
+    }
+
+    [Fact]
+    public void DecideTransfer_ReturnsTransfer_WhenTheRecipeIsAlreadyInTheTargetDay()
+    {
+        // Arrange
+        int[] mealsInDay = [10, 20];
+
+        // Act
+        var result = WeekDropDecision.DecideTransfer(Monday, 10, Tuesday, 1, false, mealsInDay);
+
+        // Assert
+        result.Should().Be(new WeekDropAction.TransferMeal(Monday, 10, Tuesday, 2, TransferMode.Move));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void DecideTransfer_ReturnsNone_WhenTheTargetIsTheSourceDay(bool copy)
+    {
+        // Arrange
+        int[] mealsInDay = [10, 20];
+
+        // Act
+        var result = WeekDropDecision.DecideTransfer(Monday, 10, Monday, 1, copy, mealsInDay);
+
+        // Assert
+        result.Should().Be(WeekDropAction.None);
     }
 }

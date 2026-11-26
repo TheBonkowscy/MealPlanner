@@ -345,4 +345,10 @@
     <data name="WeekMenuNoRecipesTitle" xml:space="preserve">
         <value>No recipes found</value>
     </data>
+    <data name="WeekMenuCopyModeLabel" xml:space="preserve">
+        <value>Copy</value>
+    </data>
+    <data name="WeekMenuCopyModeTooltip" xml:space="preserve">
+        <value>When on, dropping a meal on another day copies it. Hold Shift to copy without the switch.</value>
+    </data>
 </root>

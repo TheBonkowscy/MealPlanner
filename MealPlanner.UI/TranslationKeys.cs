@@ -102,6 +102,8 @@ public static class TranslationKeys
         public const string WeekMenuRecipePanelTitle = nameof(WeekMenuRecipePanelTitle);
         public const string WeekMenuRecipeSearchLabel = nameof(WeekMenuRecipeSearchLabel);
         public const string WeekMenuNoRecipesTitle = nameof(WeekMenuNoRecipesTitle);
+        public const string WeekMenuCopyModeLabel = nameof(WeekMenuCopyModeLabel);
+        public const string WeekMenuCopyModeTooltip = nameof(WeekMenuCopyModeTooltip);
     }
 
     public static class ViewRecipe
