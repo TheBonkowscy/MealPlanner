@@ -1,24 +1,12 @@
 ﻿using System.Net.Http.Json;
 using Flurl;
-using MealPlanner.Client.Extensions;
-using MealPlanner.Client.Models;
 using MealPlanner.Shared.Menus;
-using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 
 namespace MealPlanner.Client.Menus;
 
-internal class MenuClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IUpdateMenus, IDeleteMenus
+internal class MenuClient(HttpClient httpClient) : IFindMenus, IDeleteMenus
 {
-    public async Task<ApiResult<CreateMenuResponse>> CreateMenu(CreateMenuRequest createMenuRequest, CancellationToken cancellationToken)
-    {
-        var response = await httpClient.PostAsJsonAsync(Constants.MenusRoute,
-            createMenuRequest,
-            options: null,
-            cancellationToken);
-        return await response.ToApiResult<CreateMenuResponse>(cancellationToken);
-    }
-
     public async Task<GetMenuResponse?> Get(int id, CancellationToken cancellationToken)
     {
         var endpoint = AppendDateToBaseUri(id.ToString());
@@ -81,14 +69,6 @@ internal class MenuClient(HttpClient httpClient) : IFindMenus, ICreateMenus, IUp
         }
 
         return GetWeekResponse.Empty;
-    }
-
-    public async Task<ApiResult<UpdateMenuResponse>> Update(UpdateMenuRequest request, CancellationToken cancellationToken)
-    {
-        var response = await httpClient.PutAsJsonAsync(AppendDateToBaseUri(request.Date.ToString("yyyy-MM-dd")), request, options: null,
-            cancellationToken);
-
-        return await response.ToApiResult<UpdateMenuResponse>(cancellationToken);
     }
 
     public async Task<bool> Delete(DateOnly date, CancellationToken cancellationToken)
