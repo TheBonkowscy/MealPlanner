@@ -17,13 +17,10 @@ public static class ServiceRegistration
     public static Task RegisterMenuServices(this IServiceCollection services)
     {
         /* Menus */
-        services.AddTransient<ICreateMenu, MenuCreator>();
         services.AddTransient<IReadMenu, MenuReader>();
-        services.AddTransient<IUpdateMenu, MenuUpdater>();
         services.AddTransient<IDeleteMenu, MenuDeleter>();
-        
+
         /* Meals */
-        services.AddTransient<IMapMeals, MealsMapper>();
         services.AddTransient<ICreateMeals, MealCreator>();
         services.AddTransient<IUpdateMeals, MealUpdater>();
         services.AddTransient<IDeleteMeals, MealDeleter>();

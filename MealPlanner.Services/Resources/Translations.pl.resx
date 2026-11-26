@@ -47,9 +47,6 @@
     <data name="InvalidRecipeIngredients" xml:space="preserve">
         <value>Podaj składniki i ich prawidłową liczbę</value>
     </data>
-    <data name="InvalidMealsInMenu" xml:space="preserve">
-        <value>Liczba posiłków jest nieprawidłowa</value>
-    </data>
     <data name="InvalidRecipeServings" xml:space="preserve">
         <value>Podaj prawidłową liczbę porcji jakie daje przepis</value>
     </data>
@@ -76,12 +73,6 @@
     </data>
     <data name="MealAlreadyPresentInTheDay" xml:space="preserve">
         <value>Posiłek {0} został już dodany do menu</value>
-    </data>
-    <data name="MealDetailsMissing" xml:space="preserve">
-        <value>Nie znaleziono szczegółów posiłku</value>
-    </data>
-    <data name="MenuAlreadyExists" xml:space="preserve">
-        <value>Menu na {0} już istnieje</value>
     </data>
     <data name="MenuDateTooFarInTheFuture" xml:space="preserve">
         <value>Data dla menu jest zbyt daleko w przyszłości</value>

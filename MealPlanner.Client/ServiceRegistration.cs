@@ -20,10 +20,6 @@ public static class ServiceRegistration
             
             services.AddHttpClient<IFindMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())
                 .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
-            services.AddHttpClient<ICreateMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())
-                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
-            services.AddHttpClient<IUpdateMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())
-                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
             services.AddHttpClient<IDeleteMenus, MenuClient>(nameof(MenuClient), IServiceCollection.ConfigureClient())
                 .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
             

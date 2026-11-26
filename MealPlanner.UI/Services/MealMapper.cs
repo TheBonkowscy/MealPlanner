@@ -1,6 +1,5 @@
 ﻿using MealPlanner.Shared.Recipes.Responses;
 using MealPlanner.UI.Models;
-using MealPlanner.UI.Models.Editors;
 
 namespace MealPlanner.UI.Services;
 
@@ -18,8 +17,6 @@ public class MealMapper
         return meals;
     }
     
-    public List<RecipeByIdDto> MapMeals(GetRecipesResponse result) => [.. result.Recipes.Select(x => new RecipeByIdDto(x.Id, x.Name))];
-
     public List<PanelRecipe> MapPanelRecipes(GetRecipesResponse? response) =>
         response is null
             ? []

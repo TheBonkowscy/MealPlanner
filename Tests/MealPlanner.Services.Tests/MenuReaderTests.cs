@@ -35,31 +35,6 @@ public class MenuReaderTests
     }
     
     [Fact]
-    public async Task GetById_ReturnsNull_WhenMenuDoesNotExist()
-    {
-        // Act
-        var result = await _sut.Get(1, CancellationToken.None);
-        
-        // Assert
-        result.Should().BeNull();
-    }
-    
-    [Fact]
-    public async Task GetById_ReturnsMenuIfExists()
-    {
-        // Arrange
-        var menu = CreateAndSaveMenu(Today);
-        
-        // Act
-        var result = await _sut.Get(menu.Id, CancellationToken.None);
-        
-        // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(menu.Id);
-        result.Date.Should().Be(menu.Date);
-    }
-
-    [Fact]
     public async Task GetForDate_ReturnsNull_WhenMenuDoesNotExist()
     {
         // Act

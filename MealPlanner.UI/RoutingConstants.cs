@@ -6,19 +6,11 @@ public static class RoutingConstants
     {
         private const string BasePath = "menus";
         private const string Details = BasePath + "/day/";
-        private const string Edit = BasePath + "/edit/";
-        private const string Create = BasePath + "/create/";
         private const string Week = BasePath + "/week/";
 
         public static string DetailsForDate(DateOnly date) => $"/{Details}{date:yyyy-MM-dd}";
 
-        public static string CreateForDate(DateOnly date) => $"/{Create}{date:yyyy-MM-dd}";
-
-        public static string EditForDate(DateOnly date) => $"/{Edit}{date:yyyy-MM-dd}";
-
         public static string WeekFor(DateOnly date) => $"/{Week}{date:yyyy-MM-dd}";
-        
-        public static string DeleteForDate(DateOnly date) => $"/{BasePath}{date:yyyy-MM-dd}";
     }
     
     public static class Editors
