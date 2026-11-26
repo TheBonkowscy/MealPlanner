@@ -852,11 +852,38 @@ namespace MealPlanner.UI {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to No recipes found.
+        /// </summary>
+        public static string WeekMenuNoRecipesTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuNoRecipesTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Previous week.
         /// </summary>
         public static string WeekMenuPreviousWeekButtonTitle {
             get {
                 return ResourceManager.GetString("WeekMenuPreviousWeekButtonTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Recipes.
+        /// </summary>
+        public static string WeekMenuRecipePanelTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuRecipePanelTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search recipes.
+        /// </summary>
+        public static string WeekMenuRecipeSearchLabel {
+            get {
+                return ResourceManager.GetString("WeekMenuRecipeSearchLabel", resourceCulture);
             }
         }
 

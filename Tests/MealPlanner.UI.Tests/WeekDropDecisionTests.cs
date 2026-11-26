@@ -83,4 +83,65 @@ public class WeekDropDecisionTests
         // Assert
         result.Should().Be(WeekDropAction.None);
     }
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(1, 2)]
+    [InlineData(3, 4)]
+    [InlineData(4, 5)]
+    [InlineData(99, 5)]
+    [InlineData(-5, 1)]
+    public void DecideAdd_ReturnsAddAtTheDroppedPosition_ClampedToOneThroughCountPlusOne(int dropIndex, int expectedPosition)
+    {
+        // Arrange
+        int[] mealsInDay = [10, 20, 30, 40];
+
+        // Act
+        var result = WeekDropDecision.DecideAdd(50, 4, Monday, dropIndex, mealsInDay);
+
+        // Assert
+        result.Should().Be(new WeekDropAction.AddMeal(Monday, 50, expectedPosition, 4));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    [InlineData(-1)]
+    public void DecideAdd_ReturnsAddAtPositionOne_ForADayWithoutMeals(int dropIndex)
+    {
+        // Arrange
+        int[] mealsInDay = [];
+
+        // Act
+        var result = WeekDropDecision.DecideAdd(50, 2, Tuesday, dropIndex, mealsInDay);
+
+        // Assert
+        result.Should().Be(new WeekDropAction.AddMeal(Tuesday, 50, 1, 2));
+    }
+
+    [Fact]
+    public void DecideAdd_CarriesTheServingsOfTheRecipe()
+    {
+        // Arrange
+        int[] mealsInDay = [10, 20, 30, 40];
+
+        // Act
+        var result = WeekDropDecision.DecideAdd(50, 7, Monday, 2, mealsInDay);
+
+        // Assert
+        result.Should().Be(new WeekDropAction.AddMeal(Monday, 50, 3, 7));
+    }
+
+    [Fact]
+    public void DecideAdd_ReturnsAdd_WhenTheRecipeIsAlreadyInTheDay()
+    {
+        // Arrange
+        int[] mealsInDay = [10, 20];
+
+        // Act
+        var result = WeekDropDecision.DecideAdd(10, 3, Monday, 1, mealsInDay);
+
+        // Assert
+        result.Should().Be(new WeekDropAction.AddMeal(Monday, 10, 2, 3));
+    }
 }

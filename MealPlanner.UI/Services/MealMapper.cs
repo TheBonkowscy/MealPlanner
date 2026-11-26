@@ -19,4 +19,11 @@ public class MealMapper
     }
     
     public List<RecipeByIdDto> MapMeals(GetRecipesResponse result) => [.. result.Recipes.Select(x => new RecipeByIdDto(x.Id, x.Name))];
+
+    public List<PanelRecipe> MapPanelRecipes(GetRecipesResponse? response) =>
+        response is null
+            ? []
+            : [.. response.Recipes
+                .OrderBy(recipe => recipe.Name, StringComparer.CurrentCultureIgnoreCase)
+                .Select(recipe => new PanelRecipe(recipe.Id, recipe.Name, recipe.Servings))];
 }

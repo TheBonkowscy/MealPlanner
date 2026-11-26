@@ -6,5 +6,7 @@ public abstract record WeekDropAction
 
     public sealed record ReorderMeal(DateOnly Day, int RecipeId, int Position) : WeekDropAction;
 
+    public sealed record AddMeal(DateOnly Day, int RecipeId, int Position, int Servings) : WeekDropAction;
+
     private sealed record NoAction : WeekDropAction;
 }

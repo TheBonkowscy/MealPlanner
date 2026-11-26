@@ -99,6 +99,9 @@ public static class TranslationKeys
         public const string WeekMenuServingsLabel = nameof(WeekMenuServingsLabel);
         public const string WeekMenuDeleteMealButtonTitle = nameof(WeekMenuDeleteMealButtonTitle);
         public const string WeekMenuUnexpectedErrorTitle = nameof(WeekMenuUnexpectedErrorTitle);
+        public const string WeekMenuRecipePanelTitle = nameof(WeekMenuRecipePanelTitle);
+        public const string WeekMenuRecipeSearchLabel = nameof(WeekMenuRecipeSearchLabel);
+        public const string WeekMenuNoRecipesTitle = nameof(WeekMenuNoRecipesTitle);
     }
 
     public static class ViewRecipe

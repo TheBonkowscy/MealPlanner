@@ -336,4 +336,13 @@
     <data name="WeekMenuUnexpectedErrorTitle" xml:space="preserve">
         <value>Coś poszło nie tak</value>
     </data>
+    <data name="WeekMenuRecipePanelTitle" xml:space="preserve">
+        <value>Przepisy</value>
+    </data>
+    <data name="WeekMenuRecipeSearchLabel" xml:space="preserve">
+        <value>Szukaj przepisów</value>
+    </data>
+    <data name="WeekMenuNoRecipesTitle" xml:space="preserve">
+        <value>Nie znaleziono przepisów</value>
+    </data>
 </root>
