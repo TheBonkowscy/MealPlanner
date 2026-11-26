@@ -134,7 +134,7 @@ internal class RecipeClient(HttpClient httpClient) :
 
     public async Task DeleteStep(int id, int stepId, CancellationToken cancellationToken)
     {
-        var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/ingredients/").AppendPathSegment(stepId);
+        var endpoint = Constants.RecipesRoute.AppendPathSegment(id).AppendPathSegment("/steps/").AppendPathSegment(stepId);
         var response = await httpClient.DeleteAsync(endpoint, cancellationToken);
 
         if (response.IsSuccessStatusCode)
@@ -142,7 +142,7 @@ internal class RecipeClient(HttpClient httpClient) :
             return;
         }
 
-        throw new Exception("Unable to delete ingredients from this recipe");   // TODO: concrete types?
+        throw new Exception("Unable to delete steps from this recipe");   // TODO: concrete types?
     }
 
     public async Task<ApiResult<GetRecipeDetailsResponse>> AddPreparations(int id, AddRecipePreparationsRequest request, CancellationToken cancellationToken)
