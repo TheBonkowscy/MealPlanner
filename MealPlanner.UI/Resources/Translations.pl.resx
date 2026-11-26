@@ -324,10 +324,16 @@
     <data name="WeekMenuNoMealsTitle" xml:space="preserve">
         <value>Brak posiłków</value>
     </data>
-    <data name="WeekMenuMealServingsTitle" xml:space="preserve">
-        <value>Porcje: {0}</value>
-    </data>
     <data name="WeekMenuLoadErrorTitle" xml:space="preserve">
         <value>Nie udało się wczytać tygodnia</value>
+    </data>
+    <data name="WeekMenuServingsLabel" xml:space="preserve">
+        <value>Porcje</value>
+    </data>
+    <data name="WeekMenuDeleteMealButtonTitle" xml:space="preserve">
+        <value>Usuń posiłek</value>
+    </data>
+    <data name="WeekMenuUnexpectedErrorTitle" xml:space="preserve">
+        <value>Coś poszło nie tak</value>
     </data>
 </root>
