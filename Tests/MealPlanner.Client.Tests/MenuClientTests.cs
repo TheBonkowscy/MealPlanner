@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
 using AwesomeAssertions;
@@ -77,8 +78,203 @@ public class MenuClientTests
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
+    [Fact]
+    public async Task Get_RequestsMenuRouteWithIsoDate()
+    {
+        // Arrange
+        var stub = new StubHttpMessageHandler(HttpStatusCode.OK, JsonContent.Create(SampleMenu()));
+        var client = CreateClient(stub);
+
+        // Act
+        await client.Get(new DateTime(2025, 1, 3, 15, 30, 0), CancellationToken.None);
+
+        // Assert
+        stub.Request!.Method.Should().Be(HttpMethod.Get);
+        stub.Request.RequestUri!.PathAndQuery.Should().Be($"{Constants.MenusRoute}/2025-01-03");
+    }
+
+    [Fact(Skip = "MenuClient.Get formats the date with the current culture: under th-TH it requests /menus/2568-01-03. Remove Skip once Get formats with CultureInfo.InvariantCulture.")]
+    public async Task Get_UsesGregorianIsoDate_UnderThaiCulture()
+    {
+        // Arrange
+        var stub = new StubHttpMessageHandler(HttpStatusCode.OK, JsonContent.Create(SampleMenu()));
+        var client = CreateClient(stub);
+        var originalCulture = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = new CultureInfo("th-TH");
+
+        try
+        {
+            // Act
+            await client.Get(new DateTime(2025, 1, 3), CancellationToken.None);
+
+            // Assert
+            stub.Request!.RequestUri!.PathAndQuery.Should().Be($"{Constants.MenusRoute}/2025-01-03");
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
+    [Fact]
+    public async Task Get_ReturnsDeserialisedResponse_WhenSuccessful()
+    {
+        // Arrange
+        var expected = SampleMenu();
+        var stub = new StubHttpMessageHandler(HttpStatusCode.OK, JsonContent.Create(expected));
+        var client = CreateClient(stub);
+
+        // Act
+        var result = await client.Get(new DateTime(2025, 1, 3), CancellationToken.None);
+
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+    }
+
+    [Theory]
+    [MemberData(nameof(FailureStatuses))]
+    public async Task Get_ReturnsNull_WhenNotSuccessful(HttpStatusCode status)
+    {
+        // Arrange
+        var stub = new StubHttpMessageHandler(status, ErrorBody());
+        var client = CreateClient(stub);
+
+        // Act
+        var result = await client.Get(new DateTime(2025, 1, 3), CancellationToken.None);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Get_ForwardsCancellationToken()
+    {
+        // Arrange
+        var stub = new StubHttpMessageHandler(HttpStatusCode.InternalServerError, ErrorBody());
+        var client = CreateClient(stub);
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+
+        // Act
+        var act = () => client.Get(new DateTime(2025, 1, 3), cancellation.Token);
+
+        // Assert
+        await act.Should().ThrowAsync<OperationCanceledException>();
+    }
+
+    [Fact]
+    public async Task GetToday_RequestsRouteOfToday()
+    {
+        // Arrange
+        var today = DateTime.Today;
+        var stub = new StubHttpMessageHandler(HttpStatusCode.OK, JsonContent.Create(SampleMenu()));
+        var client = CreateClient(stub);
+
+        // Act
+        await client.GetToday(CancellationToken.None);
+
+        // Assert
+        stub.Request!.Method.Should().Be(HttpMethod.Get);
+        stub.Request.RequestUri!.PathAndQuery.Should().Be($"{Constants.MenusRoute}/{today:yyyy-MM-dd}");
+    }
+
+    [Fact]
+    public async Task GetToday_ReturnsDeserialisedResponse_WhenSuccessful()
+    {
+        // Arrange
+        var expected = SampleMenu();
+        var stub = new StubHttpMessageHandler(HttpStatusCode.OK, JsonContent.Create(expected));
+        var client = CreateClient(stub);
+
+        // Act
+        var result = await client.GetToday(CancellationToken.None);
+
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+    }
+
+    [Theory]
+    [MemberData(nameof(FailureStatuses))]
+    public async Task GetToday_ReturnsNull_WhenNotSuccessful(HttpStatusCode status)
+    {
+        // Arrange
+        var stub = new StubHttpMessageHandler(status, ErrorBody());
+        var client = CreateClient(stub);
+
+        // Act
+        var result = await client.GetToday(CancellationToken.None);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Delete_SendsDeleteToMenuRouteWithIsoDate()
+    {
+        // Arrange
+        var stub = new StubHttpMessageHandler(HttpStatusCode.NoContent);
+        var client = CreateClient(stub);
+
+        // Act
+        await client.Delete(new DateOnly(2025, 1, 3), CancellationToken.None);
+
+        // Assert
+        stub.Request!.Method.Should().Be(HttpMethod.Delete);
+        stub.Request.RequestUri!.PathAndQuery.Should().Be($"{Constants.MenusRoute}/2025-01-03");
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.OK)]
+    [InlineData(HttpStatusCode.NoContent)]
+    public async Task Delete_ReturnsTrue_WhenSuccessful(HttpStatusCode status)
+    {
+        // Arrange
+        var stub = new StubHttpMessageHandler(status);
+        var client = CreateClient(stub);
+
+        // Act
+        var result = await client.Delete(new DateOnly(2025, 1, 3), CancellationToken.None);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [Theory]
+    [MemberData(nameof(FailureStatuses))]
+    public async Task Delete_ReturnsFalse_WhenNotSuccessful(HttpStatusCode status)
+    {
+        // Arrange
+        var stub = new StubHttpMessageHandler(status, ErrorBody());
+        var client = CreateClient(stub);
+
+        // Act
+        var result = await client.Delete(new DateOnly(2025, 1, 3), CancellationToken.None);
+
+        // Assert
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Delete_ForwardsCancellationToken()
+    {
+        // Arrange
+        var stub = new StubHttpMessageHandler(HttpStatusCode.NoContent);
+        var client = CreateClient(stub);
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+
+        // Act
+        var act = () => client.Delete(new DateOnly(2025, 1, 3), cancellation.Token);
+
+        // Assert
+        await act.Should().ThrowAsync<OperationCanceledException>();
+    }
+
     private static MenuClient CreateClient(StubHttpMessageHandler stub) =>
         new(new HttpClient(stub) { BaseAddress = new Uri("http://localhost") });
+
+    private static GetMenuResponse SampleMenu() =>
+        new(7, new DateOnly(2025, 1, 3), [new OrderedRecipeListItemResponse(1, 1, 2, "Soup")]);
 
     private static HttpContent ErrorBody() => JsonContent.Create(new { title = "error" });
 }
