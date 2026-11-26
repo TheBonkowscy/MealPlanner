@@ -9,7 +9,6 @@ namespace MealPlanner.Services.Menus;
 
 public interface IReadMenu
 {
-    Task<GetMenuResponse?> Get(int id, CancellationToken ct);
     Task<GetMenuResponse?> Get(DateOnly date, CancellationToken ct);
     Task<GetExistingMenusResponse> GetRange(DateOnly? from, DateOnly? to, CancellationToken ct);
     Task<GetWeekResponse> GetWeek(DateTime day, CancellationToken cancellationToken);
@@ -17,15 +16,6 @@ public interface IReadMenu
 
 public class MenuReader(MealPlannerDbContext ctx) : IReadMenu
 {
-    public async Task<GetMenuResponse?> Get(int id, CancellationToken ct)
-    {
-        var menu = await ctx.Menus
-            .Include(x => x.Meals)
-            .ThenInclude(x => x.Recipe)
-            .FirstOrDefaultAsync(x => x.Id == id, ct);
-        return menu is null ? null : MapMenu(menu);
-    }
-
     private static GetMenuResponse MapMenu(Menu menu)
     {
         var mappedMeals = menu.Meals

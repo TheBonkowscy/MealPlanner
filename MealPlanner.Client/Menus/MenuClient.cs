@@ -7,18 +7,6 @@ namespace MealPlanner.Client.Menus;
 
 internal class MenuClient(HttpClient httpClient) : IFindMenus, IDeleteMenus
 {
-    public async Task<GetMenuResponse?> Get(int id, CancellationToken cancellationToken)
-    {
-        var endpoint = AppendDateToBaseUri(id.ToString());
-        var response = await httpClient.GetAsync(endpoint, cancellationToken);
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<GetMenuResponse>(cancellationToken); 
-        }
-
-        return null;
-    }
-
     public async Task<GetMenuResponse?> Get(DateTime date, CancellationToken cancellationToken)
     {
         var endpoint = AppendDateToBaseUri(date.ToString("yyyy-MM-dd"));

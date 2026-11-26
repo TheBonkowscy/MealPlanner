@@ -23,34 +23,6 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     private static readonly List<AddMealAction> MealsToAdd = [TestActions.AddMeal(PreExistingRecipe, 1, 1)];
     
     [Fact]
-    public async Task Get_ById_ReturnsMenuIfExists()
-    {
-        // Arrange 
-        var menu = Menu.Create(Tomorrow, MealsToAdd).Value;
-        await AddMenuToDatabase(menu);
-        
-        // Act
-        var result = await Client.GetAsync(BuildGetRoute(menu.Id));
-        
-        // Assert
-        result.EnsureSuccessStatusCode();
-        var response = await result.Content.ReadFromJsonAsync<GetMenuResponse>();
-        response.Should().NotBeNull();
-        response.Id.Should().Be(menu.Id);
-        response.Date.Should().Be(menu.Date);
-    }
-    
-    [Fact]
-    public async Task Get_ById_ReturnsNotFound_WhenMenuDoesNotExist()
-    {
-        // Act
-        var result = await Client.GetAsync(BuildGetRoute(1));
-        
-        // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-    
-    [Fact]
     public async Task Get_ForSpecificDate_ReturnsNotFound_WhenMenuDoesNotExist()
     {
         // Act
@@ -345,8 +317,6 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     private static IEnumerable<DateOnly> DaysOfWeekStartingOn(DateOnly monday) => Enumerable.Range(0, 7).Select(monday.AddDays);
 
     private static string BuildGetWeekRoute(DateOnly date) => $"{Constants.MenuWeeksRoute}/{date.ToString("O")}";
-
-    private static string BuildGetRoute(int id) => $"{Constants.MenusRoute}/{id.ToString()}";
 
     private static string BuildGetRoute(DateOnly date) => $"{Constants.MenusRoute}/{date.ToString("O")}";
 
