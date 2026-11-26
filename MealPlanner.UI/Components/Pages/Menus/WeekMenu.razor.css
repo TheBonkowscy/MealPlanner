@@ -1,9 +1,23 @@
 .week-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.week-nav {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 16px;
-    margin-bottom: 16px;
+}
+
+.copy-mode {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .week-title {
@@ -110,6 +124,19 @@
 }
 
 @media (max-width: 960px) {
+    .week-header {
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+
+    .copy-mode {
+        position: static;
+        transform: none;
+        flex-basis: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
     .week-layout {
         grid-template-columns: 1fr;
     }

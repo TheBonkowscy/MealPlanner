@@ -4,11 +4,12 @@ using Flurl;
 using MealPlanner.Client.Extensions;
 using MealPlanner.Client.Models;
 using MealPlanner.Shared.Menus;
+using MealPlanner.Shared.Menus.Meals;
 using MealPlanner.Shared.Menus.Requests;
 
 namespace MealPlanner.Client.Meals;
 
-public class MealClient(HttpClient httpClient) : IAddMeals, IUpdateMeals, IDeleteMeals
+public class MealClient(HttpClient httpClient) : IAddMeals, IUpdateMeals, IDeleteMeals, ITransferMeals
 {
     public async Task<ApiResult> Add(DateOnly date, CreateMealRequest createMealRequest, CancellationToken cancellationToken)
     {
@@ -42,6 +43,18 @@ public class MealClient(HttpClient httpClient) : IAddMeals, IUpdateMeals, IDelet
             return ApiResult.Success();
         }
         
+        return await response.ToApiResult(cancellationToken);
+    }
+
+    public async Task<ApiResult> Transfer(DateOnly date, int mealId, TransferMealRequest transferMealRequest, CancellationToken cancellationToken)
+    {
+        var endpoint = BuildMenuPath(date).AppendPathSegment(mealId).AppendPathSegment("transfer");
+        var response = await httpClient.PostAsJsonAsync(endpoint, transferMealRequest, cancellationToken);
+        if (response.IsSuccessStatusCode)
+        {
+            return ApiResult.Success();
+        }
+
         return await response.ToApiResult(cancellationToken);
     }
 

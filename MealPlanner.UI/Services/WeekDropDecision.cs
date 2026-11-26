@@ -1,3 +1,5 @@
+using MealPlanner.Shared.Menus.Meals;
+
 namespace MealPlanner.UI.Services;
 
 public static class WeekDropDecision
@@ -37,6 +39,29 @@ public static class WeekDropDecision
         var position = Math.Clamp(dropIndex + 1, 1, recipeIdsInTargetDay.Count + 1);
 
         return new WeekDropAction.AddMeal(targetDay, recipeId, position, servings);
+    }
+
+    public static WeekDropAction DecideTransfer(
+        DateOnly sourceDay,
+        int recipeId,
+        DateOnly targetDay,
+        int dropIndex,
+        bool copy,
+        IReadOnlyList<int> recipeIdsInTargetDay)
+    {
+        if (sourceDay == targetDay)
+        {
+            return WeekDropAction.None;
+        }
+
+        var position = Math.Clamp(dropIndex + 1, 1, recipeIdsInTargetDay.Count + 1);
+
+        return new WeekDropAction.TransferMeal(
+            sourceDay,
+            recipeId,
+            targetDay,
+            position,
+            copy ? TransferMode.Copy : TransferMode.Move);
     }
 
     private static int? CurrentPositionOf(int recipeId, IReadOnlyList<int> recipeIdsInDay)

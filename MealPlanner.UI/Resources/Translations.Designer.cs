@@ -816,6 +816,24 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string WeekMenuCopyModeLabel {
+            get {
+                return ResourceManager.GetString("WeekMenuCopyModeLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When on, dropping a meal on another day copies it. Hold Shift to copy without the switch..
+        /// </summary>
+        public static string WeekMenuCopyModeTooltip {
+            get {
+                return ResourceManager.GetString("WeekMenuCopyModeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove meal.
         /// </summary>
         public static string WeekMenuDeleteMealButtonTitle {

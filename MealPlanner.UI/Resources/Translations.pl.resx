@@ -345,4 +345,10 @@
     <data name="WeekMenuNoRecipesTitle" xml:space="preserve">
         <value>Nie znaleziono przepisów</value>
     </data>
+    <data name="WeekMenuCopyModeLabel" xml:space="preserve">
+        <value>Kopiuj</value>
+    </data>
+    <data name="WeekMenuCopyModeTooltip" xml:space="preserve">
+        <value>Gdy przełącznik jest włączony, upuszczenie posiłku na inny dzień kopiuje go. Przytrzymaj Shift, aby kopiować bez przełącznika.</value>
+    </data>
 </root>

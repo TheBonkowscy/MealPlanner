@@ -3,16 +3,18 @@
 @using MealPlanner.Client.Menus
 @using MealPlanner.Client.Models
 @using MealPlanner.Client.Recipes
+@using MealPlanner.Shared.Menus.Meals
 @using MealPlanner.Shared.Menus.Requests
 @using MealPlanner.Shared.Menus.Responses
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @using Microsoft.Extensions.Localization
-@implements IDisposable
+@implements IAsyncDisposable
 @inject IFindMenus FindMenus
 @inject IUpdateMeals MealUpdater
 @inject IAddMeals MealAdder
 @inject IDeleteMeals MealDeleter
+@inject ITransferMeals MealTransferer
 @inject IFindRecipes FindRecipes
 @inject AppBarService AppBarService
 @inject MealMapper MealMapper
@@ -20,25 +22,37 @@
 @inject ILogger<WeekMenu> Logger
 @inject TimeProvider Clock
 @inject IStringLocalizer<Translations> L
+@inject IJSRuntime JS
 
 <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-4">
     <div class="week-header">
-        <MudTooltip Text="@L[TranslationKeys.WeekMenu.WeekMenuPreviousWeekButtonTitle]">
-            <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
-                           Href="@RoutingConstants.Menus.WeekFor(WeekNavigation.Previous(_weekStart))"
-                           aria-label="@L[TranslationKeys.WeekMenu.WeekMenuPreviousWeekButtonTitle]" />
-        </MudTooltip>
+        <div class="week-nav">
+            <MudTooltip Text="@L[TranslationKeys.WeekMenu.WeekMenuPreviousWeekButtonTitle]">
+                <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
+                               Href="@RoutingConstants.Menus.WeekFor(WeekNavigation.Previous(_weekStart))"
+                               aria-label="@L[TranslationKeys.WeekMenu.WeekMenuPreviousWeekButtonTitle]" />
+            </MudTooltip>
 
-        <div class="week-title">
-            <MudText Typo="Typo.h5">@WeekTitle</MudText>
-            <MudText Typo="Typo.subtitle2" Class="mud-text-secondary">@WeekRange</MudText>
+            <div class="week-title">
+                <MudText Typo="Typo.h5">@WeekTitle</MudText>
+                <MudText Typo="Typo.subtitle2" Class="mud-text-secondary">@WeekRange</MudText>
+            </div>
+
+            <MudTooltip Text="@L[TranslationKeys.WeekMenu.WeekMenuNextWeekButtonTitle]">
+                <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
+                               Href="@RoutingConstants.Menus.WeekFor(WeekNavigation.Next(_weekStart))"
+                               aria-label="@L[TranslationKeys.WeekMenu.WeekMenuNextWeekButtonTitle]" />
+            </MudTooltip>
         </div>
 
-        <MudTooltip Text="@L[TranslationKeys.WeekMenu.WeekMenuNextWeekButtonTitle]">
-            <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
-                           Href="@RoutingConstants.Menus.WeekFor(WeekNavigation.Next(_weekStart))"
-                           aria-label="@L[TranslationKeys.WeekMenu.WeekMenuNextWeekButtonTitle]" />
-        </MudTooltip>
+        <div class="copy-mode">
+            <MudTooltip Text="@L[TranslationKeys.WeekMenu.WeekMenuCopyModeTooltip]">
+                <MudSwitch T="bool"
+                           @bind-Value="_copyMode"
+                           Color="Color.Primary"
+                           Label="@L[TranslationKeys.WeekMenu.WeekMenuCopyModeLabel]" />
+            </MudTooltip>
+        </div>
     </div>
 
     @if (_loading)
@@ -78,7 +92,6 @@
                             <MudDropZone T="WeekDragItem"
                                          Identifier="@day.Date.ToString("O", CultureInfo.InvariantCulture)"
                                          AllowReorder="true"
-                                         CanDrop="@(item => item is PanelRecipe || item is WeekMeal meal && meal.Date == day.Date)"
                                          ApplyDropClassesOnDragStarted="true">
                                 <ItemRenderer Context="item">
                                     @if (item is WeekMeal meal)
@@ -158,6 +171,7 @@
     private DateOnly _weekStart;
     private DateOnly _today;
     private MudDropContainer<WeekDragItem>? _container;
+    private IJSObjectReference? _dragModule;
     private List<WeekDay> _days = [];
     private List<WeekDragItem> _items = [];
     private List<PanelRecipe> _panelRecipes = [];
@@ -165,6 +179,7 @@
     private bool _loading = true;
     private bool _failed;
     private bool _busy;
+    private bool _copyMode;
     private bool _refreshContainerAfterRender;
     private int _reloadVersion;
 
@@ -205,11 +220,57 @@
         }
     }
 
-    public void Dispose()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            var module = await JS.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Menus/WeekMenu.razor.js");
+            await module.InvokeVoidAsync("start");
+
+            if (_cts.IsCancellationRequested)
+            {
+                await ReleaseDragModuleAsync(module);
+                return;
+            }
+
+            _dragModule = module;
+        }
+        catch (JSException ex)
+        {
+            Logger.LogError(ex, "Loading the drag modifier module failed");
+        }
+        catch (Exception ex) when (ex is JSDisconnectedException or OperationCanceledException)
+        {
+        }
+    }
+
+    public async ValueTask DisposeAsync()
     {
         _cts.Cancel();
         _cts.Dispose();
         AppBarService.ClearActions();
+
+        if (_dragModule is not null)
+        {
+            await ReleaseDragModuleAsync(_dragModule);
+        }
+    }
+
+    private static async Task ReleaseDragModuleAsync(IJSObjectReference module)
+    {
+        try
+        {
+            await module.InvokeVoidAsync("stop");
+            await module.DisposeAsync();
+        }
+        catch (Exception ex) when (ex is JSDisconnectedException or JSException or OperationCanceledException)
+        {
+        }
     }
 
     private void ApplyWeek(GetWeekResponse week)
@@ -336,13 +397,44 @@
 
     private Task ItemDroppedAsync(MudItemDropInfo<WeekDragItem> drop)
     {
+        if (!_copyMode && drop.Item is WeekMeal dragged && IsOtherDay(dragged, drop.DropzoneIdentifier))
+        {
+            _ = DropOnOtherDayAsync(dragged, drop.DropzoneIdentifier, drop.IndexInZone);
+            return Task.CompletedTask;
+        }
+
         var action = drop.Item switch
         {
-            WeekMeal meal => DecideMealDrop(meal, drop.DropzoneIdentifier, drop.IndexInZone),
+            WeekMeal meal => DecideMealDrop(meal, drop.DropzoneIdentifier, drop.IndexInZone, _copyMode),
             PanelRecipe recipe => DecideRecipeDrop(recipe, drop.DropzoneIdentifier, drop.IndexInZone),
             _ => WeekDropAction.None
         };
 
+        ApplyDropAction(action);
+
+        return Task.CompletedTask;
+    }
+
+    private async Task DropOnOtherDayAsync(WeekMeal meal, string zoneIdentifier, int dropIndex)
+    {
+        var shiftHeld = await ReadShiftHeldAsync();
+
+        if (_cts.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (shiftHeld is null)
+        {
+            _container?.Refresh();
+            return;
+        }
+
+        ApplyDropAction(DecideMealDrop(meal, zoneIdentifier, dropIndex, shiftHeld.Value));
+    }
+
+    private void ApplyDropAction(WeekDropAction action)
+    {
         switch (action)
         {
             case WeekDropAction.ReorderMeal reorder:
@@ -351,18 +443,49 @@
             case WeekDropAction.AddMeal add:
                 _ = AddMealAsync(add);
                 break;
+            case WeekDropAction.TransferMeal transfer:
+                _ = TransferAsync(transfer);
+                break;
             default:
                 _container?.Refresh();
                 break;
         }
-
-        return Task.CompletedTask;
     }
 
-    private WeekDropAction DecideMealDrop(WeekMeal meal, string zoneIdentifier, int dropIndex) =>
-        TryParseDay(zoneIdentifier, out var targetDay)
+    private async Task<bool?> ReadShiftHeldAsync()
+    {
+        try
+        {
+            if (_dragModule is not null)
+            {
+                return await _dragModule.InvokeAsync<bool>("wasShiftHeld");
+            }
+
+            Logger.LogError("The drag modifier module is not loaded");
+        }
+        catch (Exception ex) when (ex is JSException or JSDisconnectedException or OperationCanceledException)
+        {
+            Logger.LogError(ex, "Reading the Shift key state failed");
+        }
+
+        Snackbar.Add(L[TranslationKeys.WeekMenu.WeekMenuUnexpectedErrorTitle], Severity.Error);
+        return null;
+    }
+
+    private static bool IsOtherDay(WeekMeal meal, string zoneIdentifier) =>
+        TryParseDay(zoneIdentifier, out var targetDay) && targetDay != meal.Date;
+
+    private WeekDropAction DecideMealDrop(WeekMeal meal, string zoneIdentifier, int dropIndex, bool copy)
+    {
+        if (!TryParseDay(zoneIdentifier, out var targetDay))
+        {
+            return WeekDropAction.None;
+        }
+
+        return targetDay == meal.Date
             ? WeekDropDecision.Decide(meal.Date, meal.RecipeId, targetDay, dropIndex, RecipeIdsOf(meal.Date))
-            : WeekDropAction.None;
+            : WeekDropDecision.DecideTransfer(meal.Date, meal.RecipeId, targetDay, dropIndex, copy, RecipeIdsOf(targetDay));
+    }
 
     private WeekDropAction DecideRecipeDrop(PanelRecipe recipe, string zoneIdentifier, int dropIndex) =>
         TryParseDay(zoneIdentifier, out var targetDay)
@@ -387,6 +510,15 @@
         RunDropAsync(
             token => MealAdder.Add(add.Day, new CreateMealRequest(add.RecipeId, add.Position, add.Servings), token),
             $"Adding recipe {add.RecipeId} to {add.Day}");
+
+    private Task TransferAsync(WeekDropAction.TransferMeal transfer) =>
+        RunDropAsync(
+            token => MealTransferer.Transfer(
+                transfer.SourceDay,
+                transfer.RecipeId,
+                new TransferMealRequest(transfer.TargetDay, transfer.Position, transfer.Mode),
+                token),
+            $"Transferring meal {transfer.RecipeId} from {transfer.SourceDay} to {transfer.TargetDay}");
 
     private async Task RunDropAsync(Func<CancellationToken, Task<ApiResult>> gesture, string description)
     {

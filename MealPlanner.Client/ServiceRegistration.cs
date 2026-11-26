@@ -51,6 +51,9 @@ public static class ServiceRegistration
             services.AddHttpClient<IDeleteMeals, MealClient>(nameof(MealClient), IServiceCollection.ConfigureClient())
                 .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
 
+            services.AddHttpClient<ITransferMeals, MealClient>(nameof(MealClient), IServiceCollection.ConfigureClient())
+                .AddHttpMessageHandler<AcceptLanguageHeaderHandler>();
+
             return services;
         }    
         
