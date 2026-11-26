@@ -95,8 +95,10 @@ public static class TranslationKeys
         public const string WeekMenuPreviousWeekButtonTitle = nameof(WeekMenuPreviousWeekButtonTitle);
         public const string WeekMenuNextWeekButtonTitle = nameof(WeekMenuNextWeekButtonTitle);
         public const string WeekMenuNoMealsTitle = nameof(WeekMenuNoMealsTitle);
-        public const string WeekMenuMealServingsTitle = nameof(WeekMenuMealServingsTitle);
         public const string WeekMenuLoadErrorTitle = nameof(WeekMenuLoadErrorTitle);
+        public const string WeekMenuServingsLabel = nameof(WeekMenuServingsLabel);
+        public const string WeekMenuDeleteMealButtonTitle = nameof(WeekMenuDeleteMealButtonTitle);
+        public const string WeekMenuUnexpectedErrorTitle = nameof(WeekMenuUnexpectedErrorTitle);
     }
 
     public static class ViewRecipe

@@ -53,10 +53,8 @@
     color: var(--mud-palette-primary);
 }
 
-.meal-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+.week-day ::deep .mud-drop-zone {
+    min-height: 48px;
 }
 
 .meal {
@@ -64,10 +62,23 @@
     flex-direction: column;
     padding: 6px 0;
     overflow-wrap: anywhere;
+    cursor: grab;
 }
 
-.meal + .meal {
+.week-day ::deep .mud-drop-item + .mud-drop-item .meal {
     border-top: 1px solid var(--mud-palette-lines-default);
+}
+
+.meal-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.meal-actions ::deep .mud-input-control {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 @media (max-width: 960px) {

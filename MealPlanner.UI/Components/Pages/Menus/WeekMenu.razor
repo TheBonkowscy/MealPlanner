@@ -1,12 +1,20 @@
 @page "/menus/week/{Date:datetime}"
+@using MealPlanner.Client.Meals
 @using MealPlanner.Client.Menus
+@using MealPlanner.Client.Models
+@using MealPlanner.Shared.Menus.Requests
+@using MealPlanner.Shared.Menus.Responses
 @using MealPlanner.UI.Models
 @using MealPlanner.UI.Services
 @using Microsoft.Extensions.Localization
 @implements IDisposable
 @inject IFindMenus FindMenus
+@inject IUpdateMeals MealUpdater
+@inject IDeleteMeals MealDeleter
 @inject AppBarService AppBarService
 @inject MealMapper MealMapper
+@inject ISnackbar Snackbar
+@inject ILogger<WeekMenu> Logger
 @inject TimeProvider Clock
 @inject IStringLocalizer<Translations> L
 
@@ -40,39 +48,63 @@
     }
     else
     {
-        <div class="week-grid">
-            @foreach (var day in _days)
-            {
-                <section class="week-day @(day.Date == _today ? "today" : string.Empty)"
-                         aria-label="@day.Date.ToString("D", CultureInfo.CurrentUICulture)">
-                    <header class="week-day-header">
-                        <div class="day-name">@day.Date.ToString("dddd", CultureInfo.CurrentUICulture)</div>
-                        <div class="day-date">@day.Date.ToString("d MMM", CultureInfo.CurrentUICulture)</div>
-                    </header>
+        <MudDropContainer @ref="_container"
+                          T="WeekMeal"
+                          Items="_items"
+                          ItemsSelector="@((meal, zone) => meal.ZoneIdentifier == zone)"
+                          ItemDropped="ItemDroppedAsync"
+                          ItemDisabled="@(_ => _busy)">
+            <div class="week-grid">
+                @foreach (var day in _days)
+                {
+                    <section class="week-day @(day.Date == _today ? "today" : string.Empty)"
+                             aria-label="@day.Date.ToString("D", CultureInfo.CurrentUICulture)">
+                        <header class="week-day-header">
+                            <div class="day-name">@day.Date.ToString("dddd", CultureInfo.CurrentUICulture)</div>
+                            <div class="day-date">@day.Date.ToString("d MMM", CultureInfo.CurrentUICulture)</div>
+                        </header>
 
-                    @if (day.Meals.Count == 0)
-                    {
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">
-                            @L[TranslationKeys.WeekMenu.WeekMenuNoMealsTitle]
-                        </MudText>
-                    }
-                    else
-                    {
-                        <ul class="meal-list">
-                            @foreach (var meal in day.Meals)
-                            {
-                                <li class="meal">
-                                    <MudLink Href="@RoutingConstants.Recipes.DetailsFor(meal.Id)">@meal.Name</MudLink>
-                                    <MudText Typo="Typo.caption" Class="mud-text-secondary">
-                                        @L[TranslationKeys.WeekMenu.WeekMenuMealServingsTitle, meal.Servings]
-                                    </MudText>
-                                </li>
-                            }
-                        </ul>
-                    }
-                </section>
-            }
-        </div>
+                        @if (day.Meals.Count == 0)
+                        {
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                                @L[TranslationKeys.WeekMenu.WeekMenuNoMealsTitle]
+                            </MudText>
+                        }
+
+                        <MudDropZone T="WeekMeal"
+                                     Identifier="@day.Date.ToString("O", CultureInfo.InvariantCulture)"
+                                     AllowReorder="true"
+                                     CanDrop="@(meal => meal.Date == day.Date)"
+                                     ApplyDropClassesOnDragStarted="true">
+                            <ItemRenderer Context="meal">
+                                <div class="meal">
+                                    <MudLink Href="@RoutingConstants.Recipes.DetailsFor(meal.RecipeId)">@meal.Name</MudLink>
+                                    <div class="meal-actions">
+                                        <MudNumericField T="int"
+                                                         @key="_reloadVersion"
+                                                         Value="meal.Servings"
+                                                         ValueChanged="@(value => ChangeServingsAsync(meal, value))"
+                                                         Min="1"
+                                                         Label="@L[TranslationKeys.WeekMenu.WeekMenuServingsLabel]"
+                                                         Variant="Variant.Outlined"
+                                                         Margin="Margin.Dense"
+                                                         Disabled="_busy" />
+                                        <MudTooltip Text="@L[TranslationKeys.WeekMenu.WeekMenuDeleteMealButtonTitle]">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                           Color="Color.Error"
+                                                           Size="Size.Small"
+                                                           Disabled="_busy"
+                                                           OnClick="@(() => DeleteMealAsync(meal))"
+                                                           aria-label="@L[TranslationKeys.WeekMenu.WeekMenuDeleteMealButtonTitle]" />
+                                        </MudTooltip>
+                                    </div>
+                                </div>
+                            </ItemRenderer>
+                        </MudDropZone>
+                    </section>
+                }
+            </div>
+        </MudDropContainer>
     }
 </MudContainer>
 
@@ -83,9 +115,14 @@
 
     private DateOnly _weekStart;
     private DateOnly _today;
+    private MudDropContainer<WeekMeal>? _container;
     private List<WeekDay> _days = [];
+    private List<WeekMeal> _items = [];
     private bool _loading = true;
     private bool _failed;
+    private bool _busy;
+    private bool _refreshContainerAfterRender;
+    private int _reloadVersion;
 
     private string WeekTitle =>
         L[TranslationKeys.WeekMenu.WeekMenuTitle, ISOWeek.GetWeekOfYear(_weekStart.ToDateTime(TimeOnly.MinValue))];
@@ -109,11 +146,17 @@
             return;
         }
 
-        _failed = week.Days.Count == 0;
-        _days = [.. week.Days
-            .OrderBy(x => x.Date)
-            .Select(x => new WeekDay(x.Date, MealMapper.MapMeals(x.Meals)))];
+        ApplyWeek(week);
         _loading = false;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_refreshContainerAfterRender)
+        {
+            _refreshContainerAfterRender = false;
+            _container?.Refresh();
+        }
     }
 
     public void Dispose()
@@ -123,5 +166,155 @@
         AppBarService.ClearActions();
     }
 
-    private sealed record WeekDay(DateOnly Date, List<MealDto> Meals);
+    private void ApplyWeek(GetWeekResponse week)
+    {
+        _reloadVersion++;
+        _failed = week.Days.Count == 0;
+        _days = [.. week.Days
+            .OrderBy(x => x.Date)
+            .Select(x => new WeekDay(x.Date, [.. MealMapper.MapMeals(x.Meals)
+                .Select(meal => new WeekMeal(x.Date, meal.Id, meal.Name, meal.Servings))]))];
+        _items = [.. _days.SelectMany(day => day.Meals)];
+    }
+
+    private async Task ReloadWeekAsync(CancellationToken token)
+    {
+        var weekStart = _weekStart;
+
+        var week = await FindMenus.GetWeek(weekStart, token);
+
+        if (weekStart != _weekStart)
+        {
+            return;
+        }
+
+        ApplyWeek(week);
+        _refreshContainerAfterRender = true;
+    }
+
+    private async Task TryReloadWeekAsync(CancellationToken token)
+    {
+        try
+        {
+            await ReloadWeekAsync(token);
+        }
+        catch (Exception ex) when (ex is OperationCanceledException or HttpRequestException)
+        {
+        }
+    }
+
+    private async Task RunGestureAsync(Func<CancellationToken, Task<ApiResult>> gesture)
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        var token = _cts.Token;
+
+        _busy = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await gesture(token);
+
+            if (!result.IsSuccess)
+            {
+                Snackbar.Add(result.Error!.Message, Severity.Error);
+            }
+
+            await ReloadWeekAsync(token);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (HttpRequestException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            _refreshContainerAfterRender = true;
+            await TryReloadWeekAsync(token);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private Task ItemDroppedAsync(MudItemDropInfo<WeekMeal> drop)
+    {
+        if (drop.Item is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var action = DecideDrop(drop.Item, drop.DropzoneIdentifier, drop.IndexInZone);
+
+        if (action is WeekDropAction.ReorderMeal reorder)
+        {
+            _ = ReorderAsync(reorder);
+        }
+        else
+        {
+            _container?.Refresh();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private WeekDropAction DecideDrop(WeekMeal meal, string zoneIdentifier, int dropIndex)
+    {
+        if (!DateOnly.TryParse(zoneIdentifier, CultureInfo.InvariantCulture, DateTimeStyles.None, out var targetDay))
+        {
+            return WeekDropAction.None;
+        }
+
+        var recipeIds = _days
+            .Where(day => day.Date == meal.Date)
+            .SelectMany(day => day.Meals)
+            .Select(x => x.RecipeId)
+            .ToList();
+
+        return WeekDropDecision.Decide(meal.Date, meal.RecipeId, targetDay, dropIndex, recipeIds);
+    }
+
+    private async Task ReorderAsync(WeekDropAction.ReorderMeal reorder)
+    {
+        var weekToken = _cts.Token;
+
+        await Task.Yield();
+
+        try
+        {
+            await RunGestureAsync(token =>
+                MealUpdater.Update(reorder.Day, reorder.RecipeId, new UpdateMealRequest(null, reorder.Position), token));
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Reordering meal {RecipeId} on {Day} failed", reorder.RecipeId, reorder.Day);
+            Snackbar.Add(L[TranslationKeys.WeekMenu.WeekMenuUnexpectedErrorTitle], Severity.Error);
+            _refreshContainerAfterRender = true;
+
+            try
+            {
+                await TryReloadWeekAsync(weekToken);
+            }
+            catch (Exception reloadException)
+            {
+                Logger.LogError(reloadException, "Reloading the week after a failed reorder failed");
+            }
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private Task ChangeServingsAsync(WeekMeal meal, int servings) =>
+        RunGestureAsync(token => MealUpdater.Update(meal.Date, meal.RecipeId, new UpdateMealRequest(servings, null), token));
+
+    private Task DeleteMealAsync(WeekMeal meal) =>
+        RunGestureAsync(token => MealDeleter.Delete(meal.Date, meal.RecipeId, token));
+
+    private sealed record WeekDay(DateOnly Date, List<WeekMeal> Meals);
 }

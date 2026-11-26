@@ -816,20 +816,20 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove meal.
+        /// </summary>
+        public static string WeekMenuDeleteMealButtonTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuDeleteMealButtonTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to The week could not be loaded.
         /// </summary>
         public static string WeekMenuLoadErrorTitle {
             get {
                 return ResourceManager.GetString("WeekMenuLoadErrorTitle", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Portions: {0}.
-        /// </summary>
-        public static string WeekMenuMealServingsTitle {
-            get {
-                return ResourceManager.GetString("WeekMenuMealServingsTitle", resourceCulture);
             }
         }
 
@@ -861,11 +861,29 @@ namespace MealPlanner.UI {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Portions.
+        /// </summary>
+        public static string WeekMenuServingsLabel {
+            get {
+                return ResourceManager.GetString("WeekMenuServingsLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Week {0}.
         /// </summary>
         public static string WeekMenuTitle {
             get {
                 return ResourceManager.GetString("WeekMenuTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Something went wrong.
+        /// </summary>
+        public static string WeekMenuUnexpectedErrorTitle {
+            get {
+                return ResourceManager.GetString("WeekMenuUnexpectedErrorTitle", resourceCulture);
             }
         }
 
