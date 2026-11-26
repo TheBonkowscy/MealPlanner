@@ -1,5 +1,4 @@
-﻿using MealPlanner.Domain;
-using MealPlanner.Domain.Recipes;
+﻿using MealPlanner.Domain.Recipes;
 using MealPlanner.Persistence;
 using MealPlanner.Shared.Recipes.Responses;
 using Microsoft.EntityFrameworkCore;

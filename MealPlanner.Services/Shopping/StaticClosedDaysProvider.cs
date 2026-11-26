@@ -1,5 +1,4 @@
 ﻿using MealPlanner.Domain.Shared;
-using MealPlanner.Services.Shared;
 using MealPlanner.Services.Shopping.Validators;
 
 namespace MealPlanner.Services.Shopping;

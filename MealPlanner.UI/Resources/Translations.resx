@@ -45,9 +45,6 @@
     <data name="RecipeEditorNameTextField" xml:space="preserve">
         <value>Recipe name</value>
     </data>
-    <data name="RecipeEditorNameRequiredError" xml:space="preserve">
-        <value>Name is required</value>
-    </data>
     <data name="RecipeEditorServingsTextField" xml:space="preserve">
         <value>Number of servings</value>
     </data>
@@ -146,9 +143,6 @@
     </data>
     <data name="ViewRecipeSwitchToListButtonTitle" xml:space="preserve">
         <value>Switch to list</value>
-    </data>
-    <data name="ViewRecipeNoRecipesToDisplayTitle" xml:space="preserve">
-        <value>No meals to display</value>
     </data>
     <data name="ViewRecipeNumberOfPortionsTitle" xml:space="preserve">
         <value>Portions</value>

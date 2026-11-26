@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using MealPlanner.Domain;
 using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Persistence;

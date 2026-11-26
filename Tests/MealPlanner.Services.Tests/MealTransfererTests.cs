@@ -6,7 +6,6 @@ using MealPlanner.Persistence;
 using MealPlanner.Services.Menus.Meals;
 using MealPlanner.Services.Shared;
 using MealPlanner.Shared.Menus.Meals;
-using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Tests.Shared.Factories;
 using Moq;
 using Moq.EntityFrameworkCore;

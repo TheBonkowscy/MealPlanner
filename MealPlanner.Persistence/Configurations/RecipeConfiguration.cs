@@ -1,5 +1,4 @@
-﻿using MealPlanner.Domain;
-using MealPlanner.Domain.Recipes;
+﻿using MealPlanner.Domain.Recipes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

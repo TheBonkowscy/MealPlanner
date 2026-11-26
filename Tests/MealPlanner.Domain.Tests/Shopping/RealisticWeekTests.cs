@@ -1,5 +1,4 @@
 ﻿using AwesomeAssertions;
-using MealPlanner.Domain.Ingredients;
 using MealPlanner.Domain.Shopping;
 using MealPlanner.Domain.Shopping.Planning;
 using MealPlanner.Shared.Shopping;
