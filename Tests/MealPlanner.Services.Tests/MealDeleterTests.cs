@@ -3,7 +3,6 @@ using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Domain.Shared;
 using MealPlanner.Persistence;
-using MealPlanner.Services.Menus;
 using MealPlanner.Services.Menus.Meals;
 using MealPlanner.Services.Shared;
 using MealPlanner.Tests.Shared.Factories;

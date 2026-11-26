@@ -64,8 +64,6 @@
 @code {
     [Parameter] public int? SelectedWeek { get; set; }
 
-    [Parameter] public EventCallback<int> SelectedWeekChanged { get; set; }
-
     private readonly CancellationTokenSource _cts = new();
 
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
@@ -175,10 +173,9 @@
         return SelectedWeek == week.WeekNumber;
     }
 
-    private async Task SelectWeek(CalendarWeek week)
+    private void SelectWeek(CalendarWeek week)
     {
         SelectedWeek = week.WeekNumber;
-        await SelectedWeekChanged.InvokeAsync(week.WeekNumber);
     }
 
     private static string GetWeekTitleClass(CalendarWeek week)

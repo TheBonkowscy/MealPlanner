@@ -47,7 +47,7 @@ internal static class IngredientSeeder
     {
         var seedData = InitialData.Ingredients().Select(x => x.Value).ToArray();
         var allLowercaseNames = seedData.Select(i => i.Name.ToLower()).Distinct().ToList();
-        var existingIngredients = GetExistingIngredients(context, allLowercaseNames, CancellationToken.None);
+        var existingIngredients = GetExistingIngredients(context, allLowercaseNames);
 
         UpdateOrAddIngredient(context, allLowercaseNames, seedData, existingIngredients);
         
@@ -55,8 +55,7 @@ internal static class IngredientSeeder
     }
 
     private static Dictionary<string, Ingredient> GetExistingIngredients(DbContext context,
-        List<string> allLowercaseNames,
-        CancellationToken cancellationToken) => 
+        List<string> allLowercaseNames) =>
         context
             .Set<Ingredient>()
             .Where(x => allLowercaseNames.Contains(x.Name.ToLower()))

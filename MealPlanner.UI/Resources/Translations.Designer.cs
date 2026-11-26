@@ -276,15 +276,6 @@ namespace MealPlanner.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Name is required.
-        /// </summary>
-        public static string RecipeEditorNameRequiredError {
-            get {
-                return ResourceManager.GetString("RecipeEditorNameRequiredError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Recipe name.
         /// </summary>
         public static string RecipeEditorNameTextField {
@@ -578,15 +569,6 @@ namespace MealPlanner.UI {
         public static string ViewRecipeLoadingNameTitle {
             get {
                 return ResourceManager.GetString("ViewRecipeLoadingNameTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No meals to display.
-        /// </summary>
-        public static string ViewRecipeNoRecipesToDisplayTitle {
-            get {
-                return ResourceManager.GetString("ViewRecipeNoRecipesToDisplayTitle", resourceCulture);
             }
         }
         
