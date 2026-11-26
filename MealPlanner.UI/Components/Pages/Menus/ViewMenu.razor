@@ -69,7 +69,7 @@ else
                     Icon = Icons.Material.Filled.Edit,
                     Tooltip = L[TranslationKeys.ViewMenu.ViewMenuEditMenuActionTitle],
                     Color = Color.Inherit,
-                    OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.WeekFor(DateOnly.FromDateTime(Date))))
+                    OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.EditForDate(DateOnly.FromDateTime(Date))))
                 },
                 new AppBarAction
                 {
@@ -87,7 +87,7 @@ else
                 Icon = Icons.Material.Filled.Add,
                 Tooltip = L[TranslationKeys.ViewMenu.ViewMenuCreateMenuActionTitle],
                 Color = Color.Inherit,
-                OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.WeekFor(DateOnly.FromDateTime(Date))))
+                OnClick = EventCallback.Factory.Create(this, () => Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(DateOnly.FromDateTime(Date))))
             });
         }
         

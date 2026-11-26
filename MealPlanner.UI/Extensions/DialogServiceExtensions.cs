@@ -33,7 +33,7 @@ public static class DialogServiceExtensions
             await deleteAction(date, cancellationToken);
             
             snackbar.Add("Menu zostało pomyślnie usunięte.", Severity.Success);
-            navigation.NavigateTo(RoutingConstants.Menus.WeekFor(date));
+            navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(date));
         }
     }
     public static async Task ConfirmAndDeleteRecipeAsync(

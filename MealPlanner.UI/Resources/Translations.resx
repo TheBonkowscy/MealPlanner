@@ -114,6 +114,45 @@
     <data name="RecipeEditorStepSavedTitle" xml:space="preserve">
         <value>Step saved successfully!</value>
     </data>
+    <data name="MenuEditorNumberOfServingsTitle" xml:space="preserve">
+        <value>Number of portions</value>
+    </data>
+    <data name="MenuEditorAddMealToMenuTitle" xml:space="preserve">
+        <value>Add new meal to the menu</value>
+    </data>
+    <data name="MenuEditorSearchForMealTitle" xml:space="preserve">
+        <value>Search for meal...</value>
+    </data>
+    <data name="MenuEditorCreateMenuTitle" xml:space="preserve">
+        <value>Create menu</value>
+    </data>
+    <data name="MenuEditorMealsPlannedTitle" xml:space="preserve">
+        <value>Meals planned for this day</value>
+    </data>
+    <data name="MenuEditorWeekNameApplicationTitle" xml:space="preserve">
+        <value>Week</value>
+    </data>
+    <data name="MenuEditorValidationMealsError" xml:space="preserve">
+        <value>Add at least one meal!</value>
+    </data>
+    <data name="MenuEditorMenuCreatedSuccessfullyTitle" xml:space="preserve">
+        <value>Menu created successfully!</value>
+    </data>
+    <data name="MenuEditorDragToReorderTitle" xml:space="preserve">
+        <value>Drag to change the meals' order</value>
+    </data>
+    <data name="MenuEditorSaveChangesButtonTitle" xml:space="preserve">
+        <value>Save changes</value>
+    </data>
+    <data name="MenuEditorBackToDetailsActionTitle" xml:space="preserve">
+        <value>Back to details</value>
+    </data>
+    <data name="MenuEditorDeleteMenuActionTitle" xml:space="preserve">
+        <value>Delete menu</value>
+    </data>
+    <data name="MealEditorMenuEditedSuccessfullyTitle" xml:space="preserve">
+        <value>Menu edited successfully!</value>
+    </data>
     <data name="ViewMenuMenuForDayTitle" xml:space="preserve">
         <value>Menu for {0}</value>
     </data>
@@ -194,6 +233,9 @@
     </data>
     <data name="RecipeEditor" xml:space="preserve">
         <value>Recipe editor</value>
+    </data>
+    <data name="MenuEditorMenuEditedSuccessfullyTitle" xml:space="preserve">
+        <value>Menu edited successfully!</value>
     </data>
     <data name="RecipeEditorPreparationSavedTitle" xml:space="preserve">
         <value>Initial preparations details saved</value>
