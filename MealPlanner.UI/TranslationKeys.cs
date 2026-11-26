@@ -58,6 +58,25 @@ public static class TranslationKeys
         public const string RecipeEditorPreparationRemovedTitle = nameof(RecipeEditorPreparationRemovedTitle);
     }
 
+    public static class MenuEditor
+    {
+        public const string MenuEditorNumberOfServingsTitle = nameof(MenuEditorNumberOfServingsTitle);
+        public const string MenuEditorMealsPlannedTitle = nameof(MenuEditorMealsPlannedTitle);
+        public const string MenuEditorAddMealToMenuTitle = nameof(MenuEditorAddMealToMenuTitle);
+        public const string MenuEditorSearchForMealTitle = nameof(MenuEditorSearchForMealTitle);
+        public const string MenuEditorCreateMenuTitle = nameof(MenuEditorCreateMenuTitle);
+        public const string MenuEditorWeekNameApplicationTitle = nameof(MenuEditorWeekNameApplicationTitle);
+        public const string MenuEditorValidationMealsError = nameof(MenuEditorValidationMealsError);
+        public const string MenuEditorMenuCreatedSuccessfullyTitle = nameof(MenuEditorMenuCreatedSuccessfullyTitle);
+
+        public const string MenuEditorEditMenuTitle = nameof(MenuEditorEditMenuTitle);
+        public const string MenuEditorDragToReorderTitle = nameof(MenuEditorDragToReorderTitle);
+        public const string MenuEditorSaveChangesButtonTitle = nameof(MenuEditorSaveChangesButtonTitle);
+        public const string MenuEditorBackToDetailsActionTitle = nameof(MenuEditorBackToDetailsActionTitle);
+        public const string MenuEditorDeleteMenuActionTitle = nameof(MenuEditorDeleteMenuActionTitle);
+        public const string MenuEditorMenuEditedSuccessfullyTitle = nameof(MenuEditorMenuEditedSuccessfullyTitle);
+    }
+    
     public static class ViewMenu
     {
         public const string ViewMenuMenuForDayTitle = nameof(ViewMenuMenuForDayTitle);
