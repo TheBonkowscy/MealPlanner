@@ -76,7 +76,7 @@
         var today = DateOnly.FromDateTime(DateTime.Today);
 
         var exists = await MenuFinder.GetToday(_cts.Token);
-        Navigation.NavigateTo(exists is not null ? RoutingConstants.Menus.DetailsForDate(today) : RoutingConstants.Menus.CreateForDate(today));
+        Navigation.NavigateTo(exists is not null ? RoutingConstants.Menus.DetailsForDate(today) : RoutingConstants.Menus.WeekFor(today));
     }
 
 }

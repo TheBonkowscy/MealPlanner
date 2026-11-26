@@ -55,7 +55,7 @@
         {
             <MudAlert Severity="Severity.Info" Class="mt-4">
                 @L[TranslationKeys.ShoppingList.ShoppingListEmptyTitle]
-                <MudLink Href="@RoutingConstants.Menus.CreateForDate(_response.StartDate.AddDays(1))">
+                <MudLink Href="@RoutingConstants.Menus.WeekFor(_response.StartDate.AddDays(1))">
                     @L[TranslationKeys.ShoppingList.ShoppingListEmptyPlanMenuLink]
                 </MudLink>
             </MudAlert>

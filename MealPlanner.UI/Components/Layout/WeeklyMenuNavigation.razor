@@ -32,7 +32,7 @@
 
                             @if (!_menuExists.GetValueOrDefault(day.Day))
                             {
-                                <MudNavLink Href="@(RoutingConstants.Menus.CreateForDate(day.Day))">
+                                <MudNavLink Href="@(RoutingConstants.Menus.WeekFor(day.Day))">
                                     @day.Day.ToString("dddd, d MMMM yyyy", CultureInfo.CurrentUICulture)
                                 </MudNavLink>
                                 <MudIconButton
@@ -62,12 +62,6 @@
 </MudNavMenu>
 
 @code {
-    [Parameter] public EventCallback<DateOnly> CreateMenu { get; set; }
-
-    [Parameter] public EventCallback<DateOnly> EditMenu { get; set; }
-
-    [Parameter] public EventCallback<DateOnly> ViewMenu { get; set; }
-
     [Parameter] public int? SelectedWeek { get; set; }
 
     [Parameter] public EventCallback<int> SelectedWeekChanged { get; set; }
@@ -197,27 +191,13 @@
         return day == DateOnly.FromDateTime(DateTime.Today) ? "today-day" : string.Empty;
     }
 
-    private async Task OnMenuCreating(DateOnly day)
+    private void OnMenuCreating(DateOnly day)
     {
-        // Execute parameter callback for parent listeners
-        if (CreateMenu.HasDelegate)
-        {
-            await CreateMenu.InvokeAsync(day);
-        }
-
-        // Perform navigation
-        Navigation.NavigateTo(RoutingConstants.Menus.CreateForDate(day));
+        Navigation.NavigateTo(RoutingConstants.Menus.WeekFor(day));
     }
 
-    private async Task OnViewMenu(DateOnly day)
+    private void OnViewMenu(DateOnly day)
     {
-        // Execute parameter callback for parent listeners
-        if (ViewMenu.HasDelegate)
-        {
-            await ViewMenu.InvokeAsync(day);
-        }
-
-        // Perform navigation
         Navigation.NavigateTo(RoutingConstants.Menus.DetailsForDate(day));
     }
 
