@@ -66,17 +66,8 @@
     <data name="MissingMealRecipesById" xml:space="preserve">
         <value>Could not find meals by IDs: {0}</value>
     </data>
-    <data name="MealDetailsMissing" xml:space="preserve">
-        <value>Could not find meal details</value>
-    </data>
     <data name="MenuDoesNotExist" xml:space="preserve">
         <value>Menu for {0} does not exist</value>
-    </data>
-    <data name="MenuAlreadyExists" xml:space="preserve">
-        <value>There is already a menu for {0}</value>
-    </data>
-    <data name="InvalidMealsInMenu" xml:space="preserve">
-        <value>Please provide the correct number of meals</value>
     </data>
     <data name="RecipeDoesNotExist" xml:space="preserve">
         <value>Could not find the specified recipe</value>

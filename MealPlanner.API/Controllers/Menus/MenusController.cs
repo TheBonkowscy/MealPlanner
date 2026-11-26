@@ -1,28 +1,16 @@
-﻿using MealPlanner.Services;
-using MealPlanner.Services.Menus;
+﻿using MealPlanner.Services.Menus;
 using MealPlanner.Shared.Menus;
-using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 
 namespace MealPlanner.API.Controllers.Menus;
 
 [ApiController]
 [Route(Constants.MenusRoute)]
 public class MenusController(
-    ICreateMenu menuCreator,
     IReadMenu menuReader,
-    IUpdateMenu menusUpdater,
-    IDeleteMenu menuDeleter,
-    IStringLocalizer<Translations> localizer) : ControllerBase
+    IDeleteMenu menuDeleter) : ControllerBase
 {
-    [ProducesResponseType(typeof(CreateMenuResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [HttpPost]
-    public async Task<IResult> Create([FromBody] CreateMenuRequest createMenuRequest,
-        CancellationToken cancellationToken) => (await menuCreator.Create(createMenuRequest, cancellationToken)).ToHttpResult(localizer);
-
     [ProducesResponseType(typeof(GetMenuResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("{id:int}")]
@@ -62,15 +50,6 @@ public class MenusController(
         var menu = await menuReader.GetRange(from, to, cancellationToken);
         return Results.Ok(menu);
     }
-    
-    [ProducesResponseType(typeof(UpdateMenuResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [HttpPut("{day:datetime}")]
-    public async Task<IResult> Update([FromRoute(Name = "day")] DateTime day,
-        [FromBody] UpdateMenuRequest updateMenuRequest,
-        CancellationToken cancellationToken) =>
-        (await menusUpdater.Update(updateMenuRequest, cancellationToken)).ToHttpResult(localizer);
     
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [HttpDelete("{day:datetime}")]

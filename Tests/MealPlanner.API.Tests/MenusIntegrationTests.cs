@@ -5,7 +5,6 @@ using MealPlanner.Domain.Menus;
 using MealPlanner.Domain.Menus.Actions;
 using MealPlanner.Domain.Recipes;
 using MealPlanner.Shared.Menus;
-using MealPlanner.Shared.Menus.Requests;
 using MealPlanner.Shared.Menus.Responses;
 using MealPlanner.Shared.Recipes.Responses;
 using MealPlanner.Tests.Shared.Factories;
@@ -23,24 +22,6 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
     private static readonly Recipe PreExistingRecipe = TestRecipes.Create("Breakfast");
     private static readonly List<AddMealAction> MealsToAdd = [TestActions.AddMeal(PreExistingRecipe, 1, 1)];
     
-    [Fact]
-    public async Task Post_ReturnsId()
-    {
-        // Arrange
-        await AddRecipeToDatabase(PreExistingRecipe);
-        List<AddMealRequest> meals = [new(PreExistingRecipe.Id, 1, 1)];
-        var request = new CreateMenuRequest(Tomorrow, meals);
-        
-        // Act
-        var result = await Client.PostAsJsonAsync(Constants.MenusRoute, request);
-        
-        // Assert
-        result.EnsureSuccessStatusCode();
-        var response = await result.Content.ReadFromJsonAsync<CreateMenuResponse>();
-        response.Should().NotBeNull();
-        response.Date.Should().Be(Tomorrow);
-    }
-
     [Fact]
     public async Task Get_ById_ReturnsMenuIfExists()
     {
@@ -182,63 +163,6 @@ public class MenusIntegrationTests(MealPlannerWebApplicationFactory factory) : I
         response.ExistingMenus.Should().HaveCount(2);
         response.ExistingMenus.Should().Contain(m => m.Id == menu1.Id);
         response.ExistingMenus.Should().Contain(m => m.Id == menu2.Id);
-    }
-    [Fact]
-    public async Task Put_UpdatesExistingMenu_WhenMenuExists()
-    {
-        // Arrange
-        var initialRecipe = TestRecipes.Create("Obiad");
-        var updatedRecipe = TestRecipes.Create("Kolacja");
-        await AddRecipeToDatabase(initialRecipe);
-        await AddRecipeToDatabase(updatedRecipe);
-
-        var existingMenu = Menu.Create(SpecificDate, [TestActions.AddMeal(initialRecipe, 1, 1)]).Value;
-        await AddMenuToDatabase(existingMenu);
-
-        List<AddMealRequest> meals = [new(updatedRecipe.Id, 1, 1)];
-        var request = new UpdateMenuRequest(SpecificDate, meals);
-
-        // Act
-        var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
-
-        // Assert
-        result.EnsureSuccessStatusCode();
-
-        var getRequest = await Client.GetAsync(BuildGetRoute(SpecificDate));
-        var getResult = await getRequest.Content.ReadFromJsonAsync<GetMenuResponse>();
-
-        getResult.Should().NotBeNull();
-        getResult.Meals.Should().HaveCount(1);
-        var firstMeal = getResult.Meals.First();
-        firstMeal.Name.Should().Be(updatedRecipe.Name);
-    }
-
-    [Fact]
-    public async Task Put_ReturnsNotFound_WhenMenuDoesNotExist()
-    {
-        // Arrange
-        List<AddMealRequest> meals = [new(PreExistingRecipe.Id, 1, 1)];
-        var request = new UpdateMenuRequest(SpecificDate, meals);
-
-        // Act
-        var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
-
-        // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    public async Task Put_ReturnsNotFound_WhenRouteDateDoesNotMatchRequestBodyDate()
-    {
-        // Arrange
-        List<AddMealRequest> meals = [new(PreExistingRecipe.Id, 1, 1)];
-        var request = new UpdateMenuRequest(Tomorrow, meals);
-
-        // Act
-        var result = await Client.PutAsJsonAsync(BuildEditRoute(SpecificDate), request);
-
-        // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Theory]

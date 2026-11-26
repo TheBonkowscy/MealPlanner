@@ -177,15 +177,6 @@ namespace MealPlanner.Services {
         }
         
         /// <summary>
-        ///     Looks up a localized string similar to Please provide the correct number of meals.
-        /// </summary>
-        public static string InvalidMealsInMenu {
-            get {
-                return ResourceManager.GetString("InvalidMealsInMenu", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///     Looks up a localized string similar to Please provide the details of ahead of cooking preparations.
         /// </summary>
         public static string InvalidPreparations {
@@ -299,24 +290,6 @@ namespace MealPlanner.Services {
         public static string MealAlreadyPresentInTheDay {
             get {
                 return ResourceManager.GetString("MealAlreadyPresentInTheDay", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///     Looks up a localized string similar to Could not find meal details.
-        /// </summary>
-        public static string MealDetailsMissing {
-            get {
-                return ResourceManager.GetString("MealDetailsMissing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///     Looks up a localized string similar to There is already a menu for {0}.
-        /// </summary>
-        public static string MenuAlreadyExists {
-            get {
-                return ResourceManager.GetString("MenuAlreadyExists", resourceCulture);
             }
         }
         

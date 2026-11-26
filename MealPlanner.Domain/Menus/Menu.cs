@@ -91,11 +91,6 @@ public class Menu
         return errors.Count != 0 ? Result.Failure<Menu>(errors) : Result.Success(menu);
     }
 
-    public void RemoveAllItems()
-    {
-        _meals.Clear();
-    }
-
     public Result InsertMeal(AddMealAction addMeal)
     {
         var existingMeal = _meals.FirstOrDefault(x => x.RecipeId == addMeal.Recipe.Id);
