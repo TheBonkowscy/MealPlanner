@@ -27,6 +27,18 @@ public static class WeekDropDecision
             : new WeekDropAction.ReorderMeal(targetDay, recipeId, position);
     }
 
+    public static WeekDropAction DecideAdd(
+        int recipeId,
+        int servings,
+        DateOnly targetDay,
+        int dropIndex,
+        IReadOnlyList<int> recipeIdsInTargetDay)
+    {
+        var position = Math.Clamp(dropIndex + 1, 1, recipeIdsInTargetDay.Count + 1);
+
+        return new WeekDropAction.AddMeal(targetDay, recipeId, position, servings);
+    }
+
     private static int? CurrentPositionOf(int recipeId, IReadOnlyList<int> recipeIdsInDay)
     {
         for (var index = 0; index < recipeIdsInDay.Count; index++)
