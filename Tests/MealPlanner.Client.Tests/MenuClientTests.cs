@@ -95,7 +95,7 @@ public class MenuClientTests
         stub.Request.RequestUri!.PathAndQuery.Should().Be($"{Constants.MenusRoute}/2025-01-03");
     }
 
-    [Fact(Skip = "MenuClient.Get formats the date with the current culture: under th-TH it requests /menus/2568-01-03. Remove Skip once Get formats with CultureInfo.InvariantCulture.")]
+    [Fact(Skip = "MenuClient.Get formats the date with the current culture: under th-TH it requests /menus/2568-01-03. Remove Skip once Get formats with CultureInfo.InvariantCulture (MEAL-83).")]
     public async Task Get_UsesGregorianIsoDate_UnderThaiCulture()
     {
         // Arrange
